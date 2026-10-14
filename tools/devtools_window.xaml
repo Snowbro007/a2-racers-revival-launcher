@@ -1,0 +1,129 @@
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="A2 Revival — Devtools" Width="1240" Height="820" MinWidth="1100" MinHeight="740" WindowStartupLocation="CenterScreen"
+        Background="#091328" Foreground="#EDF3FB" FontFamily="Segoe UI" FontSize="14">
+  <Window.Resources>
+    <DrawingImage x:Key="A2RouteBadge"><DrawingImage.Drawing><DrawingGroup>
+      <GeometryDrawing Brush="White"><GeometryDrawing.Geometry><RectangleGeometry Rect="0,0,180,100" RadiusX="13" RadiusY="13"/></GeometryDrawing.Geometry></GeometryDrawing>
+      <GeometryDrawing Brush="#ED1C24"><GeometryDrawing.Geometry><RectangleGeometry Rect="6,6,168,88" RadiusX="8" RadiusY="8"/></GeometryDrawing.Geometry></GeometryDrawing>
+      <GeometryDrawing Brush="White" Geometry="F0 M23,82 L49,17 H64 L90,82 H74 L69,68 H44 L39,82 Z M49,56 H64 L56,36 Z"/>
+      <GeometryDrawing Brush="White" Geometry="M105,29 C117,16 140,16 153,24 C165,32 164,44 155,51 C147,58 132,64 120,71 H160 V82 H102 V71 C111,58 124,52 139,43 C150,36 151,31 143,27 C134,22 120,26 112,35 Z"/>
+    </DrawingGroup></DrawingImage.Drawing></DrawingImage>
+    <Style TargetType="Button">
+      <Setter Property="Foreground" Value="#F2F7FD"/><Setter Property="Background" Value="#165699"/>
+      <Setter Property="BorderBrush" Value="#5989B7"/><Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="Padding" Value="17,10"/><Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Button">
+        <Border x:Name="Surface" CornerRadius="5" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}">
+          <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        </Border>
+        <ControlTemplate.Triggers>
+          <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Surface" Property="Background" Value="#246DAE"/></Trigger>
+          <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="Surface" Property="BorderBrush" Value="White"/></Trigger>
+          <Trigger Property="IsPressed" Value="True"><Setter TargetName="Surface" Property="Opacity" Value="0.8"/></Trigger>
+          <Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.45"/></Trigger>
+        </ControlTemplate.Triggers>
+      </ControlTemplate></Setter.Value></Setter>
+    </Style>
+    <DataTemplate x:Key="ChoiceCaption"><TextBlock Text="{Binding}" TextTrimming="CharacterEllipsis"/></DataTemplate>
+    <Style TargetType="ComboBoxItem">
+      <Setter Property="Foreground" Value="#F0F5FC"/><Setter Property="Padding" Value="10,9"/>
+      <Setter Property="ContentTemplate" Value="{StaticResource ChoiceCaption}"/>
+      <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ComboBoxItem">
+        <Border x:Name="Surface" Background="#112A49" Padding="{TemplateBinding Padding}"><ContentPresenter/></Border>
+        <ControlTemplate.Triggers>
+          <Trigger Property="IsHighlighted" Value="True"><Setter TargetName="Surface" Property="Background" Value="#1E5488"/></Trigger>
+          <Trigger Property="IsSelected" Value="True"><Setter Property="Foreground" Value="#FFE378"/></Trigger>
+        </ControlTemplate.Triggers>
+      </ControlTemplate></Setter.Value></Setter>
+    </Style>
+    <Style TargetType="ComboBox">
+      <Setter Property="Foreground" Value="#F0F5FC"/><Setter Property="MinHeight" Value="42"/>
+      <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+      <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ComboBox">
+        <Grid>
+          <ToggleButton Focusable="False" IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" ClickMode="Press">
+            <ToggleButton.Template><ControlTemplate TargetType="ToggleButton">
+              <Border x:Name="Surface" Background="#102744" BorderBrush="#41638D" BorderThickness="1" CornerRadius="4">
+                <Grid><Path Data="M0,0 L5,5 10,0" Stroke="#DFEAF8" StrokeThickness="1.8" Width="11" Height="6" HorizontalAlignment="Right" Margin="0,0,14,0"/></Grid>
+              </Border>
+              <ControlTemplate.Triggers><Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Surface" Property="BorderBrush" Value="#89B7E0"/></Trigger></ControlTemplate.Triggers>
+            </ControlTemplate></ToggleButton.Template>
+          </ToggleButton>
+          <ContentPresenter Content="{TemplateBinding SelectionBoxItem}" ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}" Margin="12,5,35,5" VerticalAlignment="Center" IsHitTestVisible="False"/>
+          <Popup x:Name="PART_Popup" Placement="Bottom" IsOpen="{TemplateBinding IsDropDownOpen}" AllowsTransparency="True" Focusable="False">
+            <Border Background="#112A49" BorderBrush="#6D99C5" BorderThickness="1" MinWidth="{TemplateBinding ActualWidth}" MaxHeight="280">
+              <ScrollViewer CanContentScroll="True"><ItemsPresenter KeyboardNavigation.DirectionalNavigation="Contained"/></ScrollViewer>
+            </Border>
+          </Popup>
+        </Grid>
+        <ControlTemplate.Triggers>
+          <Trigger Property="IsKeyboardFocusWithin" Value="True"><Setter Property="Background" Value="#163C66"/></Trigger>
+          <Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.5"/></Trigger>
+        </ControlTemplate.Triggers>
+      </ControlTemplate></Setter.Value></Setter>
+    </Style>
+    <Style TargetType="TextBox">
+      <Setter Property="Background" Value="#091C33"/><Setter Property="Foreground" Value="#E4EFFC"/>
+      <Setter Property="BorderBrush" Value="#345678"/><Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="Padding" Value="11,9"/><Setter Property="CaretBrush" Value="White"/>
+      <Setter Property="SelectionBrush" Value="#337CBA"/>
+    </Style>
+    <Style x:Key="ReportText" TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+      <Setter Property="IsReadOnly" Value="True"/><Setter Property="FontFamily" Value="Consolas"/><Setter Property="FontSize" Value="13"/>
+      <Setter Property="VerticalScrollBarVisibility" Value="Auto"/><Setter Property="HorizontalScrollBarVisibility" Value="Auto"/>
+      <Setter Property="TextWrapping" Value="NoWrap"/><Setter Property="Padding" Value="18,15"/>
+      <Setter Property="AcceptsReturn" Value="True"/>
+    </Style>
+    <Style TargetType="TabItem">
+      <Setter Property="Foreground" Value="#B4C9E4"/>
+      <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="TabItem">
+        <Border x:Name="Surface" Background="#132B48" Padding="21,13" Margin="0,0,5,0" CornerRadius="5,5,0,0" BorderBrush="#345A83" BorderThickness="1,1,1,0">
+          <ContentPresenter ContentSource="Header" HorizontalAlignment="Center"/>
+        </Border>
+        <ControlTemplate.Triggers>
+          <Trigger Property="IsSelected" Value="True"><Setter TargetName="Surface" Property="Background" Value="#1A5590"/><Setter Property="Foreground" Value="White"/></Trigger>
+          <Trigger Property="IsMouseOver" Value="True"><Setter Property="Foreground" Value="White"/></Trigger>
+          <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="Surface" Property="BorderBrush" Value="White"/></Trigger>
+        </ControlTemplate.Triggers>
+      </ControlTemplate></Setter.Value></Setter>
+    </Style>
+    <Style x:Key="FieldLabel" TargetType="TextBlock"><Setter Property="Foreground" Value="#B7CBE3"/><Setter Property="Margin" Value="0,0,0,7"/></Style>
+  </Window.Resources>
+  <Grid Margin="30,24,30,24">
+    <Grid.RowDefinitions><RowDefinition Height="90"/><RowDefinition Height="92"/><RowDefinition Height="69"/><RowDefinition Height="*"/><RowDefinition Height="80"/></Grid.RowDefinitions>
+    <Grid>
+      <Grid.ColumnDefinitions><ColumnDefinition Width="125"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+      <Image Source="{StaticResource A2RouteBadge}" Width="108" Height="60" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+      <StackPanel Grid.Column="1"><TextBlock Text="DEVTOOLS" FontFamily="Bahnschrift" FontSize="32" FontWeight="SemiBold"/>
+        <TextBlock Text="Bekijk wat een opgeslagen speelproef heeft vastgelegd." Foreground="#AFC5E1" Margin="0,4,0,0"/>
+      </StackPanel>
+      <Border Grid.Column="2" Background="#12355A" BorderBrush="#426D99" BorderThickness="1" CornerRadius="4" Padding="13,9" VerticalAlignment="Top">
+        <TextBlock Text="ALLEEN LEZEN" FontSize="12" Foreground="#CDDEF2"/>
+      </Border>
+    </Grid>
+    <Grid Grid.Row="1">
+      <Grid.ColumnDefinitions><ColumnDefinition Width="175"/><ColumnDefinition Width="16"/><ColumnDefinition Width="*"/><ColumnDefinition Width="16"/><ColumnDefinition Width="*"/><ColumnDefinition Width="16"/><ColumnDefinition Width="115"/></Grid.ColumnDefinitions>
+      <StackPanel><TextBlock Text="Game" Style="{StaticResource FieldLabel}"/><ComboBox x:Name="GameChoice" AutomationProperties.Name="Game"/></StackPanel>
+      <StackPanel Grid.Column="2"><TextBlock Text="Speelproef" Style="{StaticResource FieldLabel}"/><ComboBox x:Name="RunChoice" AutomationProperties.Name="Speelproef"/></StackPanel>
+      <StackPanel Grid.Column="4"><TextBlock Text="Vergelijken met" Style="{StaticResource FieldLabel}"/><ComboBox x:Name="OtherRunChoice" AutomationProperties.Name="Vergelijkingsproef"/></StackPanel>
+      <Button x:Name="RefreshButton" Grid.Column="6" Content="Vernieuwen" VerticalAlignment="Top" Margin="0,26,0,0" Padding="12,10"/>
+    </Grid>
+    <Grid Grid.Row="2">
+      <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="12"/><ColumnDefinition Width="105"/><ColumnDefinition Width="12"/><ColumnDefinition Width="130"/></Grid.ColumnDefinitions>
+      <TextBox x:Name="QueryText" AutomationProperties.Name="Zoeken in gelezen logfragmenten" MaxLength="512" Height="42" VerticalAlignment="Top" ToolTip="Zoek in de begrensde gelezen tijdlijn- en logfragmenten. Leeg zoeken toont alle gelezen fragmenten."/>
+      <Button x:Name="SearchButton" Grid.Column="2" Content="Zoeken" VerticalAlignment="Top"/>
+      <Button x:Name="CompareButton" Grid.Column="4" Content="Vergelijken" VerticalAlignment="Top"/>
+    </Grid>
+    <TabControl x:Name="Pages" Grid.Row="3" Background="Transparent" BorderBrush="#345A83" BorderThickness="0" Padding="0">
+      <TabItem Header="Samenvatting"><TextBox x:Name="SummaryText" Style="{StaticResource ReportText}" TextWrapping="Wrap" FontFamily="Segoe UI" FontSize="14"/></TabItem>
+      <TabItem Header="Tijdlijn"><TextBox x:Name="TimelineText" Style="{StaticResource ReportText}"/></TabItem>
+      <TabItem Header="Logs"><TextBox x:Name="LogsText" Style="{StaticResource ReportText}"/></TabItem>
+      <TabItem Header="Vergelijking"><TextBox x:Name="CompareText" Style="{StaticResource ReportText}" TextWrapping="Wrap"/></TabItem>
+    </TabControl>
+    <Border Grid.Row="4" Background="#10233C" BorderBrush="#2C4C6E" BorderThickness="1" CornerRadius="5" Padding="14,10" Margin="0,14,0,0">
+      <StackPanel><TextBlock x:Name="StatusTitle" Text="Klaar om proeven te bekijken" FontWeight="SemiBold" Foreground="#FFE378"/>
+        <TextBlock x:Name="StatusMessage" Text="Dit venster start geen game en verandert geen instellingen." TextWrapping="Wrap" Foreground="#B9CEE7" FontSize="12" Margin="0,4,0,0"/>
+      </StackPanel>
+    </Border>
+  </Grid>
+</Window>

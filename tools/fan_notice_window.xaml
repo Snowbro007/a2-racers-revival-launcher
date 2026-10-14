@@ -1,0 +1,58 @@
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="A2 Racers Revival" Width="650" Height="410" MaxWidth="660" MaxHeight="410"
+        MinWidth="420" MinHeight="300" ResizeMode="NoResize" WindowStartupLocation="CenterScreen"
+        ShowInTaskbar="False" Background="#0D1521" Foreground="#F2F4FB" FontFamily="Segoe UI" FontSize="15"
+        UseLayoutRounding="True" SnapsToDevicePixels="True">
+  <Window.Resources>
+    <Style TargetType="Button">
+      <Setter Property="Foreground" Value="#FFFFFF"/><Setter Property="Background" Value="#174978"/>
+      <Setter Property="BorderBrush" Value="#6F9FCC"/><Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="Padding" Value="24,9"/><Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+      <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Button">
+        <Grid>
+          <Border x:Name="Surface" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="6" Padding="{TemplateBinding Padding}">
+            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+          </Border>
+          <Border x:Name="FocusRing" Margin="3" CornerRadius="4" BorderBrush="White" BorderThickness="1"
+                  Visibility="Collapsed" IsHitTestVisible="False"/>
+        </Grid>
+        <ControlTemplate.Triggers>
+          <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Surface" Property="Background" Value="#225D93"/></Trigger>
+          <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="FocusRing" Property="Visibility" Value="Visible"/></Trigger>
+          <Trigger Property="IsPressed" Value="True"><Setter TargetName="Surface" Property="Opacity" Value="0.8"/></Trigger>
+        </ControlTemplate.Triggers>
+      </ControlTemplate></Setter.Value></Setter>
+    </Style>
+  </Window.Resources>
+  <Grid Margin="24,20">
+    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+    <Grid>
+      <Grid.ColumnDefinitions><ColumnDefinition Width="104"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+      <Border x:Name="A2Badge" Width="86" Height="54" Background="#CB1018" BorderBrush="#FFFFFF" BorderThickness="3"
+              CornerRadius="9" HorizontalAlignment="Left">
+        <TextBlock Text="A2" FontSize="38" FontWeight="SemiBold" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+      </Border>
+      <StackPanel Grid.Column="1" VerticalAlignment="Center">
+        <TextBlock Text="A2 Racers Revival" Foreground="#9AB6D5" FontSize="13" Margin="0,0,0,3"/>
+        <TextBlock x:Name="NoticeTitle" Text="Onofficiële fanmod" FontSize="24" FontWeight="SemiBold" TextWrapping="Wrap"/>
+      </StackPanel>
+    </Grid>
+    <ScrollViewer Grid.Row="1" Margin="0,20,0,16" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                  Focusable="False">
+      <TextBlock x:Name="NoticeBody" TextWrapping="Wrap" LineHeight="23" Foreground="#E1E8F2"/>
+    </ScrollViewer>
+    <StackPanel Grid.Row="2">
+      <TextBlock x:Name="OriginalCredit" TextWrapping="Wrap" FontSize="12" Foreground="#B6C7DB"/>
+      <TextBlock x:Name="RightsFooter" TextWrapping="Wrap" FontSize="12" Foreground="#B6C7DB" Margin="0,2,0,0"/>
+      <TextBlock x:Name="SourceNote" TextWrapping="Wrap" FontSize="11" Foreground="#8FA5BF" Margin="0,3,0,0"/>
+    </StackPanel>
+    <Grid Grid.Row="3" Margin="0,18,0,0">
+      <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+      <TextBlock x:Name="CountdownNote" Text="Je gaat automatisch verder na 4 seconden." FontSize="12" Foreground="#9EB2CB"
+                 VerticalAlignment="Center" TextWrapping="Wrap" Margin="0,0,16,0"/>
+      <Button x:Name="ContinueButton" Grid.Column="1" Content="Verder" IsDefault="True" MinWidth="108" FontWeight="SemiBold"/>
+    </Grid>
+  </Grid>
+</Window>

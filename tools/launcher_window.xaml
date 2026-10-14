@@ -1,0 +1,402 @@
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="A2 Racers Revival" Width="1240" Height="820" MinWidth="1100" MinHeight="740" WindowStartupLocation="CenterScreen"
+        Background="#0D1521" Foreground="#F2F4FB" FontFamily="Segoe UI" FontSize="14">
+  <Window.Resources>
+    <DrawingImage x:Key="A2RouteBadge">
+      <!-- NL-A2.svg by Rl91 / Varkentjes, Wikimedia Commons, Public Domain Mark.
+           https://commons.wikimedia.org/wiki/File:NL-A2.svg — native paths, no remote asset at runtime. -->
+      <DrawingImage.Drawing><DrawingGroup>
+        <DrawingGroup><DrawingGroup.Transform><MatrixTransform Matrix="3.812012916815,0,0,3.7795275,24720.323379902573,8519.990990000000"/></DrawingGroup.Transform>
+          <GeometryDrawing Brush="{x:Null}"><GeometryDrawing.Pen><Pen Brush="#2A292A" Thickness="3.48456" LineJoin="Miter"/></GeometryDrawing.Pen>
+            <GeometryDrawing.Geometry><RectangleGeometry Rect="-6483.1055,-2252.5054,101.23558,63.454933" RadiusX="9.167985" RadiusY="9.167985"/></GeometryDrawing.Geometry>
+          </GeometryDrawing>
+          <GeometryDrawing Brush="#CC0605"><GeometryDrawing.Pen><Pen Brush="#F7FBF5" Thickness="2.75925" LineJoin="Miter"/></GeometryDrawing.Pen>
+            <GeometryDrawing.Geometry><RectangleGeometry Rect="-6483.0713,-2252.4712,101.16728,63.386585" RadiusX="9.2242994" RadiusY="9.2242994"/></GeometryDrawing.Geometry>
+          </GeometryDrawing>
+        </DrawingGroup>
+        <DrawingGroup><DrawingGroup.Transform><MatrixTransform Matrix="3.7795275,0,0,3.7795275,24517.565512065943,8519.588075322832"/></DrawingGroup.Transform>
+          <GeometryDrawing Brush="#F7FBF5" Geometry="F1 m -6456.2606,-2237.6118 h 6.2708 l 14.2263,34.1618 h -6.8792 l -3.3226,-7.8619 h -14.3199 l -3.3694,7.8619 h -6.9259 z m 7.6279,19.7483 -4.5861,-10.3889 -4.4925,10.3889 z"/>
+          <GeometryDrawing Brush="#F7FBF5" Geometry="F1 m -6418.175,-2219.0802 q 1.1231,-0.9359 3.1354,-2.0591 2.0123,-1.1231 3.9777,-1.7782 1.2636,-0.4212 3.0419,-0.9828 1.825,-0.5615 2.5738,-0.9359 0.7488,-0.4212 1.0763,-1.0764 0.3744,-0.7019 0.3744,-1.9186 0,-2.0591 -2.293,-2.9483 -2.2463,-0.9359 -5.4753,-0.9359 -2.4803,0.047 -5.1477,1.1231 -2.6674,1.0764 -4.1649,2.7143 l -4.0714,-4.5394 q 0.7488,-0.9827 2.9014,-2.2462 2.1527,-1.3103 5.0073,-2.2463 2.8547,-0.9827 5.3817,-0.9827 4.1181,0 7.1132,1.0763 3.0418,1.0763 4.7265,3.1822 2.2462,2.761 2.2462,6.2708 0,2.3399 -0.8423,4.0246 -0.7956,1.6379 -2.0591,2.7142 -1.2635,1.0295 -2.761,1.8251 -0.936,0.5148 -3.2758,1.2167 -2.2931,0.702 -3.5098,1.1232 -1.2167,0.3743 -2.3399,1.1231 -1.9186,1.2167 -3.3226,2.9482 -1.3571,1.7315 -1.7314,2.9482 h 19.9355 v 5.99 h -27.5635 q 0,-2.4802 0.6552,-5.2412 0.6083,-2.8079 2.293,-5.5689 1.7315,-2.8078 4.1182,-4.8201 z"/>
+        </DrawingGroup>
+      </DrawingGroup></DrawingImage.Drawing>
+    </DrawingImage>
+    <LinearGradientBrush x:Key="ChromeText" StartPoint="0,0" EndPoint="0,1">
+      <GradientStop Color="#FFFFFF" Offset="0"/><GradientStop Color="#E4EAF5" Offset="0.43"/>
+      <GradientStop Color="#8390AB" Offset="0.5"/><GradientStop Color="#F8FAFF" Offset="0.61"/>
+      <GradientStop Color="#BCC9E0" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="BlueSign" StartPoint="0,0" EndPoint="0,1">
+      <GradientStop Color="#1264BF" Offset="0"/><GradientStop Color="#094892" Offset="0.48"/>
+      <GradientStop Color="#083677" Offset="1"/>
+    </LinearGradientBrush>
+    <Style TargetType="Button">
+      <Setter Property="Foreground" Value="#ECF2FA"/><Setter Property="Background" Value="#152A49"/>
+      <Setter Property="BorderBrush" Value="#3E597B"/><Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="Padding" Value="16,10"/><Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="HorizontalContentAlignment" Value="Center"/><Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+      <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Button">
+        <Grid>
+          <Border x:Name="Surface" CornerRadius="6" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}">
+            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="Center" RecognizesAccessKey="True"/>
+          </Border>
+          <Border x:Name="FocusRing" CornerRadius="6" BorderBrush="#FFFFFF" BorderThickness="1" Margin="4" Visibility="Collapsed" IsHitTestVisible="False"/>
+          <Border x:Name="HoverLight" CornerRadius="6" Background="#0DFFFFFF" Visibility="Collapsed" IsHitTestVisible="False"/>
+        </Grid>
+        <ControlTemplate.Triggers>
+          <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="HoverLight" Property="Visibility" Value="Visible"/></Trigger>
+          <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="FocusRing" Property="Visibility" Value="Visible"/></Trigger>
+          <Trigger Property="IsPressed" Value="True"><Setter TargetName="Surface" Property="Opacity" Value="0.8"/></Trigger>
+          <Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.48"/></Trigger>
+        </ControlTemplate.Triggers>
+      </ControlTemplate></Setter.Value></Setter>
+    </Style>
+    <Style x:Key="RoadSignButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+      <Setter Property="Background" Value="{StaticResource BlueSign}"/><Setter Property="BorderThickness" Value="3"/>
+      <Setter Property="Padding" Value="5"/><Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+      <Setter Property="MinHeight" Value="118"/>
+    </Style>
+    <Style TargetType="CheckBox">
+      <Setter Property="Foreground" Value="#ECF2FA"/><Setter Property="Margin" Value="0,8"/><Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="CheckBox">
+        <Grid VerticalAlignment="Center"><Grid.ColumnDefinitions><ColumnDefinition Width="26"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+          <Border x:Name="Box" Width="18" Height="18" Background="#0A1630" BorderBrush="#6684AB" BorderThickness="1" CornerRadius="3" HorizontalAlignment="Left">
+            <Path x:Name="Tick" Data="M2,8 L6,12 13,3" Stroke="#FFE057" StrokeThickness="2.5" Visibility="Collapsed"/>
+          </Border>
+          <ContentPresenter Grid.Column="1" VerticalAlignment="Center"/>
+        </Grid><ControlTemplate.Triggers>
+          <Trigger Property="IsChecked" Value="True"><Setter TargetName="Tick" Property="Visibility" Value="Visible"/><Setter TargetName="Box" Property="BorderBrush" Value="#FFE057"/></Trigger>
+          <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Box" Property="Background" Value="#203D67"/></Trigger>
+          <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="Box" Property="BorderBrush" Value="White"/><Setter TargetName="Box" Property="BorderThickness" Value="2"/></Trigger>
+          <Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.48"/></Trigger>
+        </ControlTemplate.Triggers>
+      </ControlTemplate></Setter.Value></Setter>
+    </Style>
+    <Style TargetType="ComboBoxItem"><Setter Property="Foreground" Value="#ECF2FA"/><Setter Property="Padding" Value="12,10"/>
+      <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ComboBoxItem">
+        <Border x:Name="ItemSurface" Padding="{TemplateBinding Padding}" Background="#132744"><ContentPresenter/></Border>
+        <ControlTemplate.Triggers>
+          <Trigger Property="IsHighlighted" Value="True"><Setter TargetName="ItemSurface" Property="Background" Value="#1E5187"/></Trigger>
+          <Trigger Property="IsSelected" Value="True"><Setter Property="Foreground" Value="#FFE057"/></Trigger>
+        </ControlTemplate.Triggers>
+      </ControlTemplate></Setter.Value></Setter>
+    </Style>
+    <Style TargetType="ComboBox"><Setter Property="Foreground" Value="#ECF2FA"/><Setter Property="MinHeight" Value="42"/>
+      <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ComboBox"><Grid>
+        <ToggleButton Focusable="False" IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
+          <ToggleButton.Template><ControlTemplate TargetType="ToggleButton"><Border Background="#132744" BorderBrush="#45658E" BorderThickness="1" CornerRadius="5">
+            <Path Data="M0,0 L5,5 10,0" Stroke="#FFE057" StrokeThickness="2" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,14,0"/>
+          </Border></ControlTemplate></ToggleButton.Template>
+        </ToggleButton>
+        <ContentPresenter IsHitTestVisible="False" Content="{TemplateBinding SelectionBoxItem}" ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}" VerticalAlignment="Center" Margin="13,9,36,9"/>
+        <Border x:Name="ComboFocus" BorderBrush="White" BorderThickness="1" CornerRadius="5" Margin="3" Visibility="Collapsed" IsHitTestVisible="False"/>
+        <Popup x:Name="PART_Popup" Placement="Bottom" AllowsTransparency="True" Focusable="False" IsOpen="{TemplateBinding IsDropDownOpen}">
+          <Border BorderBrush="#6684AB" BorderThickness="1" Background="#132744" MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}">
+            <ScrollViewer MaxHeight="270"><StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained"/></ScrollViewer>
+          </Border>
+        </Popup>
+      </Grid><ControlTemplate.Triggers>
+        <Trigger Property="IsKeyboardFocusWithin" Value="True"><Setter TargetName="ComboFocus" Property="Visibility" Value="Visible"/></Trigger>
+        <Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.48"/></Trigger>
+      </ControlTemplate.Triggers></ControlTemplate></Setter.Value></Setter>
+    </Style>
+    <Style TargetType="TabItem">
+      <Setter Property="Foreground" Value="#A9B9D4"/><Setter Property="Padding" Value="18,10"/>
+      <Setter Property="FontSize" Value="15"/><Setter Property="FontWeight" Value="SemiBold"/>
+      <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+      <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="TabItem">
+        <Border x:Name="TabSurface" Background="Transparent" Padding="{TemplateBinding Padding}" BorderThickness="0,0,0,3" BorderBrush="Transparent">
+          <ContentPresenter ContentSource="Header"/>
+        </Border><ControlTemplate.Triggers>
+          <Trigger Property="IsMouseOver" Value="True"><Setter Property="Foreground" Value="White"/><Setter TargetName="TabSurface" Property="Background" Value="#14263F"/></Trigger>
+          <Trigger Property="IsSelected" Value="True"><Setter Property="Foreground" Value="#FFE057"/><Setter TargetName="TabSurface" Property="BorderBrush" Value="#FFE057"/></Trigger>
+          <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="TabSurface" Property="Background" Value="#203652"/></Trigger>
+        </ControlTemplate.Triggers>
+      </ControlTemplate></Setter.Value></Setter>
+    </Style>
+    <Style TargetType="ScrollBar"><Setter Property="Width" Value="10"/></Style>
+    <Style x:Key="OverviewCard" TargetType="Border">
+      <Setter Property="Background" Value="#172638"/><Setter Property="BorderBrush" Value="#34485E"/>
+      <Setter Property="BorderThickness" Value="1"/><Setter Property="CornerRadius" Value="8"/>
+      <Setter Property="Padding" Value="16,8"/><Setter Property="MinHeight" Value="70"/>
+    </Style>
+    <Style x:Key="OverviewLabel" TargetType="TextBlock">
+      <Setter Property="Foreground" Value="#A9BDD5"/><Setter Property="FontSize" Value="12"/>
+      <Setter Property="Margin" Value="0,0,0,5"/>
+    </Style>
+    <Style x:Key="OverviewValue" TargetType="TextBlock">
+      <Setter Property="Foreground" Value="#F4F7FD"/><Setter Property="FontSize" Value="22"/>
+      <Setter Property="FontWeight" Value="SemiBold"/><Setter Property="TextWrapping" Value="Wrap"/>
+    </Style>
+    <Style x:Key="SettingsCard" TargetType="Border">
+      <Setter Property="Background" Value="#152334"/><Setter Property="BorderBrush" Value="#33465B"/>
+      <Setter Property="BorderThickness" Value="1"/><Setter Property="CornerRadius" Value="8"/>
+      <Setter Property="Padding" Value="18,15"/><Setter Property="Margin" Value="0,0,0,12"/>
+    </Style>
+    <Style x:Key="SettingsHeading" TargetType="TextBlock">
+      <Setter Property="FontSize" Value="18"/><Setter Property="FontWeight" Value="SemiBold"/>
+      <Setter Property="Foreground" Value="#F4F7FD"/><Setter Property="Margin" Value="0,0,0,12"/>
+    </Style>
+    <Style x:Key="OptionLabel" TargetType="TextBlock">
+      <Setter Property="Foreground" Value="#D7E2F2"/><Setter Property="FontSize" Value="12"/>
+      <Setter Property="FontWeight" Value="SemiBold"/><Setter Property="Margin" Value="0,0,0,6"/>
+    </Style>
+    <Style x:Key="OptionNote" TargetType="TextBlock">
+      <Setter Property="Foreground" Value="#A6B8CE"/><Setter Property="FontSize" Value="11"/>
+      <Setter Property="TextWrapping" Value="Wrap"/><Setter Property="LineHeight" Value="17"/>
+      <Setter Property="Margin" Value="0,7,0,0"/>
+    </Style>
+    <Style TargetType="Expander">
+      <Setter Property="Foreground" Value="#D7E2F2"/>
+      <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Expander">
+        <StackPanel>
+          <ToggleButton x:Name="ExpandHeader" IsChecked="{Binding IsExpanded,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}" HorizontalContentAlignment="Stretch" Background="#14253F" BorderBrush="#314662" Foreground="#D7E2F2">
+            <ToggleButton.Template><ControlTemplate TargetType="ToggleButton"><Border x:Name="ExpandSurface" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" CornerRadius="6" Padding="13,9">
+              <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="18"/></Grid.ColumnDefinitions>
+                <ContentPresenter VerticalAlignment="Center"/>
+                <Path x:Name="ExpandArrow" Grid.Column="1" Data="M0,0 L5,5 10,0" Stroke="#C9D8EC" StrokeThickness="2" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+              </Grid></Border><ControlTemplate.Triggers>
+                <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="ExpandSurface" Property="Background" Value="#203D60"/></Trigger>
+                <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="ExpandSurface" Property="BorderBrush" Value="White"/></Trigger>
+                <Trigger Property="IsChecked" Value="True"><Setter TargetName="ExpandArrow" Property="Data" Value="M0,5 L5,0 10,5"/></Trigger>
+              </ControlTemplate.Triggers></ControlTemplate></ToggleButton.Template>
+            <ContentPresenter Content="{TemplateBinding Header}"/>
+          </ToggleButton>
+          <ContentPresenter x:Name="ExpandedContent" ContentSource="Content" Margin="0,14,0,0" Visibility="Collapsed"/>
+        </StackPanel><ControlTemplate.Triggers><Trigger Property="IsExpanded" Value="True"><Setter TargetName="ExpandedContent" Property="Visibility" Value="Visible"/></Trigger></ControlTemplate.Triggers>
+      </ControlTemplate></Setter.Value></Setter>
+    </Style>
+  </Window.Resources>
+  <Grid>
+    <Grid.Background><SolidColorBrush Color="#0D1521"/></Grid.Background>
+    <Image x:Name="CoverBackdrop" Stretch="UniformToFill" IsHitTestVisible="False" Opacity="0.26"/>
+    <Border Background="#CF0D1521" IsHitTestVisible="False"/>
+    <Grid Margin="26,22,26,18">
+      <Grid.RowDefinitions><RowDefinition Height="82"/><RowDefinition Height="*"/><RowDefinition Height="20"/></Grid.RowDefinitions>
+      <Grid Grid.Row="0">
+        <Grid.ColumnDefinitions><ColumnDefinition Width="112"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+        <Image Source="{StaticResource A2RouteBadge}" Width="94" Height="59.576" Stretch="Uniform" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+        <StackPanel Grid.Column="1" Margin="0,0,0,0">
+          <TextBlock Text="Racers Revival" FontFamily="Bahnschrift" FontSize="32" FontWeight="Bold" FontStyle="Italic" Foreground="{StaticResource ChromeText}"/>
+          <TextBlock Text="Game launcher" Foreground="#A6B8CE" FontSize="12" Margin="1,4,0,0"/>
+        </StackPanel>
+        <Border Grid.Column="2" Background="#182537" BorderBrush="#33465B" BorderThickness="1" CornerRadius="5" Padding="11,6" VerticalAlignment="Top" Margin="0,8,0,0">
+          <TextBlock Text="Windows · Singleplayer" Foreground="#A6B8CE" FontSize="11"/>
+        </Border>
+      </Grid>
+      <Grid Grid.Row="1" Margin="0,0,0,10">
+        <Grid.ColumnDefinitions><ColumnDefinition Width="252"/><ColumnDefinition Width="22"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+        <Grid>
+          <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+          <TextBlock Text="BIBLIOTHEEK" FontSize="11" Foreground="#A6B8CE" FontWeight="SemiBold" Margin="3,2,0,14"/>
+          <Button x:Name="GameOne" Grid.Row="1" Style="{StaticResource RoadSignButton}" BorderBrush="#FFDD4A" Margin="0,0,0,12" AutomationProperties.Name="A2 Racer I selecteren">
+            <Border BorderBrush="#AFCDE7" BorderThickness="1" CornerRadius="2" Padding="12,11">
+              <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="45"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                <TextBlock Text="I" FontFamily="Bahnschrift" FontWeight="Bold" FontSize="43" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                  <TextBlock Text="A2 Racer I" FontFamily="Bahnschrift" FontWeight="SemiBold" FontSize="21"/>
+                  <TextBlock Text="Revived" FontSize="12" Foreground="#D3E5FA" Margin="0,4,0,0"/>
+                  <TextBlock x:Name="GameOneSelected" Text="Geselecteerd" FontSize="11" FontWeight="SemiBold" Foreground="#FFE66D" Margin="0,8,0,0"/>
+                </StackPanel>
+              </Grid>
+            </Border>
+          </Button>
+          <Button x:Name="GameTwo" Grid.Row="2" Style="{StaticResource RoadSignButton}" BorderBrush="#356E95" AutomationProperties.Name="A2 Racer II selecteren">
+            <Border BorderBrush="#AFCDE7" BorderThickness="1" CornerRadius="2" Padding="12,11">
+              <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="45"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                <TextBlock Text="II" FontFamily="Bahnschrift" FontWeight="Bold" FontSize="36" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                  <TextBlock Text="A2 Racer II" FontFamily="Bahnschrift" FontWeight="SemiBold" FontSize="21"/>
+                  <TextBlock Text="Speelbaar" FontSize="12" Foreground="#D3E5FA" Margin="0,4,0,0"/>
+                  <TextBlock x:Name="GameTwoSelected" Text="Geselecteerd" FontSize="11" FontWeight="SemiBold" Foreground="#FFE66D" Margin="0,8,0,0" Visibility="Hidden"/>
+                </StackPanel>
+              </Grid>
+            </Border>
+          </Button>
+          <Button x:Name="GameThree" Grid.Row="3" Style="{StaticResource RoadSignButton}" BorderBrush="#356E95" Margin="0,12,0,0" AutomationProperties.Name="A2 Racer III voorbereiding bekijken">
+            <Border BorderBrush="#AFCDE7" BorderThickness="1" CornerRadius="2" Padding="12,11">
+              <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="45"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                <TextBlock Text="III" FontFamily="Bahnschrift" FontWeight="Bold" FontSize="36" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                  <TextBlock Text="A2 Racer III" FontFamily="Bahnschrift" FontWeight="SemiBold" FontSize="21"/>
+                  <TextBlock Text="In ontwikkeling" FontSize="12" Foreground="#D3E5FA" Margin="0,4,0,0" TextWrapping="Wrap"/>
+                </StackPanel>
+              </Grid>
+            </Border>
+          </Button>
+          <Border Grid.Row="5" Background="#C9152334" BorderBrush="#33465B" BorderThickness="1" CornerRadius="6" Padding="14,12" Margin="0,15,0,0"><StackPanel>
+            <TextBlock Text="Kies je game" Foreground="#D7E2F2" FontWeight="SemiBold" FontSize="12"/>
+            <TextBlock Text="Elke game heeft eigen instellingen." TextWrapping="Wrap" Foreground="#A6B8CE" FontSize="11" LineHeight="17" Margin="0,5,0,0"/>
+          </StackPanel></Border>
+        </Grid>
+        <Border Grid.Column="2" CornerRadius="10" Background="#F5111D2C" BorderBrush="#33465B" BorderThickness="1" Padding="24,20,24,18">
+          <Grid>
+            <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+            <StackPanel Margin="0,0,0,10">
+              <TextBlock x:Name="GameTitle" Text="A2 Racer I" FontFamily="Bahnschrift" FontWeight="SemiBold" FontSize="30"/>
+              <TextBlock x:Name="GameSubtitle" Text="Revived-instellingen voor A2 Racer I." Foreground="#A6B8CE" TextWrapping="Wrap" FontSize="12" LineHeight="18" Margin="0,5,0,0"/>
+            </StackPanel>
+            <TabControl x:Name="Pages" Grid.Row="1" Background="Transparent" BorderThickness="0" Padding="0,10,0,0" Foreground="#F2F4FB">
+              <TabItem Header="Spelen"><Grid>
+                <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                <ScrollViewer x:Name="StartScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><StackPanel Margin="0,1,8,0">
+                  <TextBlock x:Name="PlayNote" TextWrapping="Wrap" Foreground="#A6B8CE" FontSize="12" LineHeight="18" Margin="0,0,0,8"/>
+                  <TextBlock x:Name="SelectionNote" TextWrapping="Wrap" Foreground="#FFE057" FontSize="12" LineHeight="18" Margin="0,0,0,8"/>
+                  <Grid x:Name="IOverviewPanel"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="12"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="10"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                    <Border Style="{StaticResource OverviewCard}"><StackPanel><TextBlock Text="RESOLUTIE" Style="{StaticResource OverviewLabel}"/><TextBlock x:Name="OverviewResolution" Text="—" Style="{StaticResource OverviewValue}"/></StackPanel></Border>
+                    <Border Grid.Column="2" Style="{StaticResource OverviewCard}"><StackPanel><TextBlock Text="FPS / SPELTEMPO" Style="{StaticResource OverviewLabel}"/><TextBlock x:Name="OverviewFps" Text="—" Style="{StaticResource OverviewValue}"/></StackPanel></Border>
+                    <Border Grid.Row="2" Style="{StaticResource OverviewCard}"><StackPanel><TextBlock Text="WEGZICHT" Style="{StaticResource OverviewLabel}"/><TextBlock x:Name="OverviewDistance" Text="—" Style="{StaticResource OverviewValue}"/></StackPanel></Border>
+                    <Border Grid.Row="2" Grid.Column="2" Style="{StaticResource OverviewCard}"><StackPanel><TextBlock x:Name="OverviewDetailLabel" Text="OBJECTAFSTAND" Style="{StaticResource OverviewLabel}"/><TextBlock x:Name="OverviewObjects" Text="—" Style="{StaticResource OverviewValue}"/></StackPanel></Border>
+                  </Grid>
+                  <Border x:Name="IIOverviewPanel" Style="{StaticResource SettingsCard}" Visibility="Collapsed"><StackPanel>
+                    <TextBlock Text="A2 Racer II spelmenu" FontSize="19" FontWeight="SemiBold" Foreground="#F4F7FD"/>
+                    <TextBlock Text="Kies bij Instellingen het aanbevolen Revival-menu of het oorspronkelijke, instabiele menu. In het Revival-menu kies je je speler, auto en baan." Style="{StaticResource OptionNote}" FontSize="12"/>
+                  </StackPanel></Border>
+                  <TextBlock x:Name="PlaySummary" Foreground="#A6B8CE" FontSize="12" TextWrapping="Wrap" LineHeight="18" Margin="0,8,0,0"/>
+                </StackPanel></ScrollViewer>
+                <StackPanel Grid.Row="1" Margin="0,14,0,0">
+                  <WrapPanel><Button x:Name="ChooseOptions" Content="Instellingen" Margin="0,0,10,0"/><Button x:Name="OriginalProfile" Content="Origineel" ToolTip="640 × 480, 20 FPS, originele zichtafstand, horizon, textures en menu." Margin="0,0,8,0"/><Button x:Name="RecommendedOptions" Content="Aanbevolen" ToolTip="1080p, 20 FPS, verder wegzicht, horizon uit en dashboard aan. HD blijft optioneel." Margin="0,0,8,0"/><Button x:Name="MaxProfile" Content="MAX" ToolTip="4K, 30 FPS, alle geladen objecten, HD-textures en HD-menu. Meer belasting; de ronde maprand kan zichtbaar zijn."/></WrapPanel>
+                  <TextBlock x:Name="ProfileNote" Visibility="Collapsed" Text="De profielinstellingen staan in het speeloverzicht; losse opties blijven aanpasbaar."/>
+                  <StackPanel x:Name="InstallationPanel" Visibility="Collapsed" Margin="0,10,0,0">
+                    <TextBlock x:Name="InstallationTitle" Text="Koppel je eigen A2 Racer I" FontWeight="SemiBold"/>
+                    <TextBlock x:Name="InstallationNote" Text="Zoek een bestaande installatie, kies de gamemap of importeer je gamearchief." TextWrapping="Wrap" FontSize="11" Margin="0,5,0,6"/>
+                    <ComboBox x:Name="InstallationChoice" Visibility="Collapsed" AutomationProperties.Name="Gevonden game-installaties"/>
+                    <WrapPanel><Button x:Name="DetectInstallations" Content="Installaties zoeken" Margin="0,5,8,0"/><Button x:Name="LinkInstallation" Content="Gevonden installatie koppelen" Visibility="Collapsed" Margin="0,5,0,0"/></WrapPanel>
+                    <WrapPanel><Button x:Name="ChooseInstallation" Content="Installatiemap kiezen…" Margin="0,5,8,0"/><Button x:Name="PrepareGame" Content="Game voorbereiden" Visibility="Collapsed" Margin="0,5,8,0"/><Button x:Name="ImportGame" Content="Gamearchief importeren…" Margin="0,5,8,0"/><Button x:Name="GetGame" Content="Game verkrijgen" Margin="0,5,0,0"/></WrapPanel>
+                  </StackPanel>
+                </StackPanel>
+              </Grid></TabItem>
+              <TabItem Header="Instellingen"><Grid>
+                <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                <ScrollViewer x:Name="OptionsScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><StackPanel Margin="0,1,10,0">
+                  <DockPanel LastChildFill="True" Margin="0,0,0,13">
+                    <CheckBox x:Name="IntroChoice" Content="Originele intro afspelen" DockPanel.Dock="Right" Margin="18,2,0,2" VerticalAlignment="Center" FontSize="12"/>
+                    <TextBlock x:Name="OptionsGameTitle" Text="Instellingen voor A2 Racer I" Foreground="#D7E2F2" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                  </DockPanel>
+                  <StackPanel x:Name="IIOptionsNotice" Visibility="Collapsed">
+                    <Border Style="{StaticResource SettingsCard}"><StackPanel>
+                      <TextBlock Text="Beeld" Style="{StaticResource SettingsHeading}"/>
+                      <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="18"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                        <StackPanel><TextBlock Text="Resolutie" Style="{StaticResource OptionLabel}"/><ComboBox x:Name="IIResolutionChoice" AutomationProperties.Name="A2 Racer II resolutie"/></StackPanel>
+                        <StackPanel Grid.Column="2"><TextBlock Text="Beeldverhouding" Style="{StaticResource OptionLabel}"/><ComboBox x:Name="IIRaceDisplayChoice" AutomationProperties.Name="A2 Racer II raceweergave"/></StackPanel>
+                      </Grid>
+                      <TextBlock Text="Full HD (1920 × 1080) is aanbevolen voor breedbeeld. Klassiek speelt in 640 × 480 met de originele HUD en wereldinstellingen." Style="{StaticResource OptionNote}"/>
+                    </StackPanel></Border>
+                    <Border Style="{StaticResource SettingsCard}"><StackPanel>
+                      <TextBlock Text="Gameplay" Style="{StaticResource SettingsHeading}"/>
+                      <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="18"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                        <StackPanel><TextBlock Text="FPS / speltempo" Style="{StaticResource OptionLabel}"/><TextBlock Text="60 FPS · Revival" FontSize="18" Margin="0,8,0,0"/><TextBlock Text="De race gebruikt zijn eigen speltempo." Style="{StaticResource OptionNote}"/></StackPanel>
+                        <StackPanel Grid.Column="2"><TextBlock Text="HUD" Style="{StaticResource OptionLabel}"/><ComboBox x:Name="IIHudChoice" AutomationProperties.Name="A2 Racer II HUD"/><TextBlock Text="HD HUD vereist 1080p of 4K. Radar en meldingen blijven een proef." Style="{StaticResource OptionNote}"/></StackPanel>
+                      </Grid>
+                    </StackPanel></Border>
+                    <Border Style="{StaticResource SettingsCard}"><StackPanel>
+                      <TextBlock Text="Wereld &amp; textures" Style="{StaticResource SettingsHeading}"/>
+                      <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="18"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                        <StackPanel><TextBlock Text="Wegzicht / render distance" Style="{StaticResource OptionLabel}"/><ComboBox x:Name="IIDistanceChoice" AutomationProperties.Name="A2 Racer II wegzicht"/></StackPanel>
+                        <StackPanel Grid.Column="2"><TextBlock Text="Horizon &amp; lucht" Style="{StaticResource OptionLabel}"/><ComboBox x:Name="IISkyChoice" AutomationProperties.Name="A2 Racer II horizon en lucht"/></StackPanel>
+                      </Grid>
+                      <TextBlock Text="Meer baanstukken houdt meer weg geladen; de echte zichtafstand neemt niet automatisch toe. Nieuwe combinaties moeten nog worden speelgetest." Style="{StaticResource OptionNote}"/>
+                    </StackPanel></Border>
+                    <Border Style="{StaticResource SettingsCard}"><StackPanel>
+                      <TextBlock Text="Spelmenu" Style="{StaticResource SettingsHeading}"/>
+                      <ComboBox x:Name="IIMenuChoice" AutomationProperties.Name="A2 Racer II spelmenu"/>
+                      <TextBlock x:Name="IIMenuNote" Style="{StaticResource OptionNote}" Visibility="Collapsed"/>
+                      <TextBlock Text="Speler, auto, baan, bediening en audio kies je in het spelmenu." Style="{StaticResource OptionNote}"/>
+                    </StackPanel></Border>
+                  </StackPanel>
+                  <StackPanel x:Name="IOptionsPanel">
+                    <Border Style="{StaticResource SettingsCard}"><StackPanel>
+                      <TextBlock Text="Beeld" Style="{StaticResource SettingsHeading}"/>
+                      <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="18"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                        <StackPanel><TextBlock Text="Resolutie" Style="{StaticResource OptionLabel}"/><ComboBox x:Name="ResolutionChoice"/><TextBlock x:Name="ResolutionNote" Style="{StaticResource OptionNote}"/></StackPanel>
+                        <StackPanel Grid.Column="2"><TextBlock Text="Renderer" Style="{StaticResource OptionLabel}"/><ComboBox x:Name="GraphicsChoice"/><TextBlock x:Name="GraphicsNote" Style="{StaticResource OptionNote}"/></StackPanel>
+                      </Grid>
+                      <TextBlock x:Name="CameraNote" Style="{StaticResource OptionNote}" Foreground="#C6D8EF"/>
+                    </StackPanel></Border>
+                    <Border Style="{StaticResource SettingsCard}"><StackPanel>
+                      <TextBlock Text="Gameplay" Style="{StaticResource SettingsHeading}"/>
+                      <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="18"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                        <StackPanel><TextBlock Text="FPS / speltempo" Style="{StaticResource OptionLabel}"/><ComboBox x:Name="FpsChoice"/><TextBlock x:Name="FpsNote" Style="{StaticResource OptionNote}"/></StackPanel>
+                        <StackPanel Grid.Column="2"><TextBlock Text="Camera" Style="{StaticResource OptionLabel}"/><CheckBox x:Name="DashboardChoice" Content="Dashboard aan · aanbevolen" Margin="0,10,0,6"/><TextBlock Text="Toont het stuur en dashboard tijdens de race." Style="{StaticResource OptionNote}"/></StackPanel>
+                      </Grid>
+                    </StackPanel></Border>
+                    <Border Style="{StaticResource SettingsCard}"><StackPanel>
+                      <TextBlock Text="Wereld &amp; textures" Style="{StaticResource SettingsHeading}"/>
+                      <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="18"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                        <StackPanel><TextBlock Text="Wegzicht" Style="{StaticResource OptionLabel}"/><ComboBox x:Name="DistanceChoice"/><TextBlock x:Name="DistanceNote" Style="{StaticResource OptionNote}"/></StackPanel>
+                        <StackPanel Grid.Column="2"><TextBlock Text="Objectafstand" Style="{StaticResource OptionLabel}"/><ComboBox x:Name="ObjectDistanceChoice"/><TextBlock x:Name="ObjectDistanceNote" Style="{StaticResource OptionNote}"/></StackPanel>
+                      </Grid>
+                      <Grid Margin="0,18,0,0"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="18"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                        <StackPanel><TextBlock Text="Texture pack" Style="{StaticResource OptionLabel}"/><ComboBox x:Name="TextureChoice"/><TextBlock x:Name="TextureNote" Style="{StaticResource OptionNote}"/></StackPanel>
+                        <StackPanel Grid.Column="2"><TextBlock Text="Horizonachtergrond" Style="{StaticResource OptionLabel}"/><ComboBox x:Name="HorizonChoice"/><TextBlock Text="Uit geeft vrij uitzicht op de wereld." Style="{StaticResource OptionNote}"/></StackPanel>
+                      </Grid>
+                    </StackPanel></Border>
+                    <Border Style="{StaticResource SettingsCard}"><StackPanel>
+                      <TextBlock Text="Spelmenu" Style="{StaticResource SettingsHeading}"/>
+                      <TextBlock Text="Menuweergave" Style="{StaticResource OptionLabel}"/>
+                      <ComboBox x:Name="MenuChoice" AutomationProperties.Name="Optionele spelmenuweergave"/>
+                      <TextBlock x:Name="MenuNote" Style="{StaticResource OptionNote}"/>
+                    </StackPanel></Border>
+                    <Expander x:Name="AdvancedOptions" Header="Compatibiliteit" IsExpanded="False" Margin="0,0,0,12">
+                      <StackPanel Margin="14,0,14,3">
+                        <CheckBox x:Name="FocusRecoveryChoice" Content="Alt+Tab-herstel" Margin="0,0,0,0"/>
+                        <TextBlock x:Name="FocusRecoveryNote" Style="{StaticResource OptionNote}" Margin="26,5,0,0"/>
+                      </StackPanel>
+                    </Expander>
+                  </StackPanel>
+                  <TextBlock Text="Wijzigingen gelden bij de volgende start. Geluid kies je in de game." Style="{StaticResource OptionNote}" Margin="0,2,0,9"/>
+                </StackPanel></ScrollViewer>
+                <WrapPanel Grid.Row="1" Margin="0,14,0,0"><Button x:Name="SaveOptions" Content="Opslaan" Margin="0,0,10,0"/><Button x:Name="ResetOptions" Content="Standaard herstellen"/></WrapPanel>
+              </Grid></TabItem>
+              <TabItem Header="Support"><ScrollViewer x:Name="SupportScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><StackPanel Margin="0,1,10,0">
+                <TextBlock Text="Logs en diagnose" FontSize="21" FontWeight="SemiBold" Margin="0,0,0,12"/>
+                <CheckBox x:Name="DebugChoice" Content="Uitgebreide diagnose bij de volgende start" FontSize="12" Margin="0,4,0,4"/>
+                <TextBlock Text="Met diagnose aan sluit de game na maximaal 3 minuten. Laat dit uit voor gewoon spelen." Foreground="#A6B8CE" FontSize="11" TextWrapping="Wrap" LineHeight="17" Margin="26,1,0,12"/>
+                <WrapPanel Margin="0,0,0,13"><Button x:Name="OpenLogs" Content="Logmap openen" Margin="0,0,8,8"/><Button x:Name="OpenDevtools" Content="Devtools" Margin="0,0,8,8"/><Button x:Name="RefreshState" Content="Opnieuw controleren" Margin="0,0,0,8"/></WrapPanel>
+                <TextBox x:Name="LogText" Height="190" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" Background="#0C1521" Foreground="#C2D0E5" BorderBrush="#33465B" BorderThickness="1" Padding="12" FontFamily="Consolas" FontSize="12" Text="Nog geen launchersessie gestart."/>
+              </StackPanel></ScrollViewer></TabItem>
+              <TabItem Header="Spelen" Visibility="Collapsed"><ScrollViewer x:Name="IIIStartScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><StackPanel Margin="0,1,8,0">
+                <TextBlock Text="Kies je tour en raceweergave. De compatibiliteitsproef richt zich op de gemelde racecrash; speelbaarheid moet nog worden bevestigd." TextWrapping="Wrap" Foreground="#A6B8CE" FontSize="12" LineHeight="18" Margin="0,0,0,8"/>
+                <Grid x:Name="IIIOverviewPanel"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="12"/><ColumnDefinition Width="*"/><ColumnDefinition Width="12"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                  <Border Style="{StaticResource OverviewCard}"><StackPanel><TextBlock Text="RESOLUTIE" Style="{StaticResource OverviewLabel}"/><TextBlock x:Name="IIIResolutionOverview" Text="Origineel" Style="{StaticResource OverviewValue}"/></StackPanel></Border>
+                  <Border Grid.Column="2" Style="{StaticResource OverviewCard}"><StackPanel><TextBlock Text="TOUR" Style="{StaticResource OverviewLabel}"/><TextBlock x:Name="IIITourOverview" Text="Tour 1" Style="{StaticResource OverviewValue}"/></StackPanel></Border>
+                  <Border Grid.Column="4" Style="{StaticResource OverviewCard}"><StackPanel><TextBlock Text="GAMEBESTANDEN" Style="{StaticResource OverviewLabel}"/><TextBlock x:Name="IIIReadyOverview" Text="Controleren…" Style="{StaticResource OverviewValue}"/></StackPanel></Border>
+                </Grid>
+                <TextBlock Text="Origineel speltempo, menu en textures · eigen lokale tourkopie · zonder cd-mount" Foreground="#A6B8CE" FontSize="12" TextWrapping="Wrap" LineHeight="18" Margin="0,6,0,8"/>
+                <Border Style="{StaticResource SettingsCard}"><StackPanel>
+                  <TextBlock Text="Instellingen" Style="{StaticResource SettingsHeading}"/>
+                  <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="16"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                  <StackPanel>
+                  <TextBlock Text="Europa Tour" Style="{StaticResource OptionLabel}"/>
+                  <ComboBox x:Name="IIITourChoice" AutomationProperties.Name="A2 Racer III tour kiezen"/>
+                  <Button x:Name="IIIChooseInstallation" Content="Gamemap selecteren" HorizontalAlignment="Left" Margin="0,8,0,4" AutomationProperties.Name="A2 Racer III gamemap selecteren"/>
+                  <TextBlock Text="Volledige Nederlandse gamemap of DATA-map van deze tour. Bron en eerdere voortgang blijven intact." Style="{StaticResource OptionNote}"/>
+                  </StackPanel><StackPanel Grid.Column="2">
+                  <TextBlock Text="Raceweergave" Style="{StaticResource OptionLabel}"/>
+                  <ComboBox x:Name="IIIProfileChoice" AutomationProperties.Name="A2 Racer III raceweergave kiezen"/>
+                  <TextBlock x:Name="IIIProfileNote" Style="{StaticResource OptionNote}"/>
+                  </StackPanel></Grid>
+                </StackPanel></Border>
+                <Expander Header="Support · voorbereiding" Foreground="#C4D5EA" Margin="0,0,0,12"><Border Style="{StaticResource SettingsCard}" Margin="0,10,0,0"><StackPanel>
+                  <TextBlock x:Name="IIIStatus" FontSize="13" TextWrapping="Wrap"/>
+                  <TextBlock Text="Menu, bediening, audio, Alt+Tab en voortgang moeten nog worden getest. Debug en tweak mode blijven uit." Style="{StaticResource OptionNote}"/>
+                </StackPanel></Border></Expander>
+              </StackPanel></ScrollViewer></TabItem>
+            </TabControl>
+            <Border Grid.Row="2" BorderBrush="#33465B" BorderThickness="0,1,0,0" Margin="0,12,0,0" Padding="0,12,0,0">
+              <Grid>
+                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="230"/></Grid.ColumnDefinitions>
+                <StackPanel VerticalAlignment="Center" Margin="0,0,18,0"><TextBlock x:Name="StatusTitle" Text="Controleren…" Foreground="#C4D5EA" FontWeight="SemiBold" FontSize="13"/>
+                  <TextBlock x:Name="StatusMessage" Text="Lokale startbestanden controleren." Foreground="#A6B8CE" FontSize="11" TextWrapping="Wrap" LineHeight="17" Margin="0,5,0,0"/>
+                </StackPanel>
+                <Button x:Name="PlayButton" Grid.Column="1" Content="Speel A2 Racer I" BorderBrush="#FFE057" Foreground="#142038" FontWeight="SemiBold" FontSize="18" VerticalAlignment="Center" IsEnabled="False" Padding="15,15">
+                  <Button.Background><LinearGradientBrush StartPoint="0,0" EndPoint="0,1"><GradientStop Color="#FFE66D" Offset="0"/><GradientStop Color="#EFC339" Offset="1"/></LinearGradientBrush></Button.Background>
+                </Button>
+              </Grid>
+            </Border>
+          </Grid>
+        </Border>
+      </Grid>
+      <TextBlock Grid.Row="2" Text="A2 RACERS REVIVAL" FontSize="9" Foreground="#8097B0" VerticalAlignment="Bottom"/>
+    </Grid>
+  </Grid>
+</Window>
