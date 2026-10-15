@@ -1,4 +1,4 @@
-﻿#Requires -Version 5.1
+#Requires -Version 5.1
 param([string]$PythonPath, [string]$PowerShellPath, [switch]$CheckOnly, [string]$PreviewPath,
       [ValidateSet('play','options','logs','iii')][string]$PreviewPage = 'play',
       [ValidateSet('a2racer1','a2racer2')][string]$PreviewGame)
@@ -12,6 +12,7 @@ $script:catalog = $null; $script:settings = $null; $script:game = 'a2racer1'; $s
 $script:initialized = $false; $script:bootstrapAttempted = $false
 $script:releaseInitialized = $false
 $script:installationScanAttempted = $false
+$script:installationScanNote = $null
 $script:developmentRuntimes = [bool](($PythonPath -and $PowerShellPath) -or
     (Test-Path -LiteralPath (Join-Path $workspacePath 'local\launcher\runtimes.json')))
 
@@ -457,26 +458,28 @@ function Select-Game([string]$GameName) {
     $ui.InstallationPanel.Visibility = if ($ui.ImportGame.Visibility -eq 'Visible' -or $needsII) { 'Visible' } else { 'Collapsed' }
     if (-not $sourceReady) {
         $ui.WelcomeTitle.Text = 'Eigen gamebestanden nodig'
-        $ui.WelcomeHint.Text = 'Kies hieronder Gamemap kiezen of Gamearchief importeren voor je eigen ' + $ui.GameTitle.Text + '. Daarna kun je spelen.'
+        $ui.WelcomeHint.Text = 'Heb je een volledige gamemap of een ZIP-bestand van je eigen ' + $ui.GameTitle.Text + '? Kies hieronder wat je hebt.'
     } elseif ($needsII) {
         $ui.WelcomeTitle.Text = 'Maak A2 Racer II klaar'
-        $ui.WelcomeHint.Text = 'Je gamebestanden zijn gevonden. Klik hieronder op Game voorbereiden; kies daarna Aanbevolen en Spelen.'
+        $ui.WelcomeHint.Text = 'Je gamebestanden zijn gevonden. Klik hieronder op Lokale speelkopie maken; kies daarna Aanbevolen en Spelen.'
     } else {
         $ui.WelcomeTitle.Text = 'Klaar voor de start'
         $ui.WelcomeHint.Text = 'Je gamebestanden staan klaar. Klik op Speel ' + $ui.GameTitle.Text + '. Instellingen aanpassen kan later.'
     }
-    $ui.InstallationTitle.Text = if ($needsII -and $sourceReady) { 'Stap 1 · Bereid A2 Racer II voor' } else { 'Stap 1 · Koppel je eigen ' + $ui.GameTitle.Text }
-    $ui.GetGame.Content = if ($one) { 'Game verkrijgen' } else { 'Game verkrijgen ↗' }
-    $ui.GetGame.ToolTip = if ($one) { 'Uitleg over het koppelen van je eigen gamekopie.' } else { 'Opent My Abandonware in je browser. Toestemming voor deze externe download is niet bevestigd.' }
+    $ui.InstallationTitle.Text = if ($needsII -and $sourceReady) { 'Stap 2 · Maak A2 Racer II speelbaar' } else { 'Stap 1 · Voeg je eigen ' + $ui.GameTitle.Text + ' toe' }
     $ui.GetGame.Visibility = if (-not $sourceReady) { 'Visible' } else { 'Collapsed' }
     $ui.ChooseInstallation.Visibility = if (-not $sourceReady) { 'Visible' } else { 'Collapsed' }
     $ui.DetectInstallations.Visibility = if ($one -and -not $sourceReady) { 'Visible' } else { 'Collapsed' }
     $ui.PrepareGame.Visibility = if ($needsII -and $sourceReady) { 'Visible' } else { 'Collapsed' }
+    $ui.InstallationSourceChoices.Visibility = if (-not $sourceReady) { 'Visible' } else { 'Collapsed' }
+    $ui.InstallationFoundSection.Visibility = if ($one -and -not $sourceReady -and $ui.InstallationChoice.Items.Count) { 'Visible' } else { 'Collapsed' }
+    $ui.InstallationChoice.Visibility = if ($one -and $ui.InstallationChoice.Items.Count) { 'Visible' } else { 'Collapsed' }
+    $ui.LinkInstallation.Visibility = if ($one -and $ui.InstallationChoice.SelectedItem -and $ui.InstallationChoice.SelectedItem.IsEnabled) { 'Visible' } else { 'Collapsed' }
+    $ui.InstallationFolderHint.Text = if ($one) { 'Volledige map op pc of USB' } else { 'Volledige map inclusief DATA' }
     if ($one) {
-        $ui.InstallationNote.Text = 'Kies de volledige Nederlandse A2 Racer I-gamemap of importeer je eigen gamearchief.'
+        $ui.InstallationNote.Text = if ($script:installationScanNote) { $script:installationScanNote } else { 'Kies hoe je je eigen volledige Nederlandse game hebt opgeslagen. Je bron blijft intact.' }
     } else {
-        $ui.InstallationChoice.Visibility='Collapsed';$ui.LinkInstallation.Visibility='Collapsed'
-        $ui.InstallationNote.Text=if($sourceReady){'Gamebestanden zijn gevonden. Kies Game voorbereiden voor de lokale speelkopie.'}else{'Kies de volledige Nederlandse A2 Racer II-gamemap, inclusief DATA. De oorspronkelijke bestanden blijven intact.'}
+        $ui.InstallationNote.Text=if($sourceReady){'Gamebestanden gevonden. Maak nu een lokale speelkopie; je bron blijft intact.'}else{'Kies de volledige Nederlandse gamemap met DATA, of je eigen ZIP-bestand. Je bron blijft intact.'}
     }
     $script:initialized = $true; $script:binding = $false
     Update-Summary; Update-Buttons
@@ -593,18 +596,9 @@ function Open-Devtools {
 }
 
 function Open-GameSource {
-    if ($script:game -eq 'a2racer2') {
-        # User-selected fixed external page. No archive is downloaded by us.
-        $info = New-Object Diagnostics.ProcessStartInfo
-        $info.FileName = 'https://www.myabandonware.com/game/a2-racer-ii-gri'
-        $info.UseShellExecute = $true
-        $browser = [Diagnostics.Process]::Start($info)
-        if ($browser) { $browser.Dispose() }
-        return
-    }
     $null = [Windows.MessageBox]::Show($window,
-        'Gebruik een rechtmatig verkregen eigen gamekopie. Voor deel I en II is een volledige ondersteunde Nederlandse gamemap of het ondersteunde gamearchief nodig. Een minimale cd-installatie kan gegevens missen. Deze launcher downloadt geen games.',
-        'A2 Racer verkrijgen', 'OK', 'Information')
+        'Deze launcher bevat of downloadt geen games. Gebruik je eigen rechtmatig verkregen volledige Nederlandse gamebestanden. Staat de game op een andere pc? Kopieer de complete gamemap naar deze pc, of gebruik je eigen ondersteunde ZIP-bestand. Kies daarna hierboven de map of het ZIP-bestand. Een minimale cd-installatie kan bestanden missen.',
+        'Welke gamebestanden heb ik nodig?', 'OK', 'Information')
 }
 
 function Load-Runtimes {
@@ -701,9 +695,13 @@ function Show-Installations($Result) {
     }
     $ui.InstallationChoice.SelectedItem = $first
     $ui.InstallationChoice.Visibility = if ($ui.InstallationChoice.Items.Count) { 'Visible' } else { 'Collapsed' }
+    $ui.InstallationFoundSection.Visibility = if ($script:game -eq 'a2racer1' -and $ui.InstallationChoice.Items.Count) { 'Visible' } else { 'Collapsed' }
     $ui.LinkInstallation.Visibility = if ($first) { 'Visible' } else { 'Collapsed' }
-    $ui.InstallationNote.Text = if ($first) { 'Ondersteunde installatie gevonden. Koppelen maakt een eigen kopie; je installatie blijft intact.' } elseif ($ui.InstallationChoice.Items.Count) { 'Installatie gevonden, maar deze versie is onvolledig of niet ondersteund. Zie de uitleg bij de map. Importeer anders je volledige gamearchief.' } else { 'Geen geregistreerde installatie gevonden. Kies zelf de volledige gamemap of importeer je gamearchief.' }
-    Set-Status 'Installatiecontrole afgerond' $ui.InstallationNote.Text
+    $script:installationScanNote = if ($first) { 'Game gevonden op deze pc. Gebruik die hieronder, of kies zelf een gamemap of ZIP-bestand.' } elseif ($ui.InstallationChoice.Items.Count) { 'Deze Windows-installatie is onvolledig of niet ondersteund. Kies je eigen volledige map of ZIP-bestand.' } else { 'Geen bekende Windows-installatie gevonden. Kies je eigen volledige gamemap of ZIP-bestand.' }
+    if ($script:game -eq 'a2racer1') {
+        $ui.InstallationNote.Text = $script:installationScanNote
+        Set-Status 'Installatiecontrole afgerond' $script:installationScanNote
+    }
     Update-Buttons
 }
 
@@ -771,7 +769,7 @@ try {
             'GraphicsNote','ResolutionChoice','ResolutionNote','CameraNote','DistanceChoice','DistanceNote','ObjectDistanceChoice','ObjectDistanceNote','TextureChoice','TextureNote','MenuChoice','MenuNote',
             'HorizonChoice','FocusRecoveryChoice','FocusRecoveryNote','ChooseOptions','RecommendedOptions','OverviewResolution','OverviewFps','OverviewDistance','OverviewObjects','OverviewDetailLabel','SelectionNote','AdvancedOptions','StartScroll','SupportScroll','OptionsScroll','DashboardChoice','FpsChoice','FpsNote','IntroChoice','DebugChoice',
             'OriginalProfile','MaxProfile','SaveOptions','ResetOptions','OpenLogs','OpenDevtools','RefreshState','LogText','StatusTitle','StatusMessage','PlayButton',
-            'InstallationPanel','InstallationTitle','InstallationChoice','InstallationNote','DetectInstallations','ChooseInstallation','LinkInstallation','GetGame','PrepareGame')) {
+            'InstallationPanel','InstallationTitle','InstallationChoice','InstallationNote','InstallationFoundSection','InstallationSourceChoices','InstallationFolderHint','DetectInstallations','ChooseInstallation','LinkInstallation','GetGame','PrepareGame')) {
         $ui[$name] = $window.FindName($name)
         if (-not $ui[$name]) { throw ('Ontbrekend launcherelement: ' + $name) }
     }
@@ -896,7 +894,7 @@ try {
     $ui.ImportGame.Add_Click({
         $dialog = New-Object Microsoft.Win32.OpenFileDialog
         $archiveName = if ($script:game -eq 'a2racer2') {'A2_Racer_II_v1.01_Win_ROM_NL.zip'} else {'A2-Racer_Win_NL.zip'}
-        $dialog.Title = 'Kies je eigen ondersteunde '+$ui.GameTitle.Text+'-archief'; $dialog.Filter = 'Gamearchief (*.zip)|*.zip'
+        $dialog.Title = 'Kies het ZIP-bestand van je eigen '+$ui.GameTitle.Text; $dialog.Filter = 'Gamearchief (*.zip)|*.zip'
         $candidate = Join-Path $workspacePath $archiveName
         if (Test-Path -LiteralPath $candidate) { $dialog.FileName = $candidate }
         if ($dialog.ShowDialog($window)) {

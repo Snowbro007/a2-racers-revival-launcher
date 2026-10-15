@@ -6,17 +6,17 @@ Deel I en II zijn speelbaar; aan III wordt nog gewerkt. Voor later: deel IV en k
 
 ## Beginnen
 
-**[Download de nieuwste beta](https://github.com/Snowbro007/a2-racers-revival-launcher/releases/tag/v0.1.0-beta.3)** · Windows 11 x64
+**[Download de nieuwste beta](https://github.com/Snowbro007/a2-racers-revival-launcher/releases/tag/v0.1.0-beta.4)** · Windows 11 x64
 
 1. Pak de ZIP uit en open **Launcher.cmd**.
-2. Kies je game en wijs je eigen volledige Nederlandse gamemap aan. Bij deel III kies je eerst de tour.
+2. Kies je game. Klik **Ik heb een gamemap** of **Ik heb een ZIP-bestand** voor je eigen volledige Nederlandse game. Voor deel I kun je ook **Bekende Windows-installatie zoeken** gebruiken. Bij deel III kies je eerst de tour.
 3. Kies bij de profielknoppen **Aanbevolen** en klik op **Spelen**.
 
 De eerste keer heb je internet nodig; Python installeren hoeft niet. Je originele bestanden blijven intact. Bewaar bij updates een backup van `local/`.
 
 ## Goed om te weten
 
-Dit is een onofficieel fanproject, zonder officiële steun van Davilex, Visma of andere rechthebbenden. De oorspronkelijke games en merken blijven van hun rechthebbenden. Je hebt een rechtmatig verkregen eigen game nodig; games worden niet meegeleverd of gedownload. Externe gamelinks zijn geen bewijs van toestemming.
+Dit is een onofficieel fanproject, zonder officiële steun van Davilex, Visma of andere rechthebbenden. De oorspronkelijke games en merken blijven van hun rechthebbenden. Je hebt een rechtmatig verkregen eigen game nodig; games worden niet meegeleverd of gedownload.
 
 Eigen code en documentatie vallen onder [MIT](LICENSE); spelmateriaal, fanmod-art en externe onderdelen niet. Zie [licenties en herkomst](THIRD-PARTY-NOTICES.md). Beta zonder garantie. De SHA-256-controlesom van de actuele ZIP staat bij de release.
 
