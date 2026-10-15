@@ -1,0 +1,202 @@
+name: Refresh clean beta 2 release
+
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/refresh-beta2.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh-clean-beta-2
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    if: github.repository == 'Snowbro007/a2-racers-revival-launcher' && github.ref == 'refs/heads/main'
+    runs-on: windows-latest
+    timeout-minutes: 25
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_TAG: v0.1.0-beta.2
+      RELEASE_VERSION: 0.1.0-beta.2
+      RELEASE_ZIP: dist/A2-Racers-Revival-0.1.0-beta.2-Windows-x64.zip
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Build and verify launcher-only package
+        shell: pwsh
+        run: |
+          if ((Get-Content VERSION.txt -Raw).Trim() -ne $env:RELEASE_VERSION) {
+            throw 'VERSION.txt does not match the release tag.'
+          }
+          python -B tools/portable_launcher.py build --public --output $env:RELEASE_ZIP
+          if ($LASTEXITCODE -ne 0) { throw 'Public package build failed.' }
+          python -B tools/portable_launcher.py audit --archive $env:RELEASE_ZIP
+          if ($LASTEXITCODE -ne 0) { throw 'Public package audit failed.' }
+          python -B tools/check_public_release.py --archive $env:RELEASE_ZIP --version $env:RELEASE_VERSION --notes-template docs/public-release-notes.md --notes-output dist/release-notes.md
+          if ($LASTEXITCODE -ne 0) { throw 'Game-free release check failed.' }
+
+      - name: Replace old assets and clean release history
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $false
+          $repo = $env:GITHUB_REPOSITORY
+          $tag = $env:RELEASE_TAG
+          $zipName = [IO.Path]::GetFileName($env:RELEASE_ZIP)
+          $sumName = "$zipName.sha256"
+          $runKey = "$($env:GITHUB_RUN_ID)-$($env:GITHUB_RUN_ATTEMPT)"
+          $stageZipName = "stage-$runKey-$zipName"
+          $stageSumName = "stage-$runKey-$sumName"
+          $oldZipName = "old-$runKey-$zipName"
+          $oldSumName = "old-$runKey-$sumName"
+          $stageZipPath = Join-Path dist $stageZipName
+          $stageSumPath = Join-Path dist $stageSumName
+          Copy-Item -LiteralPath $env:RELEASE_ZIP -Destination $stageZipPath
+          Copy-Item -LiteralPath "$($env:RELEASE_ZIP).sha256" -Destination $stageSumPath
+          $localZipHash = (Get-FileHash -LiteralPath $stageZipPath -Algorithm SHA256).Hash.ToLowerInvariant()
+          $localSumHash = (Get-FileHash -LiteralPath $stageSumPath -Algorithm SHA256).Hash.ToLowerInvariant()
+
+          function Get-Release {
+            $json = gh api "repos/$repo/releases/tags/$tag"
+            if ($LASTEXITCODE -ne 0) { throw 'Could not read release.' }
+            return $json | ConvertFrom-Json
+          }
+          function Get-Asset($release, [string]$name) {
+            $match = @($release.assets | Where-Object { $_.name -ceq $name })
+            if ($match.Count -ne 1) { throw "Expected one release asset named $name, got $($match.Count)." }
+            return $match[0]
+          }
+          function Rename-Asset([long]$id, [string]$name) {
+            gh api -X PATCH "repos/$repo/releases/assets/$id" -f "name=$name" | Out-Null
+            if ($LASTEXITCODE -ne 0) { throw "Could not rename asset $id to $name." }
+          }
+          function Swap-Asset([long]$oldId, [long]$newId, [string]$name, [string]$backupName) {
+            Rename-Asset $oldId $backupName
+            try {
+              Rename-Asset $newId $name
+            } catch {
+              $reason = $_.Exception.Message
+              try {
+                Rename-Asset $oldId $name
+              } catch {
+                throw "Could not publish $name, and restoring its original URL failed: $reason; $($_.Exception.Message)"
+              }
+              throw "Could not publish $name; its original URL was restored: $reason"
+            }
+          }
+          function Restore-Asset([long]$oldId, [long]$newId, [string]$name, [string]$stageName) {
+            Rename-Asset $newId $stageName
+            try {
+              Rename-Asset $oldId $name
+            } catch {
+              $reason = $_.Exception.Message
+              try { Rename-Asset $newId $name } catch {
+                throw "Could not restore $name, and republishing the candidate failed: $reason; $($_.Exception.Message)"
+              }
+              throw "Could not restore the original $name; the candidate URL was restored: $reason"
+            }
+          }
+          function Delete-Asset([long]$id) {
+            gh api -X DELETE "repos/$repo/releases/assets/$id" | Out-Null
+            if ($LASTEXITCODE -ne 0) { throw "Could not delete old asset $id." }
+          }
+          function Confirm-PublicDownload([string]$url, [string]$destination, [string]$expectedHash) {
+            for ($attempt = 1; $attempt -le 4; $attempt++) {
+              try {
+                if (Test-Path -LiteralPath $destination) { Remove-Item -LiteralPath $destination }
+                Invoke-WebRequest -Uri $url -OutFile $destination -MaximumRedirection 10
+                $downloadHash = (Get-FileHash -LiteralPath $destination -Algorithm SHA256).Hash.ToLowerInvariant()
+                if ($downloadHash -cne $expectedHash) { throw 'Downloaded bytes do not match the staged asset.' }
+                return
+              } catch {
+                if ($attempt -eq 4) {
+                  throw "Public download verification failed after four attempts: $($_.Exception.Message)"
+                }
+                Start-Sleep -Seconds 3
+              }
+            }
+          }
+
+          $before = Get-Release
+          $oldZip = Get-Asset $before $zipName
+          $oldSum = Get-Asset $before $sumName
+          $headSha = gh api "repos/$repo/git/ref/heads/main" --jq '.object.sha'
+          if ($LASTEXITCODE -ne 0 -or $headSha.Trim() -cne $env:GITHUB_SHA) {
+            throw 'Main moved since this workflow checked out its source.'
+          }
+          $tagJson = gh api "repos/$repo/git/ref/tags/$tag"
+          if ($LASTEXITCODE -ne 0) { throw 'Could not read the existing release tag.' }
+          $tagBefore = $tagJson | ConvertFrom-Json
+          if ($tagBefore.object.type -cne 'commit') { throw 'The release tag is not a lightweight commit tag.' }
+          $oldTagSha = $tagBefore.object.sha
+          gh release upload $tag $stageZipPath $stageSumPath --repo $repo
+          if ($LASTEXITCODE -ne 0) { throw 'Staged asset upload failed; original assets were preserved.' }
+          $staged = Get-Release
+          $newZip = Get-Asset $staged $stageZipName
+          $newSum = Get-Asset $staged $stageSumName
+          if ($newZip.digest -cne "sha256:$localZipHash" -or $newSum.digest -cne "sha256:$localSumHash") {
+            throw 'Staged asset checksum mismatch; original assets were preserved.'
+          }
+
+          $headSha = gh api "repos/$repo/git/ref/heads/main" --jq '.object.sha'
+          if ($LASTEXITCODE -ne 0 -or $headSha.Trim() -cne $env:GITHUB_SHA) {
+            throw 'Main moved before the release switch; original assets were preserved.'
+          }
+          gh api -X PATCH "repos/$repo/git/refs/tags/$tag" -f "sha=$env:GITHUB_SHA" -F force=true | Out-Null
+          if ($LASTEXITCODE -ne 0) { throw 'Could not retarget release tag.' }
+          $zipSwapped = $false
+          $sumSwapped = $false
+          try {
+            Swap-Asset $oldZip.id $newZip.id $zipName $oldZipName
+            $zipSwapped = $true
+            Swap-Asset $oldSum.id $newSum.id $sumName $oldSumName
+            $sumSwapped = $true
+
+            $updated = Get-Release
+            $publishedZip = Get-Asset $updated $zipName
+            $publishedSum = Get-Asset $updated $sumName
+            if ($publishedZip.digest -cne "sha256:$localZipHash") { throw 'Updated ZIP digest mismatch.' }
+            if ($publishedSum.digest -cne "sha256:$localSumHash") { throw 'Updated checksum digest mismatch.' }
+
+            $downloadedZip = Join-Path dist "downloaded-$runKey.zip"
+            $downloadedSum = Join-Path dist "downloaded-$runKey.zip.sha256"
+            Confirm-PublicDownload $publishedZip.browser_download_url $downloadedZip $localZipHash
+            Confirm-PublicDownload $publishedSum.browser_download_url $downloadedSum $localSumHash
+
+            gh release edit $tag --repo $repo --notes-file dist/release-notes.md
+            if ($LASTEXITCODE -ne 0) { throw 'Could not update release notes.' }
+          } catch {
+            $reason = $_.Exception.Message
+            $rollbackProblems = @()
+            if ($sumSwapped) {
+              try { Restore-Asset $oldSum.id $newSum.id $sumName $stageSumName }
+              catch { $rollbackProblems += $_.Exception.Message }
+            }
+            if ($zipSwapped) {
+              try { Restore-Asset $oldZip.id $newZip.id $zipName $stageZipName }
+              catch { $rollbackProblems += $_.Exception.Message }
+            }
+            gh api -X PATCH "repos/$repo/git/refs/tags/$tag" -f "sha=$oldTagSha" -F force=true | Out-Null
+            if ($LASTEXITCODE -ne 0) { $rollbackProblems += 'Could not restore the original release tag.' }
+            if ($rollbackProblems.Count -ne 0) {
+              throw "Release refresh failed: $reason Rollback problems: $($rollbackProblems -join '; ')"
+            }
+            throw "Release refresh failed; original assets and tag were restored: $reason"
+          }
+          Delete-Asset $oldZip.id
+          Delete-Asset $oldSum.id
+
+          gh release delete v0.1.0-beta.1 --repo $repo --cleanup-tag --yes
+          if ($LASTEXITCODE -ne 0) { throw 'Could not remove obsolete beta 1 release and tag.' }
+
