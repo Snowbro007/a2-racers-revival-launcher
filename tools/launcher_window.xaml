@@ -59,6 +59,15 @@
       <Setter Property="Background" Value="#1B334E"/><Setter Property="BorderBrush" Value="#718FAE"/>
       <Setter Property="Padding" Value="11,7"/><Setter Property="MinHeight" Value="40"/>
     </Style>
+    <Style x:Key="SetupChoiceButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+      <Setter Property="Background" Value="#163B60"/><Setter Property="BorderBrush" Value="#7299C2"/>
+      <Setter Property="HorizontalContentAlignment" Value="Stretch"/><Setter Property="Padding" Value="10,8"/>
+      <Setter Property="MinHeight" Value="60"/>
+    </Style>
+    <Style x:Key="SetupHelpButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+      <Setter Property="Background" Value="#213149"/><Setter Property="BorderBrush" Value="#566F8A"/>
+      <Setter Property="Padding" Value="10,6"/><Setter Property="FontSize" Value="12"/>
+    </Style>
     <Style TargetType="CheckBox">
       <Setter Property="Foreground" Value="#ECF2FA"/><Setter Property="Margin" Value="0,8"/><Setter Property="Cursor" Value="Hand"/>
       <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="CheckBox">
@@ -177,10 +186,10 @@
     <Grid Margin="26,22,26,18">
       <Grid.RowDefinitions><RowDefinition Height="82"/><RowDefinition Height="*"/><RowDefinition Height="20"/></Grid.RowDefinitions>
       <Grid Grid.Row="0">
-        <Grid.ColumnDefinitions><ColumnDefinition Width="76"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+        <Grid.ColumnDefinitions><ColumnDefinition Width="68"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
         <Image x:Name="LauncherBadge" Width="60" Height="60" Stretch="Uniform" HorizontalAlignment="Left" VerticalAlignment="Top"/>
         <StackPanel Grid.Column="1" Margin="0,0,0,0">
-          <TextBlock Text="Racers Revival" FontFamily="Bahnschrift" FontSize="32" FontWeight="Bold" FontStyle="Italic" Foreground="{StaticResource ChromeText}"/>
+          <TextBlock Text="A2 Racers Revival" FontFamily="Bahnschrift" FontSize="32" FontWeight="Bold" FontStyle="Italic" Foreground="{StaticResource ChromeText}"/>
           <TextBlock Text="Game launcher" Foreground="#A6B8CE" FontSize="12" Margin="1,4,0,0"/>
         </StackPanel>
         <Border Grid.Column="2" Background="#182537" BorderBrush="#33465B" BorderThickness="1" CornerRadius="5" Padding="11,6" VerticalAlignment="Top" Margin="0,8,0,0">
@@ -252,15 +261,34 @@
                       </StackPanel>
                     </Grid>
                   </Border>
+                  <Border x:Name="InstallationPanel" Visibility="Collapsed" Background="#233147" BorderBrush="#FFE057" BorderThickness="1" CornerRadius="8" Padding="16,12" Margin="0,0,0,14"><StackPanel>
+                    <TextBlock x:Name="InstallationTitle" Text="Stap 1 · Voeg je eigen A2 Racer I toe" FontSize="18" FontWeight="SemiBold" Foreground="#FFF1BD"/>
+                    <TextBlock x:Name="InstallationNote" Text="Kies hoe je je eigen volledige Nederlandse game hebt opgeslagen. Je bron blijft intact." TextWrapping="Wrap" FontSize="12" Foreground="#D7E2F2" Margin="0,5,0,8"/>
+                    <StackPanel x:Name="InstallationFoundSection" Visibility="Collapsed" Margin="0,0,0,9">
+                      <TextBlock Text="GEVONDEN OP DEZE PC" Foreground="#B6D4EF" FontSize="10" FontWeight="Bold" Margin="0,0,0,5"/>
+                      <WrapPanel><ComboBox x:Name="InstallationChoice" Width="410" AutomationProperties.Name="Gevonden A2 Racer I-installaties"/><Button x:Name="LinkInstallation" Content="Deze game gebruiken" Visibility="Collapsed" Style="{StaticResource SetupHelpButton}" Margin="8,0,0,0"/></WrapPanel>
+                    </StackPanel>
+                    <StackPanel x:Name="InstallationSourceChoices">
+                      <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="9"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                        <Button x:Name="ChooseInstallation" Grid.Column="0" Style="{StaticResource SetupChoiceButton}" AutomationProperties.Name="Ik heb een gamemap. Volledige gamemap kiezen" ToolTip="Kies de volledige gamemap van je eigen Nederlandse game. De launcher controleert en kopieert de bestanden; de bron blijft intact.">
+                          <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="32"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                            <Border Width="25" Height="25" CornerRadius="5" Background="#335C7B" VerticalAlignment="Center"><Viewbox Width="18" Height="18"><Canvas Width="20" Height="20"><Path Data="M2,5 L8,5 L10,7 L18,7 L18,16 L2,16 Z" Fill="#D4EBFF"/></Canvas></Viewbox></Border>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center"><TextBlock Text="Ik heb een gamemap" FontWeight="SemiBold" FontSize="13"/><TextBlock x:Name="InstallationFolderHint" Text="Volledige map op pc of USB" Foreground="#C6DCF0" FontSize="11" TextWrapping="Wrap" Margin="0,2,0,0"/></StackPanel>
+                          </Grid>
+                        </Button>
+                        <Button x:Name="ImportGame" Grid.Column="2" Style="{StaticResource SetupChoiceButton}" AutomationProperties.Name="Ik heb een ZIP-bestand. Gamearchief kiezen" ToolTip="Kies een ZIP-bestand van je eigen ondersteunde Nederlandse game. De launcher controleert en kopieert de bestanden; het ZIP-bestand blijft intact.">
+                          <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="32"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                            <Border Width="25" Height="25" CornerRadius="5" Background="#335C7B" VerticalAlignment="Center"><TextBlock Text="ZIP" Foreground="#D4EBFF" FontWeight="Bold" FontSize="9" VerticalAlignment="Center" HorizontalAlignment="Center"/></Border>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center"><TextBlock Text="Ik heb een ZIP-bestand" FontWeight="SemiBold" FontSize="13"/><TextBlock Text="Van mijn eigen Nederlandse game" Foreground="#C6DCF0" FontSize="11" TextWrapping="Wrap" Margin="0,2,0,0"/></StackPanel>
+                          </Grid>
+                        </Button>
+                      </Grid>
+                      <WrapPanel Margin="0,8,0,0"><TextBlock Text="ANDERE HULP" Foreground="#AFC8E2" FontSize="10" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,10,0"/><Button x:Name="DetectInstallations" Content="Bekende Windows-installatie zoeken" Style="{StaticResource SetupHelpButton}" ToolTip="Zoekt alleen geregistreerde A2 Racer I-installaties in Windows; scant niet alle schijven." Margin="0,0,7,0"/><Button x:Name="GetGame" Content="Welke bestanden heb ik nodig?" Style="{StaticResource SetupHelpButton}" ToolTip="Uitleg over je eigen gamebestanden. De launcher levert of downloadt geen game."/></WrapPanel>
+                    </StackPanel>
+                    <Button x:Name="PrepareGame" Content="Lokale speelkopie maken" Visibility="Collapsed" HorizontalAlignment="Left" Margin="0,5,0,0"/>
+                  </StackPanel></Border>
                   <TextBlock x:Name="PlayNote" TextWrapping="Wrap" Foreground="#A6B8CE" FontSize="12" LineHeight="18" Margin="0,0,0,8"/>
                   <TextBlock x:Name="SelectionNote" TextWrapping="Wrap" Foreground="#FFE057" FontSize="12" LineHeight="18" Margin="0,0,0,8"/>
-                  <Border x:Name="InstallationPanel" Visibility="Collapsed" Background="#233147" BorderBrush="#FFE057" BorderThickness="1" CornerRadius="8" Padding="18,16" Margin="0,0,0,14"><StackPanel>
-                    <TextBlock x:Name="InstallationTitle" Text="Stap 1 · Koppel je eigen A2 Racer I" FontSize="18" FontWeight="SemiBold" Foreground="#FFF1BD"/>
-                    <TextBlock x:Name="InstallationNote" Text="Kies je volledige gamemap of importeer je gamearchief." TextWrapping="Wrap" FontSize="12" Foreground="#D7E2F2" Margin="0,7,0,8"/>
-                    <ComboBox x:Name="InstallationChoice" Visibility="Collapsed" AutomationProperties.Name="Gevonden game-installaties"/>
-                    <WrapPanel><Button x:Name="ChooseInstallation" Content="Gamemap kiezen…" Margin="0,5,8,0"/><Button x:Name="ImportGame" Content="Gamearchief importeren…" Margin="0,5,8,0"/><Button x:Name="PrepareGame" Content="Game voorbereiden" Visibility="Collapsed" Margin="0,5,8,0"/></WrapPanel>
-                    <WrapPanel><Button x:Name="DetectInstallations" Content="Installaties zoeken" Margin="0,5,8,0"/><Button x:Name="LinkInstallation" Content="Gevonden installatie koppelen" Visibility="Collapsed" Margin="0,5,8,0"/><Button x:Name="GetGame" Content="Game verkrijgen" Margin="0,5,0,0"/></WrapPanel>
-                  </StackPanel></Border>
                   <Grid x:Name="IOverviewPanel"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="12"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="10"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
                     <Border Style="{StaticResource OverviewCard}"><StackPanel><TextBlock Text="RESOLUTIE" Style="{StaticResource OverviewLabel}"/><TextBlock x:Name="OverviewResolution" Text="—" Style="{StaticResource OverviewValue}"/></StackPanel></Border>
                     <Border Grid.Column="2" Style="{StaticResource OverviewCard}"><StackPanel><TextBlock Text="FPS / SPELTEMPO" Style="{StaticResource OverviewLabel}"/><TextBlock x:Name="OverviewFps" Text="—" Style="{StaticResource OverviewValue}"/></StackPanel></Border>
