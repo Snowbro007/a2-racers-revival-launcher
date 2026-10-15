@@ -30,7 +30,7 @@ try {
             $null = [Management.Automation.Language.Parser]::ParseFile((Join-Path $PSScriptRoot $script), [ref]$tokens, [ref]$errors)
             if ($errors.Count) { throw ('Parserfout in ' + $script) }
         }
-        Write-Host 'Controle geslaagd. Geen game gestart of cd gemount. Gebruik Start-A2.cmd voor de speeltest.'
+        Write-Host 'Controle geslaagd. Geen game gestart of cd gemount. Open Launcher.cmd om te spelen.'
         return
     }
     $active = @(Get-CimInstance Win32_Process -Filter "Name='A2.EXE' OR Name='A2MOVIE.DAT' OR Name='A2MENU.DAT' OR Name='A2SPEL.DAT'" |

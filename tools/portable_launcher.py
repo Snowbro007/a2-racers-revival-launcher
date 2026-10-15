@@ -22,6 +22,7 @@ PUBLIC_FILES = ('LICENSE', 'VERSION.txt', 'tools/prepare_public_release.py', 'do
                 'docs/release-third-party-notices.md', 'docs/public-release.json',
                 'docs/public-gitignore.txt', 'docs/public-release-notes.md')
 EXTRA_FILES = (
+    'Controleren.cmd',
     'tools/portable_launcher.py', 'tools/launcher_assets.py',
     'tools/Start-IHDMenu.ps1', 'tools/i_frontend.ps1',
     'tools/i_frontend_state.py', 'tools/i_frontend_prepare.py',
