@@ -1,6 +1,10 @@
-# A2 Racers Revival — 0.1.0-beta.1
+# A2 Racers Revival — 0.1.0-beta.2
 
-Eerste openbare beta voor Windows 11 x64. Eigen ondersteunde Nederlandse games vereist; geen games meegeleverd.
+Verbeterde openbare beta voor Windows 11 x64. Eigen ondersteunde Nederlandse games vereist; geen games meegeleverd.
+
+- Nieuw startvenster met duidelijke spelstatus en grote speelknop.
+- Rood-wit A2-pictogram voor het venster en de snelkoppeling.
+- `Controleren.cmd` toont een duidelijke foutmelding als een onderdeel ontbreekt.
 
 - I: Revived, Full HD en optionele HD textures/HD-menu.
 - II: speelbaar, Full HD aanbevolen; originele HUD op 720p/1080p/4K. Uitgebreide HD-HUD/MAX zijn op een schone pc nog niet beschikbaar.
@@ -10,4 +14,4 @@ Eerste openbare beta voor Windows 11 x64. Eigen ondersteunde Nederlandse games v
 
 Onafhankelijk fanproject, zonder officiële steun van Davilex/Visma of andere rechthebbenden. Games, merken en oorspronkelijk materiaal blijven van hun rechthebbenden. MIT geldt alleen voor eigen launchercode/documentatie; zie THIRD-PARTY-NOTICES.md. Beta zonder garantie. Behoud een backup van local/ bij updates.
 
-De releasepagina vermeldt de checksum en scanstatus van de uiteindelijke ZIP. Een VirusTotal-resultaat is geen veiligheidsgarantie en dekt geen later opgehaalde componenten of zelf aangeleverde games.
+De SHA-256-controlesom van de uiteindelijke ZIP staat hieronder op de releasepagina.

@@ -1,0 +1,60 @@
+name: Publish game-free beta 2
+
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/publish-beta2.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-game-free-beta-2
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.repository == 'Snowbro007/a2-racers-revival-launcher' && github.ref == 'refs/heads/main'
+    runs-on: windows-latest
+    timeout-minutes: 20
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_TAG: v0.1.0-beta.2
+      RELEASE_VERSION: 0.1.0-beta.2
+      RELEASE_ZIP: dist/A2-Racers-Revival-0.1.0-beta.2-Windows-x64.zip
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Build and verify launcher-only package
+        shell: pwsh
+        run: |
+          if ((Get-Content VERSION.txt -Raw).Trim() -ne $env:RELEASE_VERSION) {
+            throw 'VERSION.txt does not match the release tag.'
+          }
+          python -B tools/portable_launcher.py build --public --output $env:RELEASE_ZIP
+          if ($LASTEXITCODE -ne 0) { throw 'Public package build failed.' }
+          python -B tools/portable_launcher.py audit --archive $env:RELEASE_ZIP
+          if ($LASTEXITCODE -ne 0) { throw 'Public package audit failed.' }
+          python -B tools/check_public_release.py --archive $env:RELEASE_ZIP --version $env:RELEASE_VERSION --notes-template docs/public-release-notes.md --notes-output dist/release-notes.md
+          if ($LASTEXITCODE -ne 0) { throw 'Game-free release check failed.' }
+
+      - name: Create new beta release
+        shell: pwsh
+        run: |
+          $PSNativeCommandUseErrorActionPreference = $false
+          gh release view $env:RELEASE_TAG --repo $env:GITHUB_REPOSITORY --json tagName *> $null
+          if ($LASTEXITCODE -eq 0) { throw 'Beta 2 already has a release; refusing to replace it.' }
+          git ls-remote --exit-code --tags origin "refs/tags/$env:RELEASE_TAG" | Out-Null
+          if ($LASTEXITCODE -eq 0) { throw 'Beta 2 tag already exists; refusing to retarget it.' }
+          if ($LASTEXITCODE -ne 2) { throw 'Could not check the beta 2 tag.' }
+          $checksum = "$($env:RELEASE_ZIP).sha256"
+          gh release create $env:RELEASE_TAG $env:RELEASE_ZIP $checksum --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --title 'A2 Racers Revival 0.1.0-beta.2' --notes-file dist/release-notes.md --prerelease
+          if ($LASTEXITCODE -ne 0) { throw 'Beta 2 release upload failed.' }

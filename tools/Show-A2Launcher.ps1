@@ -766,7 +766,7 @@ try {
     $reader = New-Object Xml.XmlNodeReader ([xml][IO.File]::ReadAllText((Join-Path $PSScriptRoot 'launcher_window.xaml')))
     try { $window = [Windows.Markup.XamlReader]::Load($reader) } finally { $reader.Close() }
     $ui = @{}
-    foreach ($name in @('CoverBackdrop','CoverPreview','WelcomeTitle','WelcomeHint','GameOne','GameTwo','GameThree','GameOneAvailability','GameTwoAvailability','IIITourChoice','IIIStatus','IIIStartScroll','IIIOverviewPanel','IIITourOverview','IIIReadyOverview','IIIResolutionOverview','IIIProfileChoice','IIIProfileNote','IIIChooseInstallation','GameOneSelected','GameTwoSelected','GameTitle','GameSubtitle','OptionsGameTitle',
+    foreach ($name in @('CoverBackdrop','CoverPreview','LauncherBadge','WelcomeTitle','WelcomeHint','GameOne','GameTwo','GameThree','GameOneAvailability','GameTwoAvailability','IIITourChoice','IIIStatus','IIIStartScroll','IIIOverviewPanel','IIITourOverview','IIIReadyOverview','IIIResolutionOverview','IIIProfileChoice','IIIProfileNote','IIIChooseInstallation','GameOneSelected','GameTwoSelected','GameTitle','GameSubtitle','OptionsGameTitle',
             'IOptionsPanel','IIOptionsNotice','IOverviewPanel','IIOverviewPanel','IIMenuChoice','IIRaceDisplayChoice','IIResolutionChoice','IIHudChoice','IISkyChoice','IIDistanceChoice','IIMenuNote','Pages','PlaySummary','PlayNote','ImportGame','GraphicsChoice',
             'GraphicsNote','ResolutionChoice','ResolutionNote','CameraNote','DistanceChoice','DistanceNote','ObjectDistanceChoice','ObjectDistanceNote','TextureChoice','TextureNote','MenuChoice','MenuNote',
             'HorizonChoice','FocusRecoveryChoice','FocusRecoveryNote','ChooseOptions','RecommendedOptions','OverviewResolution','OverviewFps','OverviewDistance','OverviewObjects','OverviewDetailLabel','SelectionNote','AdvancedOptions','StartScroll','SupportScroll','OptionsScroll','DashboardChoice','FpsChoice','FpsNote','IntroChoice','DebugChoice',
@@ -784,9 +784,13 @@ try {
     $iconStream = [IO.File]::OpenRead($iconPath)
     try {
         $iconDecoder = [Windows.Media.Imaging.BitmapDecoder]::Create($iconStream, [Windows.Media.Imaging.BitmapCreateOptions]::None, [Windows.Media.Imaging.BitmapCacheOption]::OnLoad)
-        $iconFrame = @($iconDecoder.Frames) | Sort-Object PixelWidth -Descending | Select-Object -First 1
-        $iconFrame.Freeze()
-        $window.Icon = $iconFrame
+        $iconFrames = @($iconDecoder.Frames)
+        $titleFrame = $iconFrames | Sort-Object @{ Expression = { [Math]::Abs($_.PixelWidth - 32) } } | Select-Object -First 1
+        $badgeFrame = $iconFrames | Sort-Object PixelWidth -Descending | Select-Object -First 1
+        $titleFrame.Freeze()
+        $badgeFrame.Freeze()
+        $window.Icon = $titleFrame
+        $ui.LauncherBadge.Source = $badgeFrame
     } finally { $iconStream.Dispose() }
     Add-Choice $ui.IIITourChoice 'Tour 1' '1'; Add-Choice $ui.IIITourChoice 'Tour 2' '2'
     $ui.IIITourChoice.SelectedIndex = 0

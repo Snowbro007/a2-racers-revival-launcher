@@ -173,8 +173,8 @@
     <Grid Margin="26,22,26,18">
       <Grid.RowDefinitions><RowDefinition Height="82"/><RowDefinition Height="*"/><RowDefinition Height="20"/></Grid.RowDefinitions>
       <Grid Grid.Row="0">
-        <Grid.ColumnDefinitions><ColumnDefinition Width="112"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-        <Image Source="{StaticResource A2RouteBadge}" Width="94" Height="59.576" Stretch="Uniform" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+        <Grid.ColumnDefinitions><ColumnDefinition Width="76"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+        <Image x:Name="LauncherBadge" Width="60" Height="60" Stretch="Uniform" HorizontalAlignment="Left" VerticalAlignment="Top"/>
         <StackPanel Grid.Column="1" Margin="0,0,0,0">
           <TextBlock Text="Racers Revival" FontFamily="Bahnschrift" FontSize="32" FontWeight="Bold" FontStyle="Italic" Foreground="{StaticResource ChromeText}"/>
           <TextBlock Text="Game launcher" Foreground="#A6B8CE" FontSize="12" Margin="1,4,0,0"/>
