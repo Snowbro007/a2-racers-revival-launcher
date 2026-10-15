@@ -1,4 +1,4 @@
-#Requires -Version 5.1
+﻿#Requires -Version 5.1
 param([string]$PythonPath, [string]$PowerShellPath, [switch]$CheckOnly, [string]$PreviewPath,
       [ValidateSet('play','options','logs','iii')][string]$PreviewPage = 'play',
       [ValidateSet('a2racer1','a2racer2')][string]$PreviewGame)
