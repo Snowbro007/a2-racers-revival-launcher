@@ -2,6 +2,8 @@
 
 De MIT-licentie geldt voor de eigen launchercode en documentatie. Zij verleent geen rechten op de oorspronkelijke A2 Racer-games, merken, gamegegevens of externe componenten. De oorspronkelijke games worden niet meegeleverd en moeten door de speler zelf worden aangeleverd. Optionele fanmod-art wordt afzonderlijk gebruikt voor dit fanproject; de rechten op oorspronkelijk spelmateriaal blijven bij de rechthebbenden.
 
+Het A2-pictogram in het launchervenster en de snelkoppeling is gemaakt op basis van [NL-A2.svg van Rl91 / Varkentjes](https://commons.wikimedia.org/wiki/File:NL-A2.svg), gemarkeerd als publiek domein op Wikimedia Commons.
+
 Deze openbare download bevat geen externe uitvoerbare componenten. Bij de eerste start worden uitsluitend de onderstaande vastgelegde versies opgehaald, rechtstreeks bij hun leveranciers. Downloads worden vóór uitpakken of uitvoeren tegen vaste SHA256-hashes gecontroleerd. De oorspronkelijke componentarchieven, licenties en notices blijven in de lokale cache behouden. Er worden geen gamekopieën gedownload.
 
 | Component | Versie | Leverancier en licentie-informatie |

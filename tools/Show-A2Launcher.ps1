@@ -778,6 +778,16 @@ try {
     $artworkPath = Join-Path $PSScriptRoot 'launcher_art\cover-inspired-highway-v1.png'
     Set-CoverArtwork $ui.CoverBackdrop $artworkPath
     Set-CoverArtwork $ui.CoverPreview $artworkPath
+    $iconPath = Join-Path $PSScriptRoot 'launcher_art\a2-revival.ico'
+    Assert-LauncherPath $iconPath
+    if (-not (Test-Path -LiteralPath $iconPath -PathType Leaf)) { throw 'Het A2-launcherpictogram ontbreekt. Pak de complete launcher opnieuw uit.' }
+    $iconStream = [IO.File]::OpenRead($iconPath)
+    try {
+        $iconDecoder = [Windows.Media.Imaging.BitmapDecoder]::Create($iconStream, [Windows.Media.Imaging.BitmapCreateOptions]::None, [Windows.Media.Imaging.BitmapCacheOption]::OnLoad)
+        $iconFrame = @($iconDecoder.Frames) | Sort-Object PixelWidth -Descending | Select-Object -First 1
+        $iconFrame.Freeze()
+        $window.Icon = $iconFrame
+    } finally { $iconStream.Dispose() }
     Add-Choice $ui.IIITourChoice 'Tour 1' '1'; Add-Choice $ui.IIITourChoice 'Tour 2' '2'
     $ui.IIITourChoice.SelectedIndex = 0
     Add-Choice $ui.IIIProfileChoice 'Compatibiliteit · proef' 'compat'

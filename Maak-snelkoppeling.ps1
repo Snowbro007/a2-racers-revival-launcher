@@ -11,7 +11,7 @@ $ErrorActionPreference = 'Stop'
 try {
     if (-not $KitPath) { $KitPath = $PSScriptRoot }
     $kitRoot = (Get-Item -LiteralPath $KitPath -ErrorAction Stop).FullName
-    $required = if ($Launcher) { @('Launcher.cmd','tools\Show-A2Launcher.ps1','tools\launcher_window.xaml','tools\launcher_model.py','tools\launcher_common.ps1','tools\Invoke-A2LauncherSession.ps1') }
+    $required = if ($Launcher) { @('Launcher.cmd','tools\Show-A2Launcher.ps1','tools\launcher_window.xaml','tools\launcher_model.py','tools\launcher_common.ps1','tools\Invoke-A2LauncherSession.ps1','tools\launcher_art\a2-revival.ico') }
         else { @('Start-A2.cmd', 'tools\Start-A2Portable.ps1', 'payload\python-3.13.16-embed-amd64.zip') }
     foreach ($relative in $required) {
         if (-not (Test-Path -LiteralPath (Join-Path $kitRoot $relative) -PathType Leaf)) {
@@ -48,7 +48,7 @@ try {
     $shortcut.Arguments = $arguments
     $shortcut.WorkingDirectory = $kitRoot
     $shortcut.Description = $description
-    $shortcut.IconLocation = $powershellPath + ',0'
+    $shortcut.IconLocation = if ($Launcher) { (Join-Path $kitRoot 'tools\launcher_art\a2-revival.ico') + ',0' } else { $powershellPath + ',0' }
     $shortcut.WindowStyle = if ($Launcher) { 7 } else { 1 }
     $shortcut.Save()
 
