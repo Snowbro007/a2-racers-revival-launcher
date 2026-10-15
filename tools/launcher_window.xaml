@@ -194,7 +194,7 @@
                 <TextBlock Text="I" FontFamily="Bahnschrift" FontWeight="Bold" FontSize="43" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Left"/>
                 <StackPanel Grid.Column="1" VerticalAlignment="Center">
                   <TextBlock Text="A2 Racer I" FontFamily="Bahnschrift" FontWeight="SemiBold" FontSize="21"/>
-                  <TextBlock Text="Revived" FontSize="12" Foreground="#D3E5FA" Margin="0,4,0,0"/>
+                  <TextBlock x:Name="GameOneAvailability" Text="Wordt gecontroleerd" FontSize="12" Foreground="#D3E5FA" Margin="0,4,0,0"/>
                   <TextBlock x:Name="GameOneSelected" Text="Geselecteerd" FontSize="11" FontWeight="SemiBold" Foreground="#FFE66D" Margin="0,8,0,0"/>
                 </StackPanel>
               </Grid>
@@ -206,7 +206,7 @@
                 <TextBlock Text="II" FontFamily="Bahnschrift" FontWeight="Bold" FontSize="36" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Left"/>
                 <StackPanel Grid.Column="1" VerticalAlignment="Center">
                   <TextBlock Text="A2 Racer II" FontFamily="Bahnschrift" FontWeight="SemiBold" FontSize="21"/>
-                  <TextBlock Text="Speelbaar" FontSize="12" Foreground="#D3E5FA" Margin="0,4,0,0"/>
+                  <TextBlock x:Name="GameTwoAvailability" Text="Wordt gecontroleerd" FontSize="12" Foreground="#D3E5FA" Margin="0,4,0,0"/>
                   <TextBlock x:Name="GameTwoSelected" Text="Geselecteerd" FontSize="11" FontWeight="SemiBold" Foreground="#FFE66D" Margin="0,8,0,0" Visibility="Hidden"/>
                 </StackPanel>
               </Grid>
@@ -239,8 +239,24 @@
               <TabItem Header="Spelen"><Grid>
                 <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
                 <ScrollViewer x:Name="StartScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><StackPanel Margin="0,1,8,0">
+                  <Border Background="#19283D" BorderBrush="#526C8B" BorderThickness="1" CornerRadius="8" Margin="0,0,0,10" ClipToBounds="True">
+                    <Grid Height="104"><Grid.ColumnDefinitions><ColumnDefinition Width="175"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                      <Image x:Name="CoverPreview" Stretch="UniformToFill" IsHitTestVisible="False" Focusable="False" AutomationProperties.Name="A2-sfeerbeeld met een auto op de snelweg"/>
+                      <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="18,8,16,8">
+                        <TextBlock x:Name="WelcomeTitle" Text="Je game wordt gecontroleerd" Foreground="#FFE66D" FontFamily="Bahnschrift" FontSize="20" FontWeight="SemiBold"/>
+                        <TextBlock x:Name="WelcomeHint" Text="Even wachten; de launcher controleert welke gamebestanden al klaarstaan." Foreground="#E0E9F6" FontSize="12" TextWrapping="Wrap" LineHeight="17" Margin="0,5,0,0"/>
+                      </StackPanel>
+                    </Grid>
+                  </Border>
                   <TextBlock x:Name="PlayNote" TextWrapping="Wrap" Foreground="#A6B8CE" FontSize="12" LineHeight="18" Margin="0,0,0,8"/>
                   <TextBlock x:Name="SelectionNote" TextWrapping="Wrap" Foreground="#FFE057" FontSize="12" LineHeight="18" Margin="0,0,0,8"/>
+                  <Border x:Name="InstallationPanel" Visibility="Collapsed" Background="#233147" BorderBrush="#FFE057" BorderThickness="1" CornerRadius="8" Padding="18,16" Margin="0,0,0,14"><StackPanel>
+                    <TextBlock x:Name="InstallationTitle" Text="Stap 1 · Koppel je eigen A2 Racer I" FontSize="18" FontWeight="SemiBold" Foreground="#FFF1BD"/>
+                    <TextBlock x:Name="InstallationNote" Text="Kies je volledige gamemap of importeer je gamearchief." TextWrapping="Wrap" FontSize="12" Foreground="#D7E2F2" Margin="0,7,0,8"/>
+                    <ComboBox x:Name="InstallationChoice" Visibility="Collapsed" AutomationProperties.Name="Gevonden game-installaties"/>
+                    <WrapPanel><Button x:Name="ChooseInstallation" Content="Gamemap kiezen…" Margin="0,5,8,0"/><Button x:Name="ImportGame" Content="Gamearchief importeren…" Margin="0,5,8,0"/><Button x:Name="PrepareGame" Content="Game voorbereiden" Visibility="Collapsed" Margin="0,5,8,0"/></WrapPanel>
+                    <WrapPanel><Button x:Name="DetectInstallations" Content="Installaties zoeken" Margin="0,5,8,0"/><Button x:Name="LinkInstallation" Content="Gevonden installatie koppelen" Visibility="Collapsed" Margin="0,5,8,0"/><Button x:Name="GetGame" Content="Game verkrijgen" Margin="0,5,0,0"/></WrapPanel>
+                  </StackPanel></Border>
                   <Grid x:Name="IOverviewPanel"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="12"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="10"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
                     <Border Style="{StaticResource OverviewCard}"><StackPanel><TextBlock Text="RESOLUTIE" Style="{StaticResource OverviewLabel}"/><TextBlock x:Name="OverviewResolution" Text="—" Style="{StaticResource OverviewValue}"/></StackPanel></Border>
                     <Border Grid.Column="2" Style="{StaticResource OverviewCard}"><StackPanel><TextBlock Text="FPS / SPELTEMPO" Style="{StaticResource OverviewLabel}"/><TextBlock x:Name="OverviewFps" Text="—" Style="{StaticResource OverviewValue}"/></StackPanel></Border>
@@ -256,13 +272,6 @@
                 <StackPanel Grid.Row="1" Margin="0,14,0,0">
                   <WrapPanel><Button x:Name="ChooseOptions" Content="Instellingen" Margin="0,0,10,0"/><Button x:Name="OriginalProfile" Content="Origineel" ToolTip="640 × 480, 20 FPS, originele zichtafstand, horizon, textures en menu." Margin="0,0,8,0"/><Button x:Name="RecommendedOptions" Content="Aanbevolen" ToolTip="1080p, 20 FPS, verder wegzicht, horizon uit en dashboard aan. HD blijft optioneel." Margin="0,0,8,0"/><Button x:Name="MaxProfile" Content="MAX" ToolTip="4K, 30 FPS, alle geladen objecten, HD-textures en HD-menu. Meer belasting; de ronde maprand kan zichtbaar zijn."/></WrapPanel>
                   <TextBlock x:Name="ProfileNote" Visibility="Collapsed" Text="De profielinstellingen staan in het speeloverzicht; losse opties blijven aanpasbaar."/>
-                  <StackPanel x:Name="InstallationPanel" Visibility="Collapsed" Margin="0,10,0,0">
-                    <TextBlock x:Name="InstallationTitle" Text="Koppel je eigen A2 Racer I" FontWeight="SemiBold"/>
-                    <TextBlock x:Name="InstallationNote" Text="Zoek een bestaande installatie, kies de gamemap of importeer je gamearchief." TextWrapping="Wrap" FontSize="11" Margin="0,5,0,6"/>
-                    <ComboBox x:Name="InstallationChoice" Visibility="Collapsed" AutomationProperties.Name="Gevonden game-installaties"/>
-                    <WrapPanel><Button x:Name="DetectInstallations" Content="Installaties zoeken" Margin="0,5,8,0"/><Button x:Name="LinkInstallation" Content="Gevonden installatie koppelen" Visibility="Collapsed" Margin="0,5,0,0"/></WrapPanel>
-                    <WrapPanel><Button x:Name="ChooseInstallation" Content="Installatiemap kiezen…" Margin="0,5,8,0"/><Button x:Name="PrepareGame" Content="Game voorbereiden" Visibility="Collapsed" Margin="0,5,8,0"/><Button x:Name="ImportGame" Content="Gamearchief importeren…" Margin="0,5,8,0"/><Button x:Name="GetGame" Content="Game verkrijgen" Margin="0,5,0,0"/></WrapPanel>
-                  </StackPanel>
                 </StackPanel>
               </Grid></TabItem>
               <TabItem Header="Instellingen"><Grid>

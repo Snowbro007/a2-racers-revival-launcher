@@ -379,6 +379,8 @@ function Update-Summary {
 
 function Select-Game([string]$GameName) {
     if (-not $script:settings) { return }
+    $ui.GameOneAvailability.Text = if ($script:catalog.games.a2racer1.ready) { 'Klaar om te spelen' } else { 'Eigen game nodig' }
+    $ui.GameTwoAvailability.Text = if ($script:catalog.games.a2racer2.ready) { 'Klaar om te spelen' } elseif ($script:catalog.games.a2racer2.PSObject.Properties.Name -contains 'source_ready' -and $script:catalog.games.a2racer2.source_ready) { 'Game voorbereiden' } else { 'Eigen game nodig' }
     if ($script:initialized -and -not $script:binding) { $script:settings.games.($script:game) = Current-Preferences }
     $script:binding = $true; $script:game = $GameName
     $preferences = $script:settings.games.($GameName)
@@ -453,12 +455,26 @@ function Select-Game([string]$GameName) {
     $ui.ImportGame.Visibility = if (-not $sourceReady) { 'Visible' } else { 'Collapsed' }
     $needsII = -not $one -and -not $script:catalog.ii_menus.revival.available
     $ui.InstallationPanel.Visibility = if ($ui.ImportGame.Visibility -eq 'Visible' -or $needsII) { 'Visible' } else { 'Collapsed' }
-    $ui.InstallationTitle.Text = 'Koppel je eigen ' + $ui.GameTitle.Text
+    if (-not $sourceReady) {
+        $ui.WelcomeTitle.Text = 'Eigen gamebestanden nodig'
+        $ui.WelcomeHint.Text = 'Kies hieronder Gamemap kiezen of Gamearchief importeren voor je eigen ' + $ui.GameTitle.Text + '. Daarna kun je spelen.'
+    } elseif ($needsII) {
+        $ui.WelcomeTitle.Text = 'Maak A2 Racer II klaar'
+        $ui.WelcomeHint.Text = 'Je gamebestanden zijn gevonden. Klik hieronder op Game voorbereiden; kies daarna Aanbevolen en Spelen.'
+    } else {
+        $ui.WelcomeTitle.Text = 'Klaar voor de start'
+        $ui.WelcomeHint.Text = 'Je gamebestanden staan klaar. Klik op Speel ' + $ui.GameTitle.Text + '. Instellingen aanpassen kan later.'
+    }
+    $ui.InstallationTitle.Text = if ($needsII -and $sourceReady) { 'Stap 1 · Bereid A2 Racer II voor' } else { 'Stap 1 · Koppel je eigen ' + $ui.GameTitle.Text }
     $ui.GetGame.Content = if ($one) { 'Game verkrijgen' } else { 'Game verkrijgen ↗' }
     $ui.GetGame.ToolTip = if ($one) { 'Uitleg over het koppelen van je eigen gamekopie.' } else { 'Opent My Abandonware in je browser. Toestemming voor deze externe download is niet bevestigd.' }
-    $ui.DetectInstallations.Visibility = if ($one) { 'Visible' } else { 'Collapsed' }
+    $ui.GetGame.Visibility = if (-not $sourceReady) { 'Visible' } else { 'Collapsed' }
+    $ui.ChooseInstallation.Visibility = if (-not $sourceReady) { 'Visible' } else { 'Collapsed' }
+    $ui.DetectInstallations.Visibility = if ($one -and -not $sourceReady) { 'Visible' } else { 'Collapsed' }
     $ui.PrepareGame.Visibility = if ($needsII -and $sourceReady) { 'Visible' } else { 'Collapsed' }
-    if (-not $one) {
+    if ($one) {
+        $ui.InstallationNote.Text = 'Kies de volledige Nederlandse A2 Racer I-gamemap of importeer je eigen gamearchief.'
+    } else {
         $ui.InstallationChoice.Visibility='Collapsed';$ui.LinkInstallation.Visibility='Collapsed'
         $ui.InstallationNote.Text=if($sourceReady){'Gamebestanden zijn gevonden. Kies Game voorbereiden voor de lokale speelkopie.'}else{'Kies de volledige Nederlandse A2 Racer II-gamemap, inclusief DATA. De oorspronkelijke bestanden blijven intact.'}
     }
@@ -466,7 +482,8 @@ function Select-Game([string]$GameName) {
     Update-Summary; Update-Buttons
     if (-not $script:worker) {
         $reason=if($one -or $preferences.menu_profile -eq 'original'){$script:catalog.games.($GameName).reason}else{$script:catalog.ii_menus.($preferences.menu_profile).reason}
-        Set-Status 'Klaar voor de start' $reason
+        $statusTitle = if (-not $sourceReady) { 'Gamebestanden nodig' } elseif ($needsII) { 'Game voorbereiden' } else { 'Klaar voor de start' }
+        Set-Status $statusTitle $reason
     }
 }
 
@@ -749,7 +766,7 @@ try {
     $reader = New-Object Xml.XmlNodeReader ([xml][IO.File]::ReadAllText((Join-Path $PSScriptRoot 'launcher_window.xaml')))
     try { $window = [Windows.Markup.XamlReader]::Load($reader) } finally { $reader.Close() }
     $ui = @{}
-    foreach ($name in @('CoverBackdrop','GameOne','GameTwo','GameThree','IIITourChoice','IIIStatus','IIIStartScroll','IIIOverviewPanel','IIITourOverview','IIIReadyOverview','IIIResolutionOverview','IIIProfileChoice','IIIProfileNote','IIIChooseInstallation','GameOneSelected','GameTwoSelected','GameTitle','GameSubtitle','OptionsGameTitle',
+    foreach ($name in @('CoverBackdrop','CoverPreview','WelcomeTitle','WelcomeHint','GameOne','GameTwo','GameThree','GameOneAvailability','GameTwoAvailability','IIITourChoice','IIIStatus','IIIStartScroll','IIIOverviewPanel','IIITourOverview','IIIReadyOverview','IIIResolutionOverview','IIIProfileChoice','IIIProfileNote','IIIChooseInstallation','GameOneSelected','GameTwoSelected','GameTitle','GameSubtitle','OptionsGameTitle',
             'IOptionsPanel','IIOptionsNotice','IOverviewPanel','IIOverviewPanel','IIMenuChoice','IIRaceDisplayChoice','IIResolutionChoice','IIHudChoice','IISkyChoice','IIDistanceChoice','IIMenuNote','Pages','PlaySummary','PlayNote','ImportGame','GraphicsChoice',
             'GraphicsNote','ResolutionChoice','ResolutionNote','CameraNote','DistanceChoice','DistanceNote','ObjectDistanceChoice','ObjectDistanceNote','TextureChoice','TextureNote','MenuChoice','MenuNote',
             'HorizonChoice','FocusRecoveryChoice','FocusRecoveryNote','ChooseOptions','RecommendedOptions','OverviewResolution','OverviewFps','OverviewDistance','OverviewObjects','OverviewDetailLabel','SelectionNote','AdvancedOptions','StartScroll','SupportScroll','OptionsScroll','DashboardChoice','FpsChoice','FpsNote','IntroChoice','DebugChoice',
@@ -758,7 +775,19 @@ try {
         $ui[$name] = $window.FindName($name)
         if (-not $ui[$name]) { throw ('Ontbrekend launcherelement: ' + $name) }
     }
-    Set-CoverArtwork $ui.CoverBackdrop (Join-Path $PSScriptRoot 'launcher_art\cover-inspired-highway-v1.png')
+    $artworkPath = Join-Path $PSScriptRoot 'launcher_art\cover-inspired-highway-v1.png'
+    Set-CoverArtwork $ui.CoverBackdrop $artworkPath
+    Set-CoverArtwork $ui.CoverPreview $artworkPath
+    $iconPath = Join-Path $PSScriptRoot 'launcher_art\a2-revival.ico'
+    Assert-LauncherPath $iconPath
+    if (-not (Test-Path -LiteralPath $iconPath -PathType Leaf)) { throw 'Het A2-launcherpictogram ontbreekt. Pak de complete launcher opnieuw uit.' }
+    $iconStream = [IO.File]::OpenRead($iconPath)
+    try {
+        $iconDecoder = [Windows.Media.Imaging.BitmapDecoder]::Create($iconStream, [Windows.Media.Imaging.BitmapCreateOptions]::None, [Windows.Media.Imaging.BitmapCacheOption]::OnLoad)
+        $iconFrame = @($iconDecoder.Frames) | Sort-Object PixelWidth -Descending | Select-Object -First 1
+        $iconFrame.Freeze()
+        $window.Icon = $iconFrame
+    } finally { $iconStream.Dispose() }
     Add-Choice $ui.IIITourChoice 'Tour 1' '1'; Add-Choice $ui.IIITourChoice 'Tour 2' '2'
     $ui.IIITourChoice.SelectedIndex = 0
     Add-Choice $ui.IIIProfileChoice 'Compatibiliteit · proef' 'compat'
