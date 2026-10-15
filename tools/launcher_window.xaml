@@ -55,6 +55,10 @@
       <Setter Property="Padding" Value="5"/><Setter Property="HorizontalContentAlignment" Value="Stretch"/>
       <Setter Property="MinHeight" Value="118"/>
     </Style>
+    <Style x:Key="ProfileButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+      <Setter Property="Background" Value="#1B334E"/><Setter Property="BorderBrush" Value="#718FAE"/>
+      <Setter Property="Padding" Value="11,7"/><Setter Property="MinHeight" Value="40"/>
+    </Style>
     <Style TargetType="CheckBox">
       <Setter Property="Foreground" Value="#ECF2FA"/><Setter Property="Margin" Value="0,8"/><Setter Property="Cursor" Value="Hand"/>
       <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="CheckBox">
@@ -270,7 +274,25 @@
                   <TextBlock x:Name="PlaySummary" Foreground="#A6B8CE" FontSize="12" TextWrapping="Wrap" LineHeight="18" Margin="0,8,0,0"/>
                 </StackPanel></ScrollViewer>
                 <StackPanel Grid.Row="1" Margin="0,14,0,0">
-                  <WrapPanel><Button x:Name="ChooseOptions" Content="Instellingen" Margin="0,0,10,0"/><Button x:Name="OriginalProfile" Content="Origineel" ToolTip="640 × 480, 20 FPS, originele zichtafstand, horizon, textures en menu." Margin="0,0,8,0"/><Button x:Name="RecommendedOptions" Content="Aanbevolen" ToolTip="1080p, 20 FPS, verder wegzicht, horizon uit en dashboard aan. HD blijft optioneel." Margin="0,0,8,0"/><Button x:Name="MaxProfile" Content="MAX" ToolTip="4K, 30 FPS, alle geladen objecten, HD-textures en HD-menu. Meer belasting; de ronde maprand kan zichtbaar zijn."/></WrapPanel>
+                  <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="12"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                    <Border Background="#14253A" BorderBrush="#506D8D" BorderThickness="1" CornerRadius="8" Padding="12,9">
+                      <StackPanel>
+                        <TextBlock Text="KIES EEN SPEELPROFIEL" Foreground="#AFC8E2" FontSize="10" FontWeight="Bold" Margin="0,0,0,7"/>
+                        <WrapPanel>
+                          <Button x:Name="OriginalProfile" Style="{StaticResource ProfileButton}" AutomationProperties.Name="Speelprofiel Origineel" ToolTip="640 × 480, 20 FPS, originele zichtafstand, horizon, textures en menu." Margin="0,0,7,0">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center"><Border Width="26" Height="26" CornerRadius="13" Background="#274967" Margin="0,0,8,0"><Canvas Width="20" Height="20" VerticalAlignment="Center" HorizontalAlignment="Center"><Ellipse Canvas.Left="2" Canvas.Top="2" Width="16" Height="16" Stroke="#D1E5F8" StrokeThickness="1.7"/><Path Data="M10,5 L10,10 L14,12" Stroke="#D1E5F8" StrokeThickness="1.7" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round"/></Canvas></Border><TextBlock Text="Origineel" VerticalAlignment="Center" FontWeight="SemiBold"/></StackPanel>
+                          </Button>
+                          <Button x:Name="RecommendedOptions" Style="{StaticResource ProfileButton}" AutomationProperties.Name="Speelprofiel Aanbevolen" Background="#3B321D" BorderBrush="#C9A848" ToolTip="1080p, 20 FPS, verder wegzicht, horizon uit en dashboard aan. HD blijft optioneel." Margin="0,0,7,0">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center"><Border Width="26" Height="26" CornerRadius="13" Background="#7D6628" Margin="0,0,8,0"><Canvas Width="20" Height="20" VerticalAlignment="Center" HorizontalAlignment="Center"><Path Data="M3,10 L8,15 L17,5" Stroke="#FFF0B5" StrokeThickness="2.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round"/></Canvas></Border><TextBlock Text="Aanbevolen" VerticalAlignment="Center" FontWeight="SemiBold"/></StackPanel>
+                          </Button>
+                          <Button x:Name="MaxProfile" Style="{StaticResource ProfileButton}" AutomationProperties.Name="Speelprofiel MAX" Background="#3D2B28" BorderBrush="#CF8162" ToolTip="4K, 30 FPS, alle geladen objecten, HD-textures en HD-menu. Meer belasting; de ronde maprand kan zichtbaar zijn.">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center"><Border Width="26" Height="26" CornerRadius="13" Background="#8A4D38" Margin="0,0,8,0"><Canvas Width="20" Height="20" VerticalAlignment="Center" HorizontalAlignment="Center"><Path Data="M11,1 L4,11 L9,11 L7,19 L17,8 L11,8 Z" Fill="#FFE2C8"/></Canvas></Border><TextBlock Text="MAX" VerticalAlignment="Center" FontWeight="SemiBold"/></StackPanel>
+                          </Button>
+                        </WrapPanel>
+                      </StackPanel>
+                    </Border>
+                    <Button x:Name="ChooseOptions" Grid.Column="2" Content="Instellingen" VerticalAlignment="Bottom" MinHeight="40" Margin="0,0,0,1"/>
+                  </Grid>
                   <TextBlock x:Name="ProfileNote" Visibility="Collapsed" Text="De profielinstellingen staan in het speeloverzicht; losse opties blijven aanpasbaar."/>
                 </StackPanel>
               </Grid></TabItem>
