@@ -1,25 +1,23 @@
 # A2 Racers Revival
 
-Ik bouw een launcher voor de oude A2 Racer-games op moderne Windows-pc’s, met Full HD en optionele HD textures.
+Een fanproject voor de oude A2 Racer-games op moderne Windows-pc’s. I en II zijn speelbaar, met Full HD en optionele HD textures voor I. III is in ontwikkeling.
 
-Deel I en II zijn speelbaar; aan III wordt nog gewerkt. Voor later: deel IV en kijken of multiplayer mogelijk is.
+**[Download de launcher voor Windows 11 (.zip)](https://github.com/Snowbro007/a2-racers-revival-launcher/releases/download/v0.1.0-beta.4/A2-Racers-Revival-0.1.0-beta.4-Windows-x64.zip)**
 
-## Beginnen
+1. Pak de ZIP helemaal uit via **Alles uitpakken**.
+2. Open **Launcher.cmd** in de uitgepakte map.
+3. Kies je game, voeg je eigen Nederlandse gamemap of volledige ZIP toe en kies **Aanbevolen → Spelen**.
 
-**[Download de nieuwste beta](https://github.com/Snowbro007/a2-racers-revival-launcher/releases/tag/v0.1.0-beta.4)** · Windows 11 x64
+Geen aparte Python-installatie nodig. Alleen de eerste start gebruikt internet voor onderdelen; daarna speel je offline. Een gewone installer met A2-icoon en een installatiemap naar keuze wordt voorbereid.
 
-1. Pak de ZIP uit en open **Launcher.cmd**.
-2. Kies je game. Klik **Ik heb een gamemap** of **Ik heb een ZIP-bestand** voor je eigen volledige Nederlandse game. Voor deel I kun je ook **Bekende Windows-installatie zoeken** gebruiken. Bij deel III kies je eerst de tour.
-3. Kies bij de profielknoppen **Aanbevolen** en klik op **Spelen**.
+### De games
 
-De eerste keer heb je internet nodig; Python installeren hoeft niet. Je originele bestanden blijven intact. Bewaar bij updates een backup van `local/`.
+Games worden niet meegeleverd. Gebruik je eigen cd, installatie of back-up. Voor II is er een [externe downloadpagina bij MyAbandonware](https://www.myabandonware.com/game/a2-racer-ii-gri). Die site staat los van dit project; controleer of je de aangeboden kopie mag gebruiken.
 
-## Goed om te weten
+### Goed om te weten
 
-Dit is een onofficieel fanproject, zonder officiële steun van Davilex, Visma of andere rechthebbenden. De oorspronkelijke games en merken blijven van hun rechthebbenden. Je hebt een rechtmatig verkregen eigen game nodig; games worden niet meegeleverd of gedownload.
+Onofficieel fanproject, zonder steun van de rechthebbenden. De oorspronkelijke games en merken blijven van hen. [MIT](LICENSE) geldt voor eigen code; zie [overige licenties](THIRD-PARTY-NOTICES.md). Beta zonder garantie, gebouwd met hulp van **LLM’s**. Later: deel IV en multiplayer.
 
-Eigen code en documentatie vallen onder [MIT](LICENSE); spelmateriaal, fanmod-art en externe onderdelen niet. Zie [licenties en herkomst](THIRD-PARTY-NOTICES.md). Beta zonder garantie. De SHA-256-controlesom van de actuele ZIP staat bij de release.
+Nog niet digitaal ondertekend: Windows kan waarschuwen of blokkeren. [Release en SHA-256](https://github.com/Snowbro007/a2-racers-revival-launcher/releases/tag/v0.1.0-beta.4).
 
-Bij het bouwen zijn **LLM’s gebruikt als hulp bij code, onderzoek en teksten**.
-
-Vragen of iets gevonden? [GitHub Issues](https://github.com/Snowbro007/a2-racers-revival-launcher/issues) of [HeySnowdude@pm.me](mailto:HeySnowdude@pm.me).
+[GitHub Issues](https://github.com/Snowbro007/a2-racers-revival-launcher/issues) · [HeySnowdude@pm.me](mailto:HeySnowdude@pm.me)
