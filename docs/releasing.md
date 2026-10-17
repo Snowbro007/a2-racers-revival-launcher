@@ -1,57 +1,59 @@
 # Een nieuwe Windows-beta maken
 
-De beta-5-installer wordt momenteel niet gepubliceerd. Een lokale synthetische
-testhulp is door Bitdefender geblokkeerd als `Gen:Variant.MSILHeracles.213981`;
-de uitvoerbare helpertest is daarom uitgeschakeld. De eerdere Setup.exe had
-7/69 VirusTotal-detecties. Onderzoek dit voordat je een nieuwe native build
-uitvoert of als download aanbiedt. Een vals alarm is niet bevestigd.
+De workflow **Prepare Windows beta installer** start handmatig vanaf `main`.
+Hij maakt alleen een conceptrelease en vervangt nooit een bestaande versie.
+Beta 4 blijft de openbare download totdat een opvolger is goedgekeurd.
 
-De workflow **Prepare Windows beta installer** start alleen handmatig vanaf
-`main`. Hij maakt een conceptrelease, geen openbare download. Een bestaande
-versie, tag of bijlage wordt nooit vervangen.
+1. Verhoog `VERSION.txt`, beide `public-release.json`-bestanden en
+   `docs/public-release-notes.md`. Beta 6 is `0.1.0-beta.6`.
+2. Laat de pull-requestcontroles slagen en voeg de bronwijziging samen.
+3. Start de workflow op `main` met precies die versie. Hij controleert de
+   openbare bronallowlist, ZIP, eigen EXE, payload/CAB en alle MSI-tabellen.
+   Games, saves, persoonlijke mappen, prompts en runtimes worden uitgesloten.
+4. De workflow test installeren, upgraden, downgrade weigeren, repareren en
+   verwijderen met tekstfixtures. Daarna installeert hij de echte gecontroleerde
+   MSI en start uitsluitend de launchercontrole (`--check`), eerst met lege en
+   daarna gevulde runtimecache. Geen game of native testhulp wordt gestart.
+   Reparatie en behoud van synthetische voortgang/cache worden gecontroleerd.
+5. Download de kandidaat en het artifact `installed-app-evidence`. Doe nog een
+   interactieve proef op Windows 11: map kiezen, A2-icoon, launcher, Support,
+   installeren/upgraden, instellingen behouden en verwijderen. Een Windows
+   CI-server en een controlemodus vervangen deze gebruikersproef niet.
+6. Controleer ondertekening en antivirus voor precies deze bytes. Een herbouw
+   krijgt een nieuwe hash en versie. Upload niets extern zonder toestemming.
+   De beta-5-MSI gaf [0/61](https://www.virustotal.com/gui/file/d3b981eb21ae3d59e86376e5be33d34098a07619b607f3782814b81e359ce1dc/detection),
+   zijn launcher [2/71](https://www.virustotal.com/gui/file/594fc351184a43ec23aa149461d3365e86a45f3d8a92955ada911b86d66c4728/detection).
+   Dat bewijst geen vals alarm en zegt niets over beta 6. Ondertekening is
+   [voorbereid](signing-preparation.md), nog niet aangesloten.
+7. Alleen na de bewuste eindbeslissing van de beheerder: maak lokaal het
+   vrijgavebestand met onderstaande opdracht. Voeg het zonder vervangen van
+   bestaande bijlagen aan diezelfde conceptrelease toe, controleer de hashes
+   nogmaals en publiceer daarna het concept. Zonder `release-review.json`
+   biedt de updater deze release niet aan. Conceptreleases worden altijd
+   overgeslagen. Werk de README-downloadknop pas bij na publicatie.
 
-1. Werk `VERSION.txt`, beide `public-release.json`-bestanden en de openbare
-   releasetekst bij naar een nieuwe versie, bijvoorbeeld `0.1.0-beta.6`.
-2. Push de gecontroleerde broncode. Kies in GitHub **Actions → Prepare Windows
-   beta installer → Run workflow** en vul precies die versie in.
-3. Download de MSI uit de conceptrelease. Test een nieuwe installatie, een
-   zelfgekozen map, starten, bijwerken met behoud van die map en voortgang,
-   herstellen en verwijderen op een schone Windows-pc.
-4. Vermeld de echte testuitslag en eventueel het scanrapport van precies die
-   MSI. Een herbouw heeft een nieuwe hash. Laat een bestand alleen extern
-   scannen als daar toestemming voor is. Een scan bewijst geen veiligheid.
-5. Publiceer het gecontroleerde concept en werk daarna de downloadknop in
-   `README.md` en `docs/public-readme.md` bij naar die bestaande MSI-bijlage.
-   Laat de vorige werkende download staan totdat de opvolger beschikbaar is.
+```powershell
+python tools/create_update_review.py --installer "pad/naar/A2-Racers-Revival-0.1.6-beta6.msi" --build-review "pad/naar/build-review.json" --app-test "pad/naar/app-install-result.json" --output "pad/naar/release-review.json" --approve
+```
 
-De build gebruikt uitsluitend de openbare bronallowlist. Hij controleert de
-daadwerkelijke ZIP, de eigen native launcher, alle payload- en CAB-bytes en de
-tabellen en ingebedde CAB/icoonstreams van de MSI. Alleen de MSI, zijn SHA-256
-en een klein bouwverslag worden als bijlagen toegevoegd. Games, saves,
-persoonlijke mappen, prompts en gedownloade onderdelen worden uitgesloten.
-Automatische checks installeren twee aparte MSI's met uitsluitend tekstfixtures.
-Daarmee worden de installerketen, snelkoppelingen/icoon en behoud van
-testinstellingen en voortgang gecontroleerd. De daadwerkelijke native launcher
-en interactieve installer-UI worden niet gestart. Dit levert geen antivirus-,
-SmartScreen- of gamepraktijktest op. De setup is nog niet ondertekend.
+De opdracht controleert de exacte MSI-hash, bron/payloadcontrole en eerste en
+tweede appstart, reparatie/verwijderen en databehoud uit de testrapporten.
+`--approve` is de menselijke vrijgavebeslissing; het script tekent niet,
+verklaart geen antivirusdetecties tot vals alarm en publiceert niets.
+Een ingetrokken of gewijzigde vrijgave wordt voor installatie opnieuw geweigerd.
 
-MSI gebruikt drie numerieke versievelden. Onze conventie is
-`major.minor.(patch × 1000 + beta)`: `0.1.0-beta.6` wordt `0.1.6`, met als
-downloadnaam `A2-Racers-Revival-0.1.6-beta6.msi`. Beta loopt van 1 tot 999 en
-patch van 0 tot 64; major/minor maximaal 255. Gebruik altijd een hogere versie
-voor een update. UpgradeCode, component-ID's en de opgeslagen installatiemap
-blijven stabiel. Een andere versie krijgt een nieuw ProductCode; elke bouw een
-nieuw PackageCode.
+De downloadbijlagen zijn de MSI, `.sha256`, `build-review.json` en pas na
+goedkeuring `release-review.json`. De uitvoerige installatielogs en bouwplannen
+blijven aparte tijdelijke CI-artifacts. Niet als download meeleveren.
 
-De workflow gebruikt de officiële [GitHub Actions](https://github.com/actions)
-en bouwt op Windows met Python, de aanwezige .NET Framework-compiler,
-Windows Installer COM en `makecab`. Er wordt geen aparte installer-toolchain
-opgehaald en er worden geen Windows-beveiligingsinstellingen aangepast.
+MSI-versie: `major.minor.(patch × 1000 + beta)`, bijvoorbeeld `0.1.6` voor
+`0.1.0-beta.6`. Beta 1–999, patch 0–64, major/minor maximaal 255. Gebruik
+altijd een hogere versie. UpgradeCode/component-ID's en de installatiemap
+blijven stabiel. Een andere versie krijgt een nieuw ProductCode; elke bouw
+een nieuw PackageCode. Een toekomstige stabiele versie reserveert het
+numerieke slot `patch × 1000 + 1000`; de huidige bouwworkflow maakt alleen beta's.
 
-De broncheckout bevat ook synthetische regressies voor game-import, bootstrap,
-instellingen, bevroren starts en de voortgang van I/II. De MSI-auteurstests lopen
-mee via `tests/test_windows_msi.py`; de geblokkeerde native helper blijft bewust
-uit. Deze tests worden op de daadwerkelijk uitgecheckte bron gedraaid. De
-geïnstalleerde launcher heeft deze ontwikkeltests niet nodig. Runtime-extractie
-en importpromotie hebben afzonderlijke foutinjectietests voor onderbrekingen en
-schrijffouten. Dat vervangt geen antivirus- of Windows-praktijkproef.
+Er worden uitsluitend officiële GitHub Actions, Python, .NET Framework,
+Windows Installer COM en `makecab` gebruikt. Geen aparte installer-toolchain,
+zelfuitpakkende Setup.exe of uitvoerbare Harness-testhelper. Geen wijzigingen
+aan antivirus, SmartScreen, systeembeleid of permissies.

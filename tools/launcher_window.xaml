@@ -407,8 +407,14 @@
                 <WrapPanel Grid.Row="1" Margin="0,14,0,0"><Button x:Name="SaveOptions" Content="Opslaan" Margin="0,0,10,0"/><Button x:Name="ResetOptions" Content="Standaard herstellen"/></WrapPanel>
               </Grid></TabItem>
               <TabItem Header="Support"><ScrollViewer x:Name="SupportScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><StackPanel Margin="0,1,10,0">
-                <TextBlock x:Name="LauncherVersion" Text="A2 Racers Revival" FontSize="13" FontWeight="SemiBold"/>
-                <WrapPanel Margin="0,8,0,12"><Button x:Name="CheckUpdates" Content="Nieuwe versies op GitHub"/><TextBlock Text="Installeer een nieuwe versie over je huidige launcher." Foreground="#A6B8CE" FontSize="11" VerticalAlignment="Center" Margin="10,0,0,0"/></WrapPanel>
+                <Border Style="{StaticResource SettingsCard}"><StackPanel>
+                  <TextBlock x:Name="LauncherVersion" Text="A2 Racers Revival" FontSize="13" FontWeight="SemiBold"/>
+                  <CheckBox x:Name="AutomaticUpdates" Content="Bij starten op nieuwe versies controleren" Margin="0,10,0,3"/>
+                  <TextBlock Text="Controle via GitHub, zonder je gamegegevens te versturen. Downloaden en installeren doe je zelf." Foreground="#A6B8CE" FontSize="11" TextWrapping="Wrap" Margin="0,3,0,8"/>
+                  <TextBlock x:Name="UpdateMessage" Text="Updatecontrole beschikbaar na de eerste voorbereiding." Foreground="#C4D5EA" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,10"/>
+                  <WrapPanel><Button x:Name="CheckUpdates" Content="Controleer op updates"/><Button x:Name="DownloadUpdate" Content="Download update" Visibility="Collapsed"/><Button x:Name="InstallUpdate" Content="Update installeren" Visibility="Collapsed"/><Button x:Name="OpenReleases" Content="GitHub Releases openen"/></WrapPanel>
+                </StackPanel></Border>
+
                 <TextBlock Text="Logs en diagnose" FontSize="21" FontWeight="SemiBold" Margin="0,0,0,12"/>
                 <CheckBox x:Name="DebugChoice" Content="Uitgebreide diagnose bij de volgende start" FontSize="12" Margin="0,4,0,4"/>
                 <TextBlock Text="Met diagnose aan sluit de game na maximaal 3 minuten. Laat dit uit voor gewoon spelen." Foreground="#A6B8CE" FontSize="11" TextWrapping="Wrap" LineHeight="17" Margin="26,1,0,12"/>
