@@ -34,9 +34,10 @@ class NativeReleaseBuildTests(unittest.TestCase):
                 self.assertEqual([p.name for p in sources], ['NativeCommon.cs', 'Launcher.cs', 'Version.cs'])
                 output.write_bytes(b'synthetic native launcher')
             output = root / 'new-build'
-            with patch.object(portable_launcher, 'audit') as audit, patch.object(build, 'compile_cs', side_effect=compile_fixture):
+            with patch.object(portable_launcher, 'audit') as audit, patch.object(build, 'compile_cs', side_effect=compile_fixture), patch.object(build.subprocess, 'run') as run:
                 result = build.build(root, portable, output, '0.1.0-beta.5')
             audit.assert_called_once_with(portable, root)
+            run.assert_not_called()
             self.assertFalse(list(output.glob('*Setup.exe')))
             with zipfile.ZipFile(output / result['payload']) as archive:
                 self.assertEqual(set(archive.namelist()), {'app/' + name for name in rows} | {'A2 Racers Revival.exe'})
@@ -46,6 +47,18 @@ class NativeReleaseBuildTests(unittest.TestCase):
             self.assertFalse(result['signed']); self.assertFalse(result['published']); self.assertFalse(result['games_bundled'])
             with patch.object(portable_launcher, 'audit'), self.assertRaises(ValueError):
                 build.build(root, portable, output, '0.1.0-beta.5')
+
+    def test_missing_icon_fails_before_creating_or_executing_any_build_file(self):
+        with self.temporary() as directory:
+            root, portable, _ = self.fixture(directory)
+            (root / 'tools/launcher_art/a2-revival.ico').unlink()
+            output = root / 'missing-icon-build'
+            with patch.object(portable_launcher, 'audit'), patch.object(build, 'compile_cs') as compile_cs, patch.object(build.subprocess, 'run') as run:
+                with self.assertRaisesRegex(FileNotFoundError, 'A2-icoon ontbreekt'):
+                    build.build(root, portable, output, '0.1.0-beta.5')
+            compile_cs.assert_not_called()
+            run.assert_not_called()
+            self.assertFalse(output.exists())
 
     def test_wrong_version_or_game_manifest_never_creates_output(self):
         for version, games in [('0.1.0-beta.4', False), ('0.1.0-beta.5', True)]:

@@ -1,0 +1,47 @@
+name: Validate installer lifecycle
+
+on:
+  pull_request:
+    paths:
+      - 'tools/windows/msi/**'
+      - 'tests/test_windows_msi*'
+      - '.github/workflows/installer-validation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lifecycle:
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Run synthetic installer guards
+        shell: pwsh
+        run: |
+          python -m unittest tests.test_windows_msi tests.test_windows_msi_lifecycle tests.test_native_release_build -v
+          if ($LASTEXITCODE -ne 0) { throw 'Installer guards failed.' }
+      - name: Install, upgrade, refuse downgrade, repair and remove text fixtures
+        shell: pwsh
+        run: |
+          $authoringShell = (Get-Command pwsh -CommandType Application -ErrorAction Stop).Source
+          python tools/windows/msi/verify_lifecycle.py --output local/installer-validation/ci --powershell $authoringShell --execute
+          if ($LASTEXITCODE -ne 0) { throw 'Windows Installer lifecycle failed; no release is approved.' }
+      - name: Save lifecycle evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: installer-lifecycle-evidence
+          path: |
+            local/installer-validation/ci/lifecycle-result.json
+            local/installer-validation/ci/*.log
+            local/installer-validation/ci/build-*/database-audit.json
+          if-no-files-found: warn
+          retention-days: 14

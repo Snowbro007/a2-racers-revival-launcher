@@ -17,7 +17,6 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path: sys.path.insert(0, str(ROOT))
-NATIVE_FILES = ('Branding.cs', 'NativeCommon.cs', 'Launcher.cs')
 
 
 def digest(path: Path) -> str:
@@ -55,17 +54,14 @@ def build(source: Path, portable: Path, output: Path, version: str) -> dict:
             raise ValueError('Alleen een gecontroleerd openbaar pakket zonder game is toegestaan.')
         config = json.loads(archive.read(portable_launcher.PREFIX + 'public-release.json'))
         if config['version'] != version: raise ValueError('Pakketversie wijkt af van de setupversie.')
+    existing_icon = source / 'tools/launcher_art/a2-revival.ico'
+    validate_ancestors(existing_icon)
+    if not existing_icon.is_file():
+        raise FileNotFoundError('Het gecontroleerde A2-icoon ontbreekt; de build maakt of start geen icoonhulpprogramma.')
     output.mkdir()
     native = source / 'tools/windows'
     icon = output / 'a2-revival.ico'
-    existing_icon = source / 'tools/launcher_art/a2-revival.ico'
-    if existing_icon.is_file():
-        shutil.copyfile(existing_icon, icon)
-    else:
-        icon_writer = output / 'IconWriter.cs'
-        icon_writer.write_text('class IconWriter { static void Main(string[] a) { A2Revival.Windows.Branding.WriteIcon(a[0]); } }', encoding='utf-8')
-        compile_cs([native / 'Branding.cs', icon_writer], output / 'IconWriter.exe', window=False)
-        subprocess.run([str(output / 'IconWriter.exe'), str(icon)], check=True)
+    shutil.copyfile(existing_icon, icon)
     assembly = output / 'Version.cs'
     numeric = version.split('-')[0] + '.' + version.rsplit('.', 1)[1]
     assembly.write_text('using System.Reflection;\n[assembly: AssemblyTitle("A2 Racers Revival")]\n'
