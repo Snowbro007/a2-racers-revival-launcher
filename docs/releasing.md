@@ -44,3 +44,11 @@ De workflow gebruikt de officiële [GitHub Actions](https://github.com/actions)
 en bouwt op Windows met Python, de aanwezige .NET Framework-compiler,
 Windows Installer COM en `makecab`. Er wordt geen aparte installer-toolchain
 opgehaald en er worden geen Windows-beveiligingsinstellingen aangepast.
+
+De broncheckout bevat ook synthetische regressies voor game-import, bootstrap,
+instellingen, bevroren starts en de voortgang van I/II. De MSI-auteurstests lopen
+mee via `tests/test_windows_msi.py`; de geblokkeerde native helper blijft bewust
+uit. Deze tests worden op de daadwerkelijk uitgecheckte bron gedraaid. De
+geïnstalleerde launcher heeft deze ontwikkeltests niet nodig. Runtime-extractie
+en importpromotie hebben afzonderlijke foutinjectietests voor onderbrekingen en
+schrijffouten. Dat vervangt geen antivirus- of Windows-praktijkproef.

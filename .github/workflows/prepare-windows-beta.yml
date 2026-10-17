@@ -94,8 +94,6 @@ jobs:
         run: |
           python -m unittest discover -s tests -v
           if ($LASTEXITCODE -ne 0) { throw 'Launcher tests failed.' }
-          python -m unittest discover -s tools/windows/msi -p test_msi_builder.py -v
-          if ($LASTEXITCODE -ne 0) { throw 'MSI authoring tests failed.' }
 
       - name: Build and audit the public allowlist
         shell: pwsh

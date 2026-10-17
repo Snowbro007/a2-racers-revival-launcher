@@ -10,6 +10,7 @@ import re
 import shutil
 import stat
 import sys
+import uuid
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -111,7 +112,7 @@ def checked_zip(path: Path, expected: str) -> zipfile.ZipFile:
 
 
 def extract_verified(archive_path: Path, expected: str, destination: Path) -> None:
-    """Reusing a runtime requires every shipped file to match its pinned ZIP."""
+    """Publish only a complete runtime; never repair unknown existing content."""
     validate_ancestors(destination)
     # Provider module paths can exceed MAX_PATH even in a normal kit folder.
     # This affects only runtime extraction/checks, not game/process paths.
@@ -121,28 +122,57 @@ def extract_verified(archive_path: Path, expected: str, destination: Path) -> No
             absolute = "\\\\?\\UNC\\" + absolute[2:] if absolute.startswith("\\\\") else "\\\\?\\" + absolute
         destination = Path(absolute)
     with checked_zip(archive_path, expected) as archive:
-        if destination.exists():
-            validate_tree(destination)
+        def verify(folder: Path) -> None:
+            validate_tree(folder)
             expected_names = {i.filename for i in archive.infolist() if not i.is_dir()}
-            actual_names = {p.relative_to(destination).as_posix() for p in destination.rglob("*") if p.is_file()}
+            actual_names = {p.relative_to(folder).as_posix() for p in folder.rglob("*") if p.is_file()}
             if actual_names != expected_names:
-                raise ValueError("Bestaande runtime bevat afwijkende bestanden.")
+                raise ValueError("Bestaande runtime bevat afwijkende bestanden. "
+                                 "De map blijft behouden; controleer de beveiligingsmelding of gebruik een aparte verse launchermap.")
             for entry in archive.infolist():
                 if not entry.is_dir():
                     with archive.open(entry) as handle:
                         digest = stream_hash(handle)
-                    if file_hash(destination / entry.filename, 600 * 1024**2) != digest:
+                    if file_hash(folder / entry.filename, 600 * 1024**2) != digest:
                         raise ValueError("Bestaande runtime is gewijzigd.")
+
+        if destination.exists():
+            verify(destination)
             return
-        destination.mkdir(parents=True, exist_ok=False)
-        for entry in archive.infolist():
-            target = destination.joinpath(*PurePosixPath(entry.filename).parts)
-            if entry.is_dir():
-                target.mkdir(parents=True, exist_ok=True)
-            else:
-                target.parent.mkdir(parents=True, exist_ok=True)
-                with archive.open(entry) as source, target.open("xb") as out:
-                    shutil.copyfileobj(source, out, 1024**2)
+        parent = destination.parent
+        validate_ancestors(parent)
+        parent.mkdir(parents=True, exist_ok=True)
+        # A unique sibling keeps an interrupted extraction out of the live path.
+        # A hard power loss can leave this private staging folder behind, but a
+        # subsequent start uses a new one and never trusts that incomplete copy.
+        stage = parent / ("." + destination.name + "-extract-" + uuid.uuid4().hex)
+        stage.mkdir(exist_ok=False)
+        stage_parent = parent.resolve()
+        try:
+            for entry in archive.infolist():
+                target = stage.joinpath(*PurePosixPath(entry.filename).parts)
+                if entry.is_dir():
+                    target.mkdir(parents=True, exist_ok=True)
+                else:
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    with archive.open(entry) as source, target.open("xb") as out:
+                        shutil.copyfileobj(source, out, 1024**2)
+            verify(stage)
+            validate_ancestors(destination)
+            if destination.exists():
+                # Another launcher may have completed the same pinned runtime.
+                # Inspect it; never overwrite or remove its directory.
+                verify(destination)
+                return
+            stage.rename(destination)
+        finally:
+            if stage.exists():
+                # Only remove the exclusive temporary directory created above.
+                # Resolve and reject links before any recursive cleanup.
+                if stage.resolve().parent != stage_parent or not stage.name.startswith("." + destination.name + "-extract-"):
+                    raise ValueError("Onverwachte runtime-stagingmap; opruimen geweigerd.")
+                validate_tree(stage)
+                shutil.rmtree(stage)
 
 
 def payload(root: Path, kind: str) -> Path:
