@@ -29,8 +29,11 @@ daadwerkelijke ZIP, de eigen native launcher, alle payload- en CAB-bytes en de
 tabellen en ingebedde CAB/icoonstreams van de MSI. Alleen de MSI, zijn SHA-256
 en een klein bouwverslag worden als bijlagen toegevoegd. Games, saves,
 persoonlijke mappen, prompts en gedownloade onderdelen worden uitgesloten.
-Automatische checks installeren of starten de MSI niet en leveren geen
-antivirus-, SmartScreen- of praktijktest op. De setup is nog niet ondertekend.
+Automatische checks installeren twee aparte MSI's met uitsluitend tekstfixtures.
+Daarmee worden de installerketen, snelkoppelingen/icoon en behoud van
+testinstellingen en voortgang gecontroleerd. De daadwerkelijke native launcher
+en interactieve installer-UI worden niet gestart. Dit levert geen antivirus-,
+SmartScreen- of gamepraktijktest op. De setup is nog niet ondertekend.
 
 MSI gebruikt drie numerieke versievelden. Onze conventie is
 `major.minor.(patch × 1000 + beta)`: `0.1.0-beta.6` wordt `0.1.6`, met als
