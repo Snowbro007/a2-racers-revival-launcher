@@ -99,3 +99,25 @@ No WiX source, toolchain or binary is required by this builder.
 Public source files: `build_msi.py`, `write_database.ps1`, `cab_codec.py`,
 `test_msi_builder.py`, `README.md`, `.gitignore`. Do not publish caches,
 test-output directories, generated inputs or personal build reports.
+
+## Windows Installer lifecycle check
+
+From the repository root, `python tools/windows/msi/verify_lifecycle.py
+--output local/installer-validation/my-unique-run --execute` authors two tiny
+MSIs with a random test product identity. The required `.exe` filename contains
+plain text, not machine code. This test never executes a launcher or game.
+It installs in a chosen folder containing spaces and Unicode, verifies the two
+shortcut targets and exact icon bytes, upgrades without specifying the folder
+again, refuses a downgrade, repairs an owned file, and uninstalls. Synthetic
+settings, progress and cache files must survive unchanged. The test registry
+keys, product GUIDs and shortcuts are isolated from actual A2 installations.
+Without `--execute`, it only builds and audits the two synthetic MSI databases.
+
+On 17 October 2026, this lifecycle passed locally and on a clean GitHub-hosted
+Windows runner: [run 39051596665](https://github.com/Snowbro007/a2-racers-revival-launcher/actions/runs/39051596665).
+This verifies the installer engine path with text fixtures. It does not verify
+interactive folder-picker behavior, the full installed launcher, game starts,
+SmartScreen or antivirus acceptance. The native test helper remains disabled.
+`read_test_shortcuts.ps1` is the read-only shortcut inspector used by this test.
+The release workflow requires successful lifecycle evidence before it creates
+a draft release. New public releases still need their own exact-file review.

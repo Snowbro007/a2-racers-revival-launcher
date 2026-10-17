@@ -8,10 +8,10 @@ Je hoeft Python niet zelf te installeren. De eerste start haalt gecontroleerde o
 
 I en II zijn speelbaar. Deel III is voorlopig geblokkeerd na een vastloper die de muis vasthield. Je kunt wel een gamemap kiezen en de bestanden voorbereiden. Deze stop bewijst nog geen opgeloste race of muisvrijgave. Start III niet in de oude beta 4. Deel IV en multiplayer zijn plannen voor later.
 
-De MSI en launcher zijn nog niet digitaal ondertekend. Windows kan ze waarschuwen of blokkeren. Een foutloze installatie, update en verwijdering op een gewone Windows-pc moeten nog worden bevestigd; een nieuw scanrapport van precies deze bestanden ontbreekt nog. De eerdere zelfuitpakkende Setup.exe had 7/69 VirusTotal-detecties en wordt niet uitgebracht. Die uitslag is niet als een bewezen vals alarm aangemerkt.
+Installeren, bijwerken, herstellen en verwijderen zijn met aparte tekstbestanden getest op een schone Windows-runner. De snelkoppelingen en het A2-icoon kloppen; testinstellingen en voortgang blijven behouden. De volledige launcher en de interactieve installatieschermen zijn daarmee nog niet getest.
 
-Bij publicatie horen de SHA-256 en een link naar de scan van de uiteindelijke MSI op deze releasepagina. Een rapport van een oudere beta geldt niet voor deze download.
+Nog niet digitaal ondertekend: Windows kan waarschuwen of blokkeren. De vorige [MSI-scan](https://www.virustotal.com/gui/file/92caa234b4db52c634cb1e35f08223462c584f2ef75889c11a934a0f2f980e28/detection) gaf 0/58, maar de [losse launcher](https://www.virustotal.com/gui/file/bc01d7011cd692885531a1f4a3f94061aa633c9cf301a258cdd7951e95052635/detection) 2/71. Dat zijn oudere bestanden; een vals alarm is niet bewezen. De uiteindelijke download krijgt zijn eigen SHA-256 en scanstatus.
 
-Een lokale synthetische testhulp is door Bitdefender geblokkeerd als `Gen:Variant.MSILHeracles.213981`. Deze helper wordt niet meegeleverd en de uitvoerbare test staat uit. Dit moet verder worden onderzocht; een vals alarm is niet bevestigd. De nieuwe installer blijft ongepubliceerd.
+Een door Bitdefender geblokkeerde uitvoerbare testhulp en de oude zelfuitpakkende Setup.exe worden niet meegeleverd. De nieuwe MSI blijft een concept tot de laatste controles zijn afgerond.
 
 Onofficieel fanproject; oorspronkelijke rechten blijven bij de rechthebbenden. Eigen rechtmatig verkregen games vereist. MIT geldt alleen voor eigen code; zie THIRD-PARTY-NOTICES.md. Beta zonder garantie. Gebouwd met hulp van LLM’s.
