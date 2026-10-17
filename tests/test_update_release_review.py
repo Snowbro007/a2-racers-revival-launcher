@@ -4,9 +4,10 @@ import hashlib
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 
 from tools.create_update_review import create_review
-from tools.windows.msi.verify_app_install import preflight
+from tools.windows.msi.verify_app_install import preflight, inspect_signature
 
 
 class ReleaseReviewTests(unittest.TestCase):
@@ -60,6 +61,16 @@ class ReleaseReviewTests(unittest.TestCase):
                 preflight({**plan, key: value}, result)
         with self.assertRaises(ValueError):
             preflight(plan, {'sha256': '0' * 64})
+
+    def test_signature_probe_uses_system_modules_and_rejects_missing_or_bad_status(self):
+        shell = Path('C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe')
+        for status in ('', 'HashMismatch', 'NotTrusted'):
+            with patch('subprocess.check_output', return_value='{"status":"' + status + '"}'), self.assertRaises(ValueError):
+                inspect_signature(shell, self.path)
+        with patch('subprocess.check_output', return_value='{"status":"NotSigned","thumbprint":null}') as run:
+            self.assertEqual(inspect_signature(shell, self.path)['status'], 'NotSigned')
+            self.assertEqual(run.call_args.kwargs['env']['PSModulePath'], str(shell.parent / 'Modules'))
+            self.assertIn("$ErrorActionPreference='Stop'", run.call_args.args[0][-1])
 
 
 if __name__ == '__main__':
