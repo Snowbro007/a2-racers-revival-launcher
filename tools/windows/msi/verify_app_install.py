@@ -129,6 +129,14 @@ def run_trial(spec: Path, output: Path, msi: Path | None = None) -> dict:
         if not bundled_python.is_file() or not bundled_pwsh.is_file():
             raise ValueError('App used no bundled runtimes.')
         report['bundled_runtimes_verified'] = True
+        updater = checked_path(app / 'tools/launcher_updates.py')
+        update_settings = json.loads(subprocess.check_output(
+            [str(bundled_python), '-B', str(updater), '--root', str(app), 'settings'],
+            text=True, encoding='utf-8-sig', timeout=30))
+        if (update_settings.get('state') != 'settings'
+                or update_settings.get('current_version') != (app / 'VERSION.txt').read_text().strip()):
+            raise ValueError('Installed updater cannot read its own settings/version.')
+        report['updater_settings_verified'] = True
         marker = checked_path(app / 'local/installer-smoke/progress.txt')
         marker.parent.mkdir(parents=True, exist_ok=True)
         marker.write_bytes(b'Synthetic progress: preserve every byte')

@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Nieuwe versie, gelijk aan VERSION.txt (bijvoorbeeld 0.1.0-beta.6)'
+        description: 'Nieuwe versie, gelijk aan VERSION.txt (bijvoorbeeld 0.1.0-beta.7)'
         required: true
         type: string
 

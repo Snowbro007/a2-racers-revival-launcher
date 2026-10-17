@@ -1,6 +1,6 @@
 # Updates in de launcher
 
-Vanaf beta 6 staat bij Support een updatevak. De openbare launcher controleert
+Vanaf beta 7 staat bij Support een updatevak. De openbare launcher controleert
 na zijn voorbereiding eenmaal per start op nieuwere releases. Automatisch
 controleren kun je uitzetten; handmatig controleren kan altijd. Alleen GitHub
 ontvangt de normale netwerkaanvraag, geen gamemappen, saves of instellingen.

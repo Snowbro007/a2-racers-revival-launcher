@@ -1,4 +1,4 @@
-# A2 Racers Revival — 0.1.0-beta.6
+# A2 Racers Revival — 0.1.0-beta.7
 
 **Installatiekandidaat: nog niet uitgebracht.**
 
