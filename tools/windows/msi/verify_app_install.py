@@ -35,6 +35,19 @@ def preflight(plan: dict, result: dict) -> None:
         raise ValueError('Product identity mismatch.')
 
 
+def inspect_signature(shell: Path, path: Path) -> dict:
+    command = "$ErrorActionPreference='Stop'; [Console]::OutputEncoding=[Text.UTF8Encoding]::new($false); $signature=Get-AuthenticodeSignature -LiteralPath $env:A2_SIGNATURE_FILE; @{status=[string]$signature.Status;thumbprint=if($signature.SignerCertificate){$signature.SignerCertificate.Thumbprint}else{$null}} | ConvertTo-Json -Compress"
+    # A PowerShell 7 caller exports incompatible module paths to Windows PS5.
+    # Use its own system modules, without changing any machine setting.
+    environment = {**os.environ, 'A2_SIGNATURE_FILE': str(path),
+                   'PSModulePath': str(shell.parent / 'Modules')}
+    value = json.loads(subprocess.check_output([str(shell), '-NoProfile', '-Command', command],
+                      env=environment, text=True, encoding='utf-8-sig'))
+    if not isinstance(value, dict) or value.get('status') not in ('Valid', 'NotSigned'):
+        raise ValueError('Missing or invalid Authenticode result; do not execute this app.')
+    return value
+
+
 def run_trial(spec: Path, output: Path, msi: Path | None = None) -> dict:
     import winreg
     spec = checked_path(spec)
@@ -106,11 +119,7 @@ def run_trial(spec: Path, output: Path, msi: Path | None = None) -> dict:
         verify_managed_files()
         native = checked_path(target / 'A2 Racers Revival.exe')
         report['launcher_sha256'] = hashlib.sha256(native.read_bytes()).hexdigest()
-        signature_script = "[Console]::OutputEncoding=[Text.UTF8Encoding]::new($false); $signature=Get-AuthenticodeSignature -LiteralPath $env:A2_SIGNATURE_FILE; @{status=[string]$signature.Status;thumbprint=if($signature.SignerCertificate){$signature.SignerCertificate.Thumbprint}else{$null}} | ConvertTo-Json -Compress"
-        # Fixed read-only command; path data is never interpolated as code.
-        signatures = [json.loads(subprocess.check_output([str(shell), '-NoProfile', '-Command', signature_script],
-                           env={**os.environ, 'A2_SIGNATURE_FILE': str(path)}, text=True, encoding='utf-8-sig'))
-                      for path in (plan['output'], native)]
+        signatures = [inspect_signature(shell, Path(path)) for path in (plan['output'], native)]
         report['msi_signature'], report['launcher_signature'] = signatures
         app = target / 'app'
         for phase in ('first-run', 'cached-run'):
