@@ -9,6 +9,17 @@ from tools.windows.msi import verify_lifecycle as trial
 
 
 class LifecycleTests(unittest.TestCase):
+    def test_msiexec_property_quoting_keeps_spaces_and_unicode_inside_the_value(self):
+        target = r'C:\test & fixtures\gekozen map - é'
+        command = trial.msi_command(Path('msiexec.exe'), ['/i', r'C:\test build\fixture.msi'],
+                                    Path('install.log'), {'INSTALLDIR': target})
+        self.assertIn('INSTALLDIR="' + target + '"', command)
+        self.assertNotIn('"INSTALLDIR=', command)
+        self.assertIn('"C:\\test build\\fixture.msi"', command)
+        for invalid in ('quote"value', 'line\nvalue', 'nul\x00value'):
+            with self.assertRaises(ValueError):
+                trial.msi_command(Path('msiexec.exe'), [], Path('log'), {'INSTALLDIR': invalid})
+
     def test_identity_is_unique_and_does_not_use_the_live_product_registry(self):
         first = trial.identity('a' * 32)
         second = trial.identity('b' * 32)

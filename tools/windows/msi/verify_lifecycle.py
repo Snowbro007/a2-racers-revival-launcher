@@ -13,6 +13,7 @@ import io
 import json
 import os
 from pathlib import Path
+import re
 import subprocess
 import sys
 import uuid
@@ -121,6 +122,18 @@ def verify_shortcuts(shell: Path, target: Path, name: str) -> list[str]:
     return [row['path'] for row in rows]
 
 
+def msi_command(installer: Path, arguments: list[str], log: Path, properties=None) -> str:
+    # Msiexec parses PROPERTY="value with spaces" itself. CRT/list2cmdline's
+    # "PROPERTY=value with spaces" instead opens its usage dialog, even /qn.
+    # No command shell is used; metacharacters in a folder remain literal.
+    command = subprocess.list2cmdline([str(installer), *arguments, '/qn', '/norestart', '/l*v', str(log)])
+    for name, value in (properties or {}).items():
+        if not re.fullmatch('[A-Z][A-Z0-9_]*', name) or any(c in value for c in '\x00\r\n"'):
+            raise ValueError('Invalid MSI test property.')
+        command += ' ' + name + '="' + value + '"'
+    return command
+
+
 def execute_trial(folder: Path, test_identity: dict, plans: list[dict], shell: Path) -> dict:
     import winreg
     target = folder / 'Installatie met spaties - é'
@@ -142,9 +155,9 @@ def execute_trial(folder: Path, test_identity: dict, plans: list[dict], shell: P
     def save():
         receipt_path.write_text(json.dumps(receipt, indent=2) + '\n', encoding='utf-8')
 
-    def invoke(phase, arguments, *, failure_expected=False):
+    def invoke(phase, arguments, *, failure_expected=False, properties=None):
         log = folder / (phase + '.log')
-        process = subprocess.run([str(installer), *arguments, '/qn', '/norestart', '/l*v', str(log)], timeout=120)
+        process = subprocess.run(msi_command(installer, arguments, log, properties), timeout=120)
         row = {'phase': phase, 'exit_code': process.returncode, 'log': log.name}
         phases.append(row)
         save()
@@ -173,7 +186,7 @@ def execute_trial(folder: Path, test_identity: dict, plans: list[dict], shell: P
 
     save()
     try:
-        invoke('install', ['/i', plans[0]['output'], 'INSTALLDIR=' + str(target)])
+        invoke('install', ['/i', plans[0]['output']], properties={'INSTALLDIR': str(target)})
         verify_files(target, test_identity['NAME'], '0.1.5')
         verify_registered_folder()
         shortcut_paths = verify_shortcuts(shell, target, test_identity['NAME'])

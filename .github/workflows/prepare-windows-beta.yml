@@ -95,6 +95,25 @@ jobs:
           python -m unittest discover -s tests -v
           if ($LASTEXITCODE -ne 0) { throw 'Launcher tests failed.' }
 
+      - name: Verify Windows Installer lifecycle with isolated text files
+        shell: pwsh
+        run: |
+          $authoringShell = (Get-Command pwsh -CommandType Application -ErrorAction Stop).Source
+          python tools/windows/msi/verify_lifecycle.py --output local/installer-validation/release --powershell $authoringShell --execute
+          if ($LASTEXITCODE -ne 0) { throw 'Installer lifecycle failed; no release will be created.' }
+
+      - name: Preserve Windows Installer lifecycle evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: installer-lifecycle-evidence
+          path: |
+            local/installer-validation/release/lifecycle-result.json
+            local/installer-validation/release/*.log
+            local/installer-validation/release/build-*/database-audit.json
+          if-no-files-found: warn
+          retention-days: 30
+
       - name: Build and audit the public allowlist
         shell: pwsh
         run: |
@@ -124,6 +143,13 @@ jobs:
           result = load('dist/msi/build-result.json')
           plan = load('dist/msi/build-plan.json')
           audit = load('dist/msi/database-audit.json')
+          lifecycle = load('local/installer-validation/release/lifecycle-result.json')
+          if (lifecycle.get('complete') is not True or lifecycle.get('text_fixtures_only') is not True
+                  or lifecycle.get('payload_executed') is not False
+                  or lifecycle.get('settings_progress_and_cache_preserved') is not True
+                  or lifecycle.get('shortcuts_and_icon_verified') is not True
+                  or lifecycle.get('shortcuts_removed') is not True):
+              raise ValueError('Windows Installer lifecycle evidence is incomplete.')
           launcher = pathlib.Path('dist/native/A2 Racers Revival.exe').read_bytes()
           payload_path = pathlib.Path('dist/native/installation-payload.zip')
           icon = pathlib.Path('dist/native/a2-revival.ico').read_bytes()
@@ -168,7 +194,8 @@ jobs:
                     'commit': os.environ['GITHUB_SHA'], 'file': name, 'sha256': digest,
                     'launcher_sha256': sha(launcher), 'games_bundled': False, 'signed': False,
                     'source_payload_cabinet_and_database_verified': True, 'synthetic_tests_passed': True,
-                    'installation_verified': False, 'upgrade_verified': False, 'ui_verified': False,
+                    'text_fixture_installer_lifecycle_verified': True,
+                    'native_application_executed': False, 'ui_verified': False,
                     'smart_screen_verified': False, 'antivirus_scan': None, 'published': False}
           (destination / 'build-review.json').write_text(json.dumps(review, indent=2) + '\n', encoding='utf-8')
           if {path.name for path in destination.iterdir()} != {name, name + '.sha256', 'build-review.json'}:
@@ -176,7 +203,8 @@ jobs:
           notes = pathlib.Path('docs/public-release-notes.md').read_text(encoding='utf-8-sig').rstrip()
           notes += f'\n\n**MSI SHA-256:** `{digest}`\n\n'
           notes += ('Concept voor controle. Automatische bron-, payload-, CAB- en MSI-tabelcontroles geslaagd. '
-                    'Installatie, update en verwijderen op een schone Windows-pc moeten nog worden gecontroleerd. '
+                    'Installatie, update, herstel en verwijderen met tekstfixtures zijn op een schone Windows-runner gecontroleerd, inclusief behoud van testinstellingen en voortgang. '
+                    'De volledige launcher en de interactieve installatieschermen zijn hiermee nog niet gestart. '
                     'Deze build heeft nog geen VirusTotal-rapport en is niet digitaal ondertekend.\n')
           pathlib.Path('dist/release-notes.md').write_text(notes, encoding='utf-8')
 
