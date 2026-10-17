@@ -6,6 +6,7 @@ on:
       - 'tools/windows/msi/**'
       - 'tests/test_windows_msi*'
       - '.github/workflows/installer-validation.yml'
+      - '.github/workflows/prepare-windows-beta.yml'
   workflow_dispatch:
 
 permissions:

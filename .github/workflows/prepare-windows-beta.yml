@@ -88,6 +88,9 @@ jobs:
           git ls-remote --exit-code --tags origin "refs/tags/$env:RELEASE_TAG" | Out-Null
           if ($LASTEXITCODE -eq 0) { throw 'Tag already exists; refusing to retarget it.' }
           if ($LASTEXITCODE -ne 2) { throw 'Could not inspect the requested tag.' }
+          # Git returns 2 for the expected "no matching tag" result. GitHub's
+          # PowerShell wrapper otherwise propagates it as a failed step.
+          $global:LASTEXITCODE = 0
 
       - name: Run synthetic tests
         shell: pwsh
