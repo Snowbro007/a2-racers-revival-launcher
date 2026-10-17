@@ -54,6 +54,12 @@ if($ui.DownloadUpdate.Visibility -ne 'Collapsed' -or $ui.InstallUpdate.IsEnabled
 
 @unittest.skipUnless(os.name == 'nt', 'Windows WPF')
 class UpdateUITests(unittest.TestCase):
+    def test_updater_backend_and_controls_are_in_the_runtime_package(self):
+        from tools.portable_launcher import app_files
+        files = set(app_files(ROOT))
+        self.assertTrue({'tools/launcher_updates.py', 'tools/launcher_updates.ps1'} <= files)
+        self.assertFalse('tools/create_update_review.py' in files)
+
     def test_update_controls_refuse_busy_or_changed_installer_without_launching(self):
         runtime = shutil.which('pwsh')
         if not runtime:
