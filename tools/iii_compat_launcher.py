@@ -22,6 +22,7 @@ from tools import trial_manifest as manifest
 from tools.ii_frontend_state import read_regular
 from tools.ii_next_wrapper_probe import replace_setting
 from tools.local_game_data import launch_environment
+from tools import iii_start_safety
 
 PROFILES={
     'compat':{'label':'Compatibiliteit · originele resolutie',
@@ -192,6 +193,7 @@ def available(root,tour,profile):
 
 
 def start(root,tour,profile):
+    iii_start_safety.assert_start_allowed()
     target=prepare(root,tour,profile)
     if profile=='fullhd-skyoff':
         for path,changes in ((target/'raser.ini',{('PROGRAM','RESOLUTION'):3}),

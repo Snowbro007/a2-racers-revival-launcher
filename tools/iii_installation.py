@@ -7,7 +7,7 @@ from pathlib import Path
 import tempfile
 
 from tools import iii_local_launcher as native
-from tools.game_installation import bounded_files, copy_file
+from tools.game_installation import bounded_files, copy_file, promote_import
 from tools.trial_manifest import validate_ancestors, validate_tree
 
 SAVED_NAMES={'scores.dat','current.rcr','memreport.ini','debug.txt'}
@@ -89,10 +89,9 @@ def import_folder(root,source,tour):
         validate_tree(stage)
         native.local_movie_path(stage)
         native.check_folder(root,tour,stage)
-        stage.rename(target)
-    data={'schema':1,'tour':tour,'source_path':str(source),'game_path':str(target),
-          'source_tree_sha256':before['source_tree_sha256'],'source_unchanged':True,
-          'game_imported':True,'game_started':False,'disc_image_required':False}
-    with receipt.open('x',encoding='utf-8') as stream:json.dump(data,stream,indent=2)
+        data={'schema':1,'tour':tour,'source_path':str(source),'game_path':str(target),
+              'source_tree_sha256':before['source_tree_sha256'],'source_unchanged':True,
+              'game_imported':True,'game_started':False,'disc_image_required':False}
+        promote_import(stage,target,receipt,data)
     native.check(root,tour)
     return data

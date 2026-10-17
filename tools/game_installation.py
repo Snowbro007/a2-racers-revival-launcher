@@ -106,6 +106,47 @@ def copy_file(source: Path, target: Path) -> None:
             raise ValueError('Installatie veranderde tijdens koppelen.')
 
 
+def promote_import(stage: Path, destination: Path, receipt: Path, data: dict) -> None:
+    """Finish metadata before publishing game data; roll back only our own record.
+
+    A record and game directory are separate filesystem entries. This handles
+    ordinary write/promotion failures without deleting game files; it is not a
+    claim of a single crash-durable transaction across both locations.
+    """
+    for path in (stage, destination, receipt):
+        validate_ancestors(path)
+    if destination.exists() or receipt.exists():
+        raise ValueError('Gamegegevens of koppelingsrecord bestaan al; overschrijven geweigerd.')
+    owned_record = None
+    promoted = False
+    try:
+        # Exclusive creation preserves any competing or pre-existing record.
+        # A disk-full/permission error happens while only our staging is live.
+        with receipt.open('x', encoding='utf-8') as handle:
+            metadata = os.fstat(handle.fileno())
+            owned_record = (metadata.st_dev, metadata.st_ino)
+            json.dump(data, handle, ensure_ascii=True, indent=2)
+            handle.flush()
+            os.fsync(handle.fileno())
+        validate_ancestors(destination)
+        if destination.exists():
+            raise ValueError('Gamegegevens zijn intussen toegevoegd; import gestopt.')
+        stage.rename(destination)
+        promoted = True
+    finally:
+        if owned_record is not None and not promoted:
+            validate_ancestors(receipt)
+            try:
+                metadata = receipt.stat()
+            except FileNotFoundError:
+                pass
+            else:
+                if ((metadata.st_dev, metadata.st_ino) != owned_record
+                        or not receipt.is_file() or metadata.st_nlink != 1):
+                    raise ValueError('Koppelingsrecord is intussen veranderd; opruimen geweigerd.')
+                receipt.unlink()
+
+
 def discover(root: Path, *, candidates: list[Path] | None = None) -> dict:
     """Candidates are Windows registrations, or explicit paths in synthetic tests."""
     locations = registry_locations() if candidates is None else candidates
@@ -166,11 +207,9 @@ def import_installation(root: Path, source: Path, game: str = 'a2racer1') -> dic
             raise ValueError('Gamebestanden veranderden tijdens koppelen.')
         if destination.exists():
             raise ValueError('Lokale gamebestanden zijn intussen toegevoegd; import gestopt.')
-        stage.rename(destination)
         data = {'schema': 1, 'game': game, 'source_path': str(source),
                 'source_tree_sha256': inspected['source_tree_sha256'], 'source_unchanged': True}
-        with receipt.open('x', encoding='utf-8') as handle:
-            json.dump(data, handle, ensure_ascii=True, indent=2)
+        promote_import(stage, destination, receipt, data)
         return {**data, 'game_imported': True, 'game_started': False, 'disc_image_required': False}
     finally:
         # Only this uniquely named staging directory inside our own game cache.

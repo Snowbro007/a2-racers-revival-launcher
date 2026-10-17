@@ -417,11 +417,15 @@ def iii_preparation(root: Path) -> dict:
                     for name,entry in PROFILES.items()}
         profiles['original'] = {'available': launch_ready, 'label': 'Origineel',
                                 'reason': 'Originele schermmodus; de racecrash is gemeld bij Tour 1.'}
+        from tools.iii_start_safety import BLOCK_REASON
+        for profile in profiles.values():
+            profile.update(available=False, reason=BLOCK_REASON)
         tours[str(number)] = {'label': f'Tour {number}', 'source_present': present,
                              'launch_ready': launch_ready,
+                             'start_blocked': True,
                              'profiles': profiles,
                              'ready': False, 'runtime_verified': False,
-                             'reason': ('Start zonder cd gereed · speelbaarheid nog niet bevestigd.' if launch_ready else
+                             'reason': (BLOCK_REASON if launch_ready else
                                         'Bron beschikbaar · voorbereid, nog niet speelgetest.' if present
                                         else 'Lokale proefbron ontbreekt of wijkt af.')}
     return {'tours': tours, 'ready': False}
