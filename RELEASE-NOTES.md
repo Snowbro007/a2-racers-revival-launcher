@@ -6,7 +6,7 @@ Deze beta krijgt een gewone Windows-installer (.msi), een herkenbaar A2-icoon en
 
 Je hoeft Python niet zelf te installeren. De eerste start haalt gecontroleerde onderdelen op bij hun leveranciers; daarna kun je offline spelen. Voeg zelf een ondersteunde Nederlandse gamemap of volledige ZIP toe. Er worden geen games meegeleverd of opgehaald. Voor II staat in de [uitleg](README.md#de-games) een externe gamepagina.
 
-De gamefuncties blijven gelijk aan beta 4: I en II zijn speelbaar, III blijft in ontwikkeling. Deel IV en multiplayer zijn plannen voor later.
+I en II zijn speelbaar. Deel III is voorlopig geblokkeerd na een vastloper die de muis vasthield. Je kunt wel een gamemap kiezen en de bestanden voorbereiden. Deze stop bewijst nog geen opgeloste race of muisvrijgave. Start III niet in de oude beta 4. Deel IV en multiplayer zijn plannen voor later.
 
 De MSI en launcher zijn nog niet digitaal ondertekend. Windows kan ze waarschuwen of blokkeren. Een foutloze installatie, update en verwijdering op een gewone Windows-pc moeten nog worden bevestigd; een nieuw scanrapport van precies deze bestanden ontbreekt nog. De eerdere zelfuitpakkende Setup.exe had 7/69 VirusTotal-detecties en wordt niet uitgebracht. Die uitslag is niet als een bewezen vals alarm aangemerkt.
 

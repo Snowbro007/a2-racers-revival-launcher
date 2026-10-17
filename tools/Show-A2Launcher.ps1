@@ -123,16 +123,18 @@ function Update-Buttons {
     if ($ui.Pages.SelectedIndex -eq 3) {
         $iiiReady = $false
         $iiiHasMap = $false
+        $iiiBlocked = $false
         if ($script:catalog -and $ui.IIITourChoice.SelectedItem) {
             $tourState = $script:catalog.iii_preparation.tours.([string]$ui.IIITourChoice.SelectedItem.Tag)
             $iiiHasMap = ($tourState.PSObject.Properties.Name -contains 'launch_ready') -and $tourState.launch_ready
+            $iiiBlocked = $tourState.PSObject.Properties['start_blocked'] -and $tourState.start_blocked
             if ($ui.IIIProfileChoice.SelectedItem) {
                 $profileState = $tourState.profiles.([string]$ui.IIIProfileChoice.SelectedItem.Tag)
-                $iiiReady = $profileState -and $profileState.available
+                $iiiReady = $profileState -and $profileState.available -and -not $iiiBlocked
             }
         }
         $ui.PlayButton.IsEnabled = [bool]($idle -and -not $running -and $iiiReady)
-        $ui.PlayButton.Content = if ($iiiReady) { 'Start deze variant' } else { 'Gamemap nodig' }
+        $ui.PlayButton.Content = if ($iiiBlocked) { 'Start geblokkeerd' } elseif ($iiiReady) { 'Start deze variant' } else { 'Gamemap nodig' }
         $ui.PlayNote.Text = if ($iiiReady) { 'Origineel menu en race · lokale bestanden · geen cd-mount.' } else { 'Deel III is voorbereid; er wordt nog geen game gestart.' }
         $ui.GameTitle.Text = 'A2 Racer III'
         $ui.GameSubtitle.Text = 'Europa Tour · Tour 1 en Tour 2'
@@ -140,7 +142,8 @@ function Update-Buttons {
         $ui.GameOne.BorderBrush = '#356E95'; $ui.GameTwo.BorderBrush = '#356E95'
         $ui.GameOneSelected.Visibility = 'Collapsed'; $ui.GameTwoSelected.Visibility = 'Collapsed'
         if (-not $running -and -not $script:operation -and $ui.StatusTitle.Text -notin @('Start onderbroken','Deel III kon niet starten','Deel III kon niet koppelen','Kon niet doorgaan')) {
-            if ($iiiReady) { Set-Status 'Deel III voorbereid' 'Start zonder cd beschikbaar; de speeltest volgt apart.' }
+            if ($iiiBlocked) { Set-Status 'Start tijdelijk geblokkeerd' 'Een deel-III-proef liep vast en hield de muis vast. Voorbereiden blijft mogelijk.' }
+            elseif ($iiiReady) { Set-Status 'Deel III voorbereid' 'Start zonder cd beschikbaar; de speeltest volgt apart.' }
             elseif (-not $iiiHasMap) { Set-Status 'Gamemap nodig' 'Kies eerst de volledige gamemap van deze tour.' }
             else { Set-Status 'Beeldvariant niet beschikbaar' $ui.IIIProfileNote.Text }
         }
@@ -153,7 +156,7 @@ function Update-IIIStatus {
     $tourState = $script:catalog.iii_preparation.tours.($tour)
     $ui.IIIStatus.Text = $tourState.reason
     $ui.IIITourOverview.Text = 'Tour ' + $tour
-    $ui.IIIReadyOverview.Text = if (($tourState.PSObject.Properties.Name -contains 'launch_ready') -and $tourState.launch_ready) { 'Klaar voor start' } else { 'Niet beschikbaar' }
+    $ui.IIIReadyOverview.Text = if ($tourState.PSObject.Properties['start_blocked'] -and $tourState.start_blocked) { 'Start geblokkeerd' } elseif (($tourState.PSObject.Properties.Name -contains 'launch_ready') -and $tourState.launch_ready) { 'Klaar voor start' } else { 'Niet beschikbaar' }
     if ($ui.IIIProfileChoice.SelectedItem) {
         $profile = [string]$ui.IIIProfileChoice.SelectedItem.Tag
         $profileState = $tourState.profiles.($profile)

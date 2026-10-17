@@ -2,6 +2,8 @@
 
 Een fanproject voor de oude A2 Racer-games op moderne Windows-pc’s. I en II zijn speelbaar, met Full HD en optionele HD textures voor I. III is in ontwikkeling.
 
+Deel III is voorlopig gepauzeerd na een vastloper die de muis vasthield. Je kunt de gamemap kiezen en voorbereiden; starten blijft geblokkeerd totdat dit is opgelost.
+
 **Beta 5 is nog niet uitgebracht.**
 
 **[Download de Windows 11-installer (.msi)](https://github.com/Snowbro007/a2-racers-revival-launcher/releases/download/v0.1.0-beta.5/A2-Racers-Revival-0.1.5-beta5.msi)** — beschikbaar na publicatie.
