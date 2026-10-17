@@ -64,7 +64,7 @@ ProductCode changes per version; PackageCode changes per build. A rebuilt
 MSI is a new artifact with a new hash and needs its own review. No attempt is
 made to reproduce the byte hash of a previously built MSI.
 
-Run the twelve synthetic tests without building an MSI:
+Run the thirteen synthetic tests without building an MSI:
 
 ```powershell
 python -m unittest discover -s . -p "test_msi_builder.py" -v
@@ -78,7 +78,7 @@ ownership, dialog navigation, and a synthetic multi-block MSZIP cabinet.
 Test fixtures remain under `test-output/`;
 that directory and bytecode caches are excluded by `.gitignore`.
 
-The folder-picker variant passed twelve synthetic tests. The MSI authoring smoke
+The folder-picker/error-dialog variant passed thirteen synthetic tests. The MSI authoring smoke
 test built a 28,672-byte MSI from two synthetic sentinel files through the
 explicitly selected bundled PowerShell 7. Windows PowerShell initially refused
 the adjacent writer script because of its local execution policy. No policy was
