@@ -23,11 +23,11 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
-      - name: Run synthetic installer guards
+      - name: Run full synthetic launcher test suite
         shell: pwsh
         run: |
-          python -m unittest tests.test_windows_msi tests.test_windows_msi_lifecycle tests.test_native_release_build -v
-          if ($LASTEXITCODE -ne 0) { throw 'Installer guards failed.' }
+          python -m unittest discover -s tests -v
+          if ($LASTEXITCODE -ne 0) { throw 'Launcher tests failed.' }
       - name: Install, upgrade, refuse downgrade, repair and remove text fixtures
         shell: pwsh
         run: |
