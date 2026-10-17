@@ -87,6 +87,11 @@ def author_fixture(folder: Path, test_identity: dict, version: str, shell: Path)
         raise ValueError('Synthetic MSI manifest does not match its text fixture.')
     if plan['upgrade_code'] != test_identity['UPGRADE_CODE']:
         raise ValueError('Synthetic MSI uses a foreign product identity.')
+    registry = next(table['rows'] for table in plan['tables'] if table['name'] == 'Registry')
+    if any(row[1] != 1 or not (row[2] == test_identity['INSTALLER_REGISTRY_KEY']
+                              or row[2].startswith(test_identity['INSTALLER_REGISTRY_KEY'] + chr(92)))
+           for row in registry):
+        raise ValueError('Synthetic MSI would write outside its isolated HKCU test key.')
     return plan
 
 

@@ -34,6 +34,10 @@ class LifecycleTests(unittest.TestCase):
             plan = builder.build_plan(trial.fixture_files(identity['NAME'], '0.1.5'), Path('stage'), Path('icon'), '0.1.5')
         self.assertNotEqual(plan['upgrade_code'], builder.UPGRADE_CODE)
         self.assertFalse(any(table['name'] in ('CustomAction', 'RemoveFile') for table in plan['tables']))
+        registry = next(table['rows'] for table in plan['tables'] if table['name'] == 'Registry')
+        self.assertTrue(all(row[1] == 1 and (row[2] == identity['INSTALLER_REGISTRY_KEY']
+                                           or row[2].startswith(identity['INSTALLER_REGISTRY_KEY'] + chr(92)))
+                            for row in registry))
 
     def test_output_claim_preserves_existing_data_and_rejects_escape(self):
         parent = trial.ROOT / 'local/test-fixtures'
