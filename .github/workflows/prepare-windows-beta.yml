@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Nieuwe versie, gelijk aan VERSION.txt (bijvoorbeeld 0.1.0-beta.5)'
+        description: 'Nieuwe versie, gelijk aan VERSION.txt (bijvoorbeeld 0.1.0-beta.6)'
         required: true
         type: string
 
@@ -19,7 +19,7 @@ jobs:
   candidate:
     if: github.repository == 'Snowbro007/a2-racers-revival-launcher' && github.ref == 'refs/heads/main'
     runs-on: windows-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     permissions:
       contents: write
     env:
@@ -210,6 +210,47 @@ jobs:
                     'De volledige launcher en de interactieve installatieschermen zijn hiermee nog niet gestart. '
                     'Deze build heeft nog geen VirusTotal-rapport en is niet digitaal ondertekend.\n')
           pathlib.Path('dist/release-notes.md').write_text(notes, encoding='utf-8')
+
+      - name: Install and check the actual audited app without games
+        shell: pwsh
+        run: |
+          python tools/windows/msi/verify_app_install.py --spec dist/msi/build-plan.json --output local/installer-validation/full-app --execute
+          if ($LASTEXITCODE -ne 0) { throw 'Installed app check failed; no draft release will be created.' }
+
+      - name: Preserve actual app installation evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: installed-app-evidence
+          path: |
+            local/installer-validation/full-app/app-install-result.json
+            local/installer-validation/full-app/*.log
+            local/installer-validation/full-app/*.txt
+            dist/msi/build-plan.json
+            dist/msi/build-result.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Record actual app checks separately from interactive Windows 11 acceptance
+        shell: python
+        run: |
+          import json, pathlib
+          path = pathlib.Path('dist/release-files/build-review.json')
+          review = json.loads(path.read_text())
+          smoke = json.loads(pathlib.Path('local/installer-validation/full-app/app-install-result.json').read_text())
+          if (smoke.get('complete') is not True or smoke['msi_sha256'] != review['sha256']
+                  or smoke['launcher_sha256'] != review['launcher_sha256']):
+              raise ValueError('Installed app evidence does not match these release bytes.')
+          review.update(native_application_executed=True, installed_app_checks_verified=True,
+                        windows11_app_checks_verified=smoke['windows11'],
+                        msi_signature=smoke['msi_signature'], launcher_signature=smoke['launcher_signature'])
+          path.write_text(json.dumps(review, indent=2) + '\n')
+          notes = pathlib.Path('dist/release-notes.md')
+          text = notes.read_text(encoding='utf-8').replace(
+              'De volledige launcher en de interactieve installatieschermen zijn hiermee nog niet gestart.',
+              'Ook de echte launcher is via zijn controlemodus voor het eerst en vanuit cache gestart; herstel en verwijderen zijn getest. '
+              'Dit draaide op een Windows CI-runner en vervangt geen interactieve Windows 11-proef.')
+          notes.write_text(text, encoding='utf-8')
 
       - name: Save exact candidate files for review
         uses: actions/upload-artifact@v7

@@ -5,6 +5,7 @@ param([string]$PythonPath, [string]$PowerShellPath, [switch]$CheckOnly, [string]
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'launcher_common.ps1')
+. (Join-Path $PSScriptRoot 'launcher_updates.ps1')
 $workspacePath = Split-Path -Parent $PSScriptRoot
 Add-Type -AssemblyName PresentationFramework, PresentationCore, WindowsBase
 $script:operation = $null; $script:worker = $null; $script:sessionName = $null
@@ -901,10 +902,6 @@ try {
     $ui.MaxProfile.Add_Click({ Use-GameProfile 'max' })
     $ui.PlayButton.Add_Click({ if ($ui.Pages.SelectedIndex -eq 3) { Start-IIIGame } else { Start-Model 'start' (Preference-Arguments 'create-session') } })
     $ui.RefreshState.Add_Click({ Start-Model 'snapshot' @('snapshot') })
-    $ui.CheckUpdates.Add_Click({
-        try { $null = Start-Process -FilePath 'https://github.com/Snowbro007/a2-racers-revival-launcher/releases' }
-        catch { Set-Status 'Pagina niet geopend' $_.Exception.Message }
-    })
     $ui.OpenDevtools.Add_Click({ Open-Devtools })
     $ui.OpenLogs.Add_Click({
         try {
@@ -950,6 +947,12 @@ try {
     $ui.GetGame.Add_Click({
         try { Open-GameSource } catch { Set-Status 'Pagina niet geopend' $_.Exception.Message }
     })
+    Initialize-LauncherUpdates $window $ui $workspacePath {
+        if ($script:initialized -and $script:PythonPath -and (Test-Path -LiteralPath $script:PythonPath -PathType Leaf)) { return $script:PythonPath }
+        return $null
+    } {
+        return [bool]($script:operation -or ($script:worker -and -not $script:worker.process.HasExited))
+    }
     $timer = New-Object Windows.Threading.DispatcherTimer
     $timer.Interval = [TimeSpan]::FromMilliseconds(500); $timer.Add_Tick({ Poll-Launcher })
     $window.Add_Loaded({ Start-InitialCheck; $timer.Start() })
