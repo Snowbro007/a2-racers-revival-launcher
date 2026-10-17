@@ -52,6 +52,8 @@ def fixture_files(name: str, version: str) -> dict[str, bytes]:
 
 def claim_output(output: Path) -> Path:
     allowed = ROOT / 'local/installer-validation'
+    if '..' in output.parts:
+        raise ValueError('Traversal is not allowed in installer test output.')
     validate_ancestors(output)
     full = output.absolute()
     full.relative_to(allowed.absolute())
