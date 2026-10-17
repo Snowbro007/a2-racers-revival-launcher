@@ -63,4 +63,6 @@ class LifecycleTests(unittest.TestCase):
                     trial.claim_output(output)
                 with self.assertRaises(ValueError):
                     trial.claim_output(root / 'elsewhere')
+                with self.assertRaises(ValueError):
+                    trial.claim_output(root / 'local/installer-validation/../escape')
                 self.assertEqual((output / 'keep.txt').read_text(), 'preserve')
