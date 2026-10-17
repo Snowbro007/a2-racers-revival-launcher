@@ -283,7 +283,7 @@
                           </Grid>
                         </Button>
                       </Grid>
-                      <WrapPanel Margin="0,8,0,0"><TextBlock Text="ANDERE HULP" Foreground="#AFC8E2" FontSize="10" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,10,0"/><Button x:Name="DetectInstallations" Content="Bekende Windows-installatie zoeken" Style="{StaticResource SetupHelpButton}" ToolTip="Zoekt alleen geregistreerde A2 Racer I-installaties in Windows; scant niet alle schijven." Margin="0,0,7,0"/><Button x:Name="GetGame" Content="Welke bestanden heb ik nodig?" Style="{StaticResource SetupHelpButton}" ToolTip="Uitleg over je eigen gamebestanden. De launcher levert of downloadt geen game."/></WrapPanel>
+                      <WrapPanel Margin="0,8,0,0"><TextBlock Text="ANDERE HULP" Foreground="#AFC8E2" FontSize="10" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,10,0"/><Button x:Name="DetectInstallations" Content="Bekende Windows-installatie zoeken" Style="{StaticResource SetupHelpButton}" ToolTip="Zoekt alleen geregistreerde A2 Racer I-installaties in Windows; scant niet alle schijven." Margin="0,0,7,0"/><Button x:Name="GetGame" Content="Game nodig?" Style="{StaticResource SetupHelpButton}" ToolTip="Welke bestanden heb je nodig en waar vind je meer informatie? De launcher bevat geen games."/></WrapPanel>
                     </StackPanel>
                     <Button x:Name="PrepareGame" Content="Lokale speelkopie maken" Visibility="Collapsed" HorizontalAlignment="Left" Margin="0,5,0,0"/>
                   </StackPanel></Border>
@@ -407,6 +407,8 @@
                 <WrapPanel Grid.Row="1" Margin="0,14,0,0"><Button x:Name="SaveOptions" Content="Opslaan" Margin="0,0,10,0"/><Button x:Name="ResetOptions" Content="Standaard herstellen"/></WrapPanel>
               </Grid></TabItem>
               <TabItem Header="Support"><ScrollViewer x:Name="SupportScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><StackPanel Margin="0,1,10,0">
+                <TextBlock x:Name="LauncherVersion" Text="A2 Racers Revival" FontSize="13" FontWeight="SemiBold"/>
+                <WrapPanel Margin="0,8,0,12"><Button x:Name="CheckUpdates" Content="Nieuwe versies op GitHub"/><TextBlock Text="Installeer een nieuwe versie over je huidige launcher." Foreground="#A6B8CE" FontSize="11" VerticalAlignment="Center" Margin="10,0,0,0"/></WrapPanel>
                 <TextBlock Text="Logs en diagnose" FontSize="21" FontWeight="SemiBold" Margin="0,0,0,12"/>
                 <CheckBox x:Name="DebugChoice" Content="Uitgebreide diagnose bij de volgende start" FontSize="12" Margin="0,4,0,4"/>
                 <TextBlock Text="Met diagnose aan sluit de game na maximaal 3 minuten. Laat dit uit voor gewoon spelen." Foreground="#A6B8CE" FontSize="11" TextWrapping="Wrap" LineHeight="17" Margin="26,1,0,12"/>
@@ -414,7 +416,7 @@
                 <TextBox x:Name="LogText" Height="190" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" Background="#0C1521" Foreground="#C2D0E5" BorderBrush="#33465B" BorderThickness="1" Padding="12" FontFamily="Consolas" FontSize="12" Text="Nog geen launchersessie gestart."/>
               </StackPanel></ScrollViewer></TabItem>
               <TabItem Header="Spelen" Visibility="Collapsed"><ScrollViewer x:Name="IIIStartScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><StackPanel Margin="0,1,8,0">
-                <TextBlock Text="Kies je tour en raceweergave. De compatibiliteitsproef richt zich op de gemelde racecrash; speelbaarheid moet nog worden bevestigd." TextWrapping="Wrap" Foreground="#A6B8CE" FontSize="12" LineHeight="18" Margin="0,0,0,8"/>
+                <TextBlock Text="Je kunt je tour voorbereiden en een gamemap kiezen. Starten is tijdelijk geblokkeerd na een vastloper die de muis vasthield." TextWrapping="Wrap" Foreground="#A6B8CE" FontSize="12" LineHeight="18" Margin="0,0,0,8"/>
                 <Grid x:Name="IIIOverviewPanel"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="12"/><ColumnDefinition Width="*"/><ColumnDefinition Width="12"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                   <Border Style="{StaticResource OverviewCard}"><StackPanel><TextBlock Text="RESOLUTIE" Style="{StaticResource OverviewLabel}"/><TextBlock x:Name="IIIResolutionOverview" Text="Origineel" Style="{StaticResource OverviewValue}"/></StackPanel></Border>
                   <Border Grid.Column="2" Style="{StaticResource OverviewCard}"><StackPanel><TextBlock Text="TOUR" Style="{StaticResource OverviewLabel}"/><TextBlock x:Name="IIITourOverview" Text="Tour 1" Style="{StaticResource OverviewValue}"/></StackPanel></Border>

@@ -20,7 +20,14 @@ PREFIX = 'A2-Racers-Revival/'
 MAX_PACKAGE_BYTES = 1024 * 1024**2
 PUBLIC_FILES = ('LICENSE', 'VERSION.txt', 'tools/prepare_public_release.py', 'docs/public-readme.md',
                 'docs/release-third-party-notices.md', 'docs/public-release.json',
-                'docs/public-gitignore.txt', 'docs/public-release-notes.md')
+                'docs/public-gitignore.txt', 'docs/public-release-notes.md',
+                'tools/build_windows_release.py',
+                'tools/windows/Branding.cs', 'tools/windows/NativeCommon.cs',
+                'tools/windows/Launcher.cs',
+                'tools/windows/msi/build_msi.py', 'tools/windows/msi/write_database.ps1',
+                'tools/windows/msi/cab_codec.py', 'tools/windows/msi/test_msi_builder.py',
+                'tools/windows/msi/README.md', 'tools/windows/msi/.gitignore',
+                'tools/windows/msi/audit_msi.ps1')
 EXTRA_FILES = (
     'Controleren.cmd',
     'tools/launcher_art/a2-revival.ico',

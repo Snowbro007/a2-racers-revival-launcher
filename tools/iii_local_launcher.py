@@ -16,6 +16,7 @@ if str(ROOT) not in sys.path:
 from tools.local_game_data import launch_environment
 from tools.trial_manifest import validate_ancestors, validate_tree
 from tools.iii_source_catalog import CATALOG
+from tools import iii_start_safety
 
 PINS = {1: '506df78dffc4712f30a14975b9252827ba6a76c9403819816ad4bc87453eeda7',
         2: '2a9170a6efce4fcf27dc3683643183967023c8352a5e4922dd82dca8fd52f23c'}
@@ -112,6 +113,7 @@ def check_folder(root: Path, tour: int, target: Path) -> dict:
 
 
 def start(root: Path, tour: int) -> int:
+    iii_start_safety.assert_start_allowed()
     target = prepare(root, tour)
     environment = {**os.environ, **launch_environment(target)}
     # The original parent owns menu/race transitions, including Menu.ini's
