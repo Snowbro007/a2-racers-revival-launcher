@@ -1,0 +1,214 @@
+name: Prepare Windows beta installer
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Nieuwe versie, gelijk aan VERSION.txt (bijvoorbeeld 0.1.0-beta.5)'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: prepare-windows-beta
+  cancel-in-progress: false
+
+jobs:
+  candidate:
+    if: github.repository == 'Snowbro007/a2-racers-revival-launcher' && github.ref == 'refs/heads/main'
+    runs-on: windows-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    env:
+      RELEASE_VERSION: ${{ inputs.version }}
+      PYTHONDONTWRITEBYTECODE: '1'
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Validate version and public source
+        shell: python
+        run: |
+          import json, os, pathlib, re, subprocess
+          version = os.environ['RELEASE_VERSION']
+          match = re.fullmatch(r'(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)-beta\.([1-9][0-9]*)', version)
+          if not match:
+              raise ValueError('Use a numeric version such as 0.1.0-beta.5.')
+          major, minor, patch, beta = map(int, match.groups())
+          if major > 255 or minor > 255 or patch > 64 or beta > 999:
+              raise ValueError('Version exceeds the documented MSI version convention.')
+          numeric = f'{major}.{minor}.{patch * 1000 + beta}'
+          if pathlib.Path('VERSION.txt').read_text().strip() != version:
+              raise ValueError('VERSION.txt does not match the requested release.')
+          for name in ('public-release.json', 'docs/public-release.json'):
+              data = json.loads(pathlib.Path(name).read_text())
+              if data.get('version') != version or data.get('games_bundled') is not False:
+                  raise ValueError('Public version or game-free metadata does not match: ' + name)
+          notes = pathlib.Path('docs/public-release-notes.md').read_text(encoding='utf-8-sig')
+          if version not in notes.splitlines()[0]:
+              raise ValueError('Release notes do not describe this version.')
+          forbidden_parts = {'.codex', '.agents', 'local', 'reports', 'game-media', 'payload', 'prompts'}
+          forbidden_suffixes = {'.exe', '.msi', '.cab', '.dll', '.zip', '.7z', '.rar', '.iso', '.cue', '.bin', '.img', '.dat', '.sav', '.smk', '.avi', '.wav', '.mp3', '.drv', '.vxd', '.ocx'}
+          tracked = subprocess.check_output(['git', 'ls-files', '-z']).decode('utf-8').split('\0')
+          for name in filter(None, tracked):
+              path = pathlib.PurePosixPath(name)
+              if (any(part.casefold() in forbidden_parts for part in path.parts)
+                      or path.suffix.casefold() in forbidden_suffixes
+                      or 'prompt' in path.name.casefold() or path.name.casefold() == 'agents.md'):
+                  raise ValueError('Private, game or binary file in public tracked source: ' + name)
+          pathlib.Path('dist').mkdir()
+          with open(os.environ['GITHUB_ENV'], 'a', encoding='utf-8') as stream:
+              stream.write(f'RELEASE_TAG=v{version}\nMSI_VERSION={numeric}\n')
+              stream.write(f'RELEASE_MSI=A2-Racers-Revival-{numeric}-beta{beta}.msi\n')
+
+      - name: Refuse an existing tag or release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $false
+          $pages = gh api --paginate --slurp "repos/$env:GITHUB_REPOSITORY/releases?per_page=100"
+          if ($LASTEXITCODE -ne 0) { throw 'Could not inspect existing releases.' }
+          foreach ($page in ($pages | ConvertFrom-Json)) {
+            if (@($page | Where-Object tag_name -eq $env:RELEASE_TAG).Count -ne 0) {
+              throw 'Release already exists; use a new version. Existing assets are never replaced.'
+            }
+          }
+          git ls-remote --exit-code --tags origin "refs/tags/$env:RELEASE_TAG" | Out-Null
+          if ($LASTEXITCODE -eq 0) { throw 'Tag already exists; refusing to retarget it.' }
+          if ($LASTEXITCODE -ne 2) { throw 'Could not inspect the requested tag.' }
+
+      - name: Run synthetic tests
+        shell: pwsh
+        run: |
+          python -m unittest discover -s tests -v
+          if ($LASTEXITCODE -ne 0) { throw 'Launcher tests failed.' }
+          python -m unittest discover -s tools/windows/msi -p test_msi_builder.py -v
+          if ($LASTEXITCODE -ne 0) { throw 'MSI authoring tests failed.' }
+
+      - name: Build and audit the public allowlist
+        shell: pwsh
+        run: |
+          python tools/portable_launcher.py build --public --output dist/core.zip
+          if ($LASTEXITCODE -ne 0) { throw 'Public allowlist package build failed.' }
+          python tools/portable_launcher.py audit --archive dist/core.zip
+          if ($LASTEXITCODE -ne 0) { throw 'Exact public source/package audit failed.' }
+          python tools/check_public_release.py --archive dist/core.zip --version $env:RELEASE_VERSION
+          if ($LASTEXITCODE -ne 0) { throw 'Game-free public package check failed.' }
+          python tools/build_windows_release.py --portable dist/core.zip --output dist/native --version $env:RELEASE_VERSION
+          if ($LASTEXITCODE -ne 0) { throw 'Native launcher build failed.' }
+          $authoringShell = (Get-Command pwsh -CommandType Application -ErrorAction Stop).Source
+          python tools/windows/msi/build_msi.py --payload dist/native/installation-payload.zip --icon dist/native/a2-revival.ico --output dist/msi --version $env:MSI_VERSION --powershell $authoringShell
+          if ($LASTEXITCODE -ne 0) { throw 'Standard MSI build failed.' }
+          & $authoringShell -NoLogo -NoProfile -File tools/windows/msi/audit_msi.ps1 -Spec dist/msi/build-plan.json
+          if ($LASTEXITCODE -ne 0) { throw 'Read-only MSI database/embedded-stream audit failed.' }
+
+      - name: Verify payload bytes and prepare only the release files
+        shell: python
+        run: |
+          import hashlib, json, os, pathlib, shutil, sys, zipfile
+          sys.path.insert(0, str(pathlib.Path('tools/windows/msi').resolve()))
+          from cab_codec import read_cab
+          def sha(data): return hashlib.sha256(data).hexdigest()
+          def load(name): return json.loads(pathlib.Path(name).read_text(encoding='utf-8-sig'))
+          native = load('dist/native/build-receipt.json')
+          result = load('dist/msi/build-result.json')
+          plan = load('dist/msi/build-plan.json')
+          audit = load('dist/msi/database-audit.json')
+          launcher = pathlib.Path('dist/native/A2 Racers Revival.exe').read_bytes()
+          payload_path = pathlib.Path('dist/native/installation-payload.zip')
+          icon = pathlib.Path('dist/native/a2-revival.ico').read_bytes()
+          if (native.get('schema') != 2 or native.get('version') != os.environ['RELEASE_VERSION']
+                  or native.get('games_bundled') is not False or native.get('signed') is not False
+                  or native['launcher_sha256'] != sha(launcher) or native['payload_sha256'] != sha(payload_path.read_bytes())
+                  or native['icon_sha256'] != sha(icon) or native['portable_sha256'] != sha(pathlib.Path('dist/core.zip').read_bytes())):
+              raise ValueError('Native build provenance does not match the actual files.')
+          with zipfile.ZipFile('dist/core.zip') as core, zipfile.ZipFile(payload_path) as payload:
+              expected = {'app/' + name.removeprefix('A2-Racers-Revival/'): core.read(name) for name in core.namelist()}
+              expected['A2 Racers Revival.exe'] = launcher
+              if len(payload.namelist()) != len(expected) or set(payload.namelist()) != set(expected):
+                  raise ValueError('Unexpected files in native payload.')
+              if any(payload.read(name) != data for name, data in expected.items()):
+                  raise ValueError('Native payload differs from the audited public source.')
+              if [name for name, data in expected.items() if data.startswith(b'MZ')] != ['A2 Racers Revival.exe']:
+                  raise ValueError('Unexpected executable embedded in native payload.')
+          manifest = plan['manifest']
+          if {row['path'] for row in manifest} != set(expected) or len(manifest) != len(expected):
+              raise ValueError('MSI file manifest differs from the exact native payload.')
+          cabinet = pathlib.Path(plan['cab']).read_bytes()
+          cabinet_files = read_cab(cabinet)
+          if set(cabinet_files) != {row['id'] for row in manifest}:
+              raise ValueError('Unexpected cabinet files.')
+          for row in manifest:
+              if (row['size'] != len(expected[row['path']]) or row['sha256'] != sha(expected[row['path']])
+                      or cabinet_files[row['id']] != expected[row['path']]):
+                  raise ValueError('MSI cabinet differs from the public payload: ' + row['path'])
+          msi = pathlib.Path('dist/msi') / f'A2-Racers-Revival-{os.environ["MSI_VERSION"]}.msi'
+          digest = sha(msi.read_bytes())
+          if (result['version'] != os.environ['MSI_VERSION'] or result['sha256'] != digest
+                  or result['payload_sha256'] != native['payload_sha256'] or result['icon_sha256'] != sha(icon)
+                  or audit['tables_match_plan'] is not True or audit['msi_sha256'] != digest
+                  or audit['streams']['Cabinet']['sha256'] != sha(cabinet)
+                  or audit['streams']['Icon']['sha256'] != sha(icon)):
+              raise ValueError('MSI provenance or embedded stream audit mismatch.')
+          destination = pathlib.Path('dist/release-files'); destination.mkdir()
+          name = os.environ['RELEASE_MSI']
+          shutil.copyfile(msi, destination / name)
+          (destination / (name + '.sha256')).write_text(f'{digest}  {name}\n', encoding='ascii')
+          review = {'schema': 1, 'version': os.environ['RELEASE_VERSION'], 'msi_version': os.environ['MSI_VERSION'],
+                    'commit': os.environ['GITHUB_SHA'], 'file': name, 'sha256': digest,
+                    'launcher_sha256': sha(launcher), 'games_bundled': False, 'signed': False,
+                    'source_payload_cabinet_and_database_verified': True, 'synthetic_tests_passed': True,
+                    'installation_verified': False, 'upgrade_verified': False, 'ui_verified': False,
+                    'smart_screen_verified': False, 'antivirus_scan': None, 'published': False}
+          (destination / 'build-review.json').write_text(json.dumps(review, indent=2) + '\n', encoding='utf-8')
+          if {path.name for path in destination.iterdir()} != {name, name + '.sha256', 'build-review.json'}:
+              raise ValueError('Unexpected release attachment.')
+          notes = pathlib.Path('docs/public-release-notes.md').read_text(encoding='utf-8-sig').rstrip()
+          notes += f'\n\n**MSI SHA-256:** `{digest}`\n\n'
+          notes += ('Concept voor controle. Automatische bron-, payload-, CAB- en MSI-tabelcontroles geslaagd. '
+                    'Installatie, update en verwijderen op een schone Windows-pc moeten nog worden gecontroleerd. '
+                    'Deze build heeft nog geen VirusTotal-rapport en is niet digitaal ondertekend.\n')
+          pathlib.Path('dist/release-notes.md').write_text(notes, encoding='utf-8')
+
+      - name: Save exact candidate files for review
+        uses: actions/upload-artifact@v7
+        with:
+          name: A2-Racers-Revival-${{ inputs.version }}-candidate
+          path: |
+            dist/release-files/${{ env.RELEASE_MSI }}
+            dist/release-files/${{ env.RELEASE_MSI }}.sha256
+            dist/release-files/build-review.json
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 30
+
+      - name: Create a new draft beta for final review
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $false
+          $pages = gh api --paginate --slurp "repos/$env:GITHUB_REPOSITORY/releases?per_page=100"
+          if ($LASTEXITCODE -ne 0) { throw 'Could not recheck releases before upload.' }
+          foreach ($page in ($pages | ConvertFrom-Json)) {
+            if (@($page | Where-Object tag_name -eq $env:RELEASE_TAG).Count -ne 0) { throw 'Release already exists.' }
+          }
+          git ls-remote --exit-code --tags origin "refs/tags/$env:RELEASE_TAG" | Out-Null
+          if ($LASTEXITCODE -eq 0) { throw 'Tag already exists.' }
+          if ($LASTEXITCODE -ne 2) { throw 'Could not recheck the tag.' }
+          $msi = Join-Path 'dist/release-files' $env:RELEASE_MSI
+          gh release create $env:RELEASE_TAG $msi "$msi.sha256" dist/release-files/build-review.json --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --title "A2 Racers Revival $env:RELEASE_VERSION" --notes-file dist/release-notes.md --draft --prerelease
+          if ($LASTEXITCODE -ne 0) { throw 'Draft beta upload failed.' }

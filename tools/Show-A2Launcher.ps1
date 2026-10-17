@@ -596,6 +596,15 @@ function Open-Devtools {
 }
 
 function Open-GameSource {
+    if ($script:game -eq 'a2racer2') {
+        $answer = [Windows.MessageBox]::Show($window,
+            'Gebruik je eigen volledige Nederlandse A2 Racer II-gamemap of ondersteund ZIP-bestand. MyAbandonware heeft ook een pagina over deel II. Dat is een externe site; wij kunnen toestemming voor de daar aangeboden downloads niet bevestigen. De launcher downloadt geen game. Wil je die pagina openen?',
+            'A2 Racer II verkrijgen', 'YesNo', 'Information')
+        if ($answer -eq [Windows.MessageBoxResult]::Yes) {
+            $null = Start-Process -FilePath 'https://www.myabandonware.com/game/a2-racer-ii-gri'
+        }
+        return
+    }
     $null = [Windows.MessageBox]::Show($window,
         'Deze launcher bevat of downloadt geen games. Gebruik je eigen rechtmatig verkregen volledige Nederlandse gamebestanden. Staat de game op een andere pc? Kopieer de complete gamemap naar deze pc, of gebruik je eigen ondersteunde ZIP-bestand. Kies daarna hierboven de map of het ZIP-bestand. Een minimale cd-installatie kan bestanden missen.',
         'Welke gamebestanden heb ik nodig?', 'OK', 'Information')
@@ -768,12 +777,18 @@ try {
             'IOptionsPanel','IIOptionsNotice','IOverviewPanel','IIOverviewPanel','IIMenuChoice','IIRaceDisplayChoice','IIResolutionChoice','IIHudChoice','IISkyChoice','IIDistanceChoice','IIMenuNote','Pages','PlaySummary','PlayNote','ImportGame','GraphicsChoice',
             'GraphicsNote','ResolutionChoice','ResolutionNote','CameraNote','DistanceChoice','DistanceNote','ObjectDistanceChoice','ObjectDistanceNote','TextureChoice','TextureNote','MenuChoice','MenuNote',
             'HorizonChoice','FocusRecoveryChoice','FocusRecoveryNote','ChooseOptions','RecommendedOptions','OverviewResolution','OverviewFps','OverviewDistance','OverviewObjects','OverviewDetailLabel','SelectionNote','AdvancedOptions','StartScroll','SupportScroll','OptionsScroll','DashboardChoice','FpsChoice','FpsNote','IntroChoice','DebugChoice',
-            'OriginalProfile','MaxProfile','SaveOptions','ResetOptions','OpenLogs','OpenDevtools','RefreshState','LogText','StatusTitle','StatusMessage','PlayButton',
+            'OriginalProfile','MaxProfile','SaveOptions','ResetOptions','OpenLogs','OpenDevtools','RefreshState','LogText','StatusTitle','StatusMessage','PlayButton','LauncherVersion','CheckUpdates',
             'InstallationPanel','InstallationTitle','InstallationChoice','InstallationNote','InstallationFoundSection','InstallationSourceChoices','InstallationFolderHint','DetectInstallations','ChooseInstallation','LinkInstallation','GetGame','PrepareGame')) {
         $ui[$name] = $window.FindName($name)
         if (-not $ui[$name]) { throw ('Ontbrekend launcherelement: ' + $name) }
     }
     $artworkPath = Join-Path $PSScriptRoot 'launcher_art\cover-inspired-highway-v1.png'
+    $versionPath = Join-Path $workspacePath 'VERSION.txt'
+    if (Test-Path -LiteralPath $versionPath -PathType Leaf) {
+        Assert-LauncherPath $versionPath
+        $version = [IO.File]::ReadAllText($versionPath).Trim()
+        if ($version -match '^\d+\.\d+\.\d+-beta\.\d+$') { $ui.LauncherVersion.Text = 'A2 Racers Revival · '+$version }
+    }
     Set-CoverArtwork $ui.CoverBackdrop $artworkPath
     Set-CoverArtwork $ui.CoverPreview $artworkPath
     $iconPath = Join-Path $PSScriptRoot 'launcher_art\a2-revival.ico'
@@ -883,6 +898,10 @@ try {
     $ui.MaxProfile.Add_Click({ Use-GameProfile 'max' })
     $ui.PlayButton.Add_Click({ if ($ui.Pages.SelectedIndex -eq 3) { Start-IIIGame } else { Start-Model 'start' (Preference-Arguments 'create-session') } })
     $ui.RefreshState.Add_Click({ Start-Model 'snapshot' @('snapshot') })
+    $ui.CheckUpdates.Add_Click({
+        try { $null = Start-Process -FilePath 'https://github.com/Snowbro007/a2-racers-revival-launcher/releases' }
+        catch { Set-Status 'Pagina niet geopend' $_.Exception.Message }
+    })
     $ui.OpenDevtools.Add_Click({ Open-Devtools })
     $ui.OpenLogs.Add_Click({
         try {
