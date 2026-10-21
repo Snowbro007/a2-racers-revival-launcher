@@ -2,7 +2,8 @@
 param([switch]$CheckOnly, [switch]$Diagnostic, [switch]$Dismount, [string]$GameArchive,
       [ValidateRange(-1, 120)][int]$RaceFPSLimit = -1,
       [ValidateSet('original', 'gdi', 'svga', 'no-dither')][string]$MapMode,
-      [ValidateSet('original', 'borderless-4-3', 'hd-1280x960', 'hd-1280x960-fake', 'hd-1920x1440')][string]$DisplayProfile)
+      [ValidateSet('original', 'borderless-4-3', 'hd-1280x960', 'hd-1280x960-fake', 'hd-1920x1440')][string]$DisplayProfile,
+      [string]$ProgressPath)
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $kitRoot = Split-Path -Parent $PSScriptRoot
@@ -38,7 +39,7 @@ try {
         if ((Get-Item -LiteralPath $publicMarker).Length -gt 4096) { throw 'Openbaar releaserecord is te groot.' }
         $publicRelease = [IO.File]::ReadAllText($publicMarker) | ConvertFrom-Json
         if ($publicRelease.schema -ne 1 -or $publicRelease.component_delivery -ne 'verified-provider-download' -or $publicRelease.games_bundled -ne $false) { throw 'Onbekende openbare release.' }
-        & (Join-Path $PSScriptRoot 'Initialize-A2Public.ps1') -KitPath $kitRoot
+        & (Join-Path $PSScriptRoot 'Initialize-A2Public.ps1') -KitPath $kitRoot -ProgressPath $ProgressPath
         if (-not $?) { throw 'Componentdownload of hashcontrole faalde; niets gestart.' }
     }
     $pythonArchive = Join-Path $kitRoot 'payload\python-3.13.16-embed-amd64.zip'

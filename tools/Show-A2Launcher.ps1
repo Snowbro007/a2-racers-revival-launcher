@@ -555,8 +555,10 @@ function Use-GameProfile([string]$ProfileName) {
 function Start-Operation([string]$Kind, [string]$Executable, [string[]]$Arguments) {
     if ($script:operation) { return }
     try {
+        $started = [DateTime]::UtcNow
         $script:operation = New-LauncherProcess $Executable $Arguments
         $script:operation.kind = $Kind
+        $script:operation.started = $started
         Update-Buttons
     } catch { Set-Status 'Kon niet doorgaan' $_.Exception.Message; $script:operation = $null; Update-Buttons }
 }
@@ -636,7 +638,8 @@ function Start-InitialCheck {
         if (-not $script:developmentRuntimes -and -not $script:bootstrapAttempted -and ((Test-Path -LiteralPath $payload) -or $publicRelease)) {
             $script:bootstrapAttempted = $true
             Set-Status 'Eerste voorbereiding' $(if ($publicRelease) { 'De componenten worden bij hun leveranciers opgehaald en gecontroleerd. De eerste start vereist internet.' } else { 'De lokale runtimes worden gecontroleerd. Dit kan even duren.' })
-            Start-Operation 'bootstrap' (Join-Path $env:SystemRoot 'System32\WindowsPowerShell\v1.0\powershell.exe') @('-NoLogo','-NoProfile','-STA','-ExecutionPolicy','Bypass','-File',(Join-Path $PSScriptRoot 'Start-A2Portable.ps1'),'-CheckOnly')
+            $progress = Join-Path $workspacePath 'local\launcher\component-progress.json'
+            Start-Operation 'bootstrap' (Join-Path $env:SystemRoot 'System32\WindowsPowerShell\v1.0\powershell.exe') @('-NoLogo','-NoProfile','-STA','-ExecutionPolicy','Bypass','-File',(Join-Path $PSScriptRoot 'Start-A2Portable.ps1'),'-CheckOnly','-ProgressPath',$progress)
             return
         }
         if (Load-Runtimes) {
@@ -718,9 +721,66 @@ function Show-Installations($Result) {
     Update-Buttons
 }
 
+function Read-LauncherComponentProgress([string]$Root, [DateTime]$Since) {
+    # This record supplies display text only. It never authorizes a component,
+    # executable, download URL or retry. Ignore old and incomplete records.
+    try {
+        $path = Join-Path $Root 'local\launcher\component-progress.json'
+        Assert-LauncherPath $path
+        if (-not [IO.File]::Exists($path)) { return }
+        $file = Get-Item -LiteralPath $path
+        if ($file.Length -gt 4096 -or $file.LastWriteTimeUtc -lt $Since) { return }
+        $stream = [IO.File]::Open($path, [IO.FileMode]::Open, [IO.FileAccess]::Read, ([IO.FileShare]::ReadWrite -bor [IO.FileShare]::Delete))
+        try {
+            if ($stream.Length -gt 4096) { return }
+            $reader = New-Object IO.StreamReader($stream, [Text.Encoding]::UTF8)
+            try {
+                $buffer = New-Object char[] 4097
+                $count = $reader.ReadBlock($buffer, 0, $buffer.Length)
+                if ($count -gt 4096) { return }
+                $value = (New-Object string($buffer, 0, $count)) | ConvertFrom-Json
+            } finally { $reader.Dispose() }
+        } finally { $stream.Dispose() }
+        if ((($value.PSObject.Properties.Name | Sort-Object) -join ',') -ne 'component,received,schema,stage,total') { return }
+        if ($value.schema -isnot [int] -and $value.schema -isnot [long]) { return }
+        if ($value.schema -ne 1 -or $value.stage -notin @('checking','downloading','complete','error')) { return }
+        if ($value.received -isnot [int] -and $value.received -isnot [long]) { return }
+        if ($value.received -lt 0 -or $value.received -gt 180MB) { return }
+        if ($null -ne $value.total) {
+            if ($value.total -isnot [int] -and $value.total -isnot [long]) { return }
+            if ($value.total -le 0 -or $value.total -gt 180MB -or $value.received -gt $value.total) { return }
+        }
+        $labels = @{
+            'python-3.13.16-embed-amd64.zip'='Python'
+            'PowerShell-7.6.5-win-x64.zip'='PowerShell'
+            'cnc-ddraw-v7.0.0.0.zip'='Beeldondersteuning voor deel I'
+            'dgVoodoo2_87_5.zip'='3D-ondersteuning'
+            'ffmpeg-9.0.2-essentials_build.zip'='Video en muziek'
+        }
+        if ($value.stage -eq 'complete') {
+            return @{title='Onderdelen voorbereiden';message='Downloads gecontroleerd. De onderdelen worden nu uitgepakt en gecontroleerd.'}
+        }
+        if ($value.component -isnot [string] -or -not $labels.ContainsKey($value.component)) { return }
+        if ($value.stage -eq 'error') {
+            return @{title='Download onderbroken';message=($labels[$value.component]+': voorbereiding gestopt. Bekijk Support voor de oorzaak; je kunt later opnieuw starten.')}
+        }
+        if ($value.stage -eq 'checking') {
+            return @{title='Onderdelen controleren';message=$labels[$value.component]}
+        }
+        $received = [Math]::Round($value.received / 1MB, 1)
+        $amount = if ($null -eq $value.total) { "$received MB ontvangen" } else { "$received van $([Math]::Round($value.total / 1MB, 1)) MB" }
+        return @{title='Onderdelen downloaden';message=($labels[$value.component]+' · '+$amount)}
+    } catch { return } # A transient display record cannot stop the launcher.
+}
+
 function Poll-Launcher {
     $pending = $null
     try {
+        if ($script:operation -and $script:operation.ContainsKey('kind') -and
+                $script:operation.kind -eq 'bootstrap' -and $script:operation.ContainsKey('started')) {
+            $progress = Read-LauncherComponentProgress $workspacePath $script:operation.started
+            if ($progress) { Set-Status $progress.title $progress.message }
+        }
         if ($script:operation -and $script:operation.process.HasExited -and $script:operation.output.IsCompleted -and $script:operation.error.IsCompleted) {
             $pending = $script:operation; $script:operation = $null
             $output = $pending.output.GetAwaiter().GetResult(); $errorText = $pending.error.GetAwaiter().GetResult()

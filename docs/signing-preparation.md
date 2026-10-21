@@ -38,3 +38,12 @@ De eigenaar kan de aanvraag baseren op: **A2 Racers Revival**, MIT voor eigen
 code, openbare broncode en CI in deze repository, contact
 **HeySnowdude@pm.me**, Windows singleplayer-fanlauncher, geen games in de
 distributie. Deze aanvraag is nog niet ingediend.
+
+
+Gecontroleerd op 21 oktober 2026: Artifact Signing Public Trust accepteert
+individuele ontwikkelaars momenteel alleen in VS/Canada; organisaties in de EU
+kunnen wel in aanmerking komen. Voor een Nederlandse particulier is dit dus
+geen direct beschikbare standaardroute. Zie de
+[actuele voorwaarden](https://learn.microsoft.com/en-us/azure/artifact-signing/quickstart).
+SignPath-toelating voor onze eigen code en de later gedownloade proprietary
+compatibiliteitscomponenten moet afzonderlijk worden beoordeeld.

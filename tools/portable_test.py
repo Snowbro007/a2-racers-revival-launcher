@@ -10,6 +10,7 @@ import re
 import shutil
 import stat
 import sys
+import time
 import uuid
 import zipfile
 
@@ -164,7 +165,24 @@ def extract_verified(archive_path: Path, expected: str, destination: Path) -> No
                 # Inspect it; never overwrite or remove its directory.
                 verify(destination)
                 return
-            stage.rename(destination)
+            # Windows can briefly deny a directory rename while another reader
+            # holds a handle. Retry only its access/sharing errors, with at most
+            # 750 ms of backoff. Recheck both trees; never repair or overwrite an unknown
+            # destination, and never treat this as evidence about an antivirus.
+            for attempt, delay in enumerate((0, 0.05, 0.1, 0.2, 0.4)):
+                if delay:
+                    time.sleep(delay)
+                    verify(stage)
+                    validate_ancestors(destination)
+                    if destination.exists():
+                        verify(destination)
+                        return
+                try:
+                    stage.rename(destination)
+                    break
+                except OSError as error:
+                    if getattr(error, 'winerror', None) not in (5, 32, 33) or attempt == 4:
+                        raise
         finally:
             if stage.exists():
                 # Only remove the exclusive temporary directory created above.

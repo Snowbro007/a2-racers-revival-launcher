@@ -1,6 +1,6 @@
 #Requires -Version 5.1
 [CmdletBinding()]
-param([string]$KitPath = (Split-Path -Parent $PSScriptRoot), [switch]$CheckOnly)
+param([string]$KitPath = (Split-Path -Parent $PSScriptRoot), [switch]$CheckOnly, [string]$ProgressPath)
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
@@ -37,7 +37,66 @@ function Test-A2ProviderFile([string]$Path,[string]$Pin) {
     return $true
 }
 
-function Copy-A2ProviderStream($InputStream,[string]$Destination,[string]$Pin) {
+function Get-A2DownloadMilliseconds {
+    return [double][Diagnostics.Stopwatch]::GetTimestamp() * 1000 / [Diagnostics.Stopwatch]::Frequency
+}
+
+function Wait-A2DownloadTask($Task,[double]$DeadlineMilliseconds,[scriptblock]$Clock,[string]$Component) {
+    $remaining=$DeadlineMilliseconds-(& $Clock)
+    if($remaining -le 0){throw ('Downloadtijd verstreken voor '+$Component+'; probeer later opnieuw.')}
+    $wait=[int][Math]::Min(30000,[Math]::Ceiling($remaining))
+    if(-not $Task.Wait($wait)){throw ('Componentdownload reageert niet: '+$Component+'. Probeer later opnieuw.')}
+    if((& $Clock) -ge $DeadlineMilliseconds){throw ('Downloadtijd verstreken voor '+$Component+'; probeer later opnieuw.')}
+}
+
+function Write-A2DownloadProgress([string]$Component,[long]$Received,[long]$ExpectedLength) {
+    $amount=if($ExpectedLength -ge 0){[string]$Received+' van '+$ExpectedLength+' bytes'}else{[string]$Received+' bytes'}
+    Write-Host ('Component downloaden: '+$Component+' - '+$amount)
+}
+
+function Write-A2ComponentState([string]$Root,[string]$ProgressPath,
+        [ValidateSet('checking','downloading','complete','error')][string]$Stage,
+        [string]$Component='',[long]$Received=0,[long]$ExpectedLength=-1) {
+    if(-not $ProgressPath){return}
+    Assert-A2PublicPath $Root
+    $expected=[IO.Path]::GetFullPath((Join-Path $Root 'local\launcher\component-progress.json'))
+    if([IO.Path]::GetFullPath($ProgressPath) -ne $expected){throw 'Ongeldig componentvoortgangspad.'}
+    Assert-A2PublicPath $expected
+    $folder=Split-Path -Parent $expected
+    $temporary=Join-Path $folder ('.component-progress-'+[Guid]::NewGuid().ToString('N')+'.tmp')
+    Assert-A2PublicPath $temporary
+    $value=[ordered]@{schema=1;stage=$Stage;component=$Component;received=$Received;total=if($ExpectedLength -ge 0){$ExpectedLength}else{$null}}
+    $bytes=[Text.Encoding]::UTF8.GetBytes(($value | ConvertTo-Json -Compress))
+    try{
+        # This optional display record must never fail a valid download merely
+        # because a reader locks it or this filesystem cannot replace a file.
+        # Path validation remains outside the best-effort I/O catch blocks.
+        try{
+            [IO.Directory]::CreateDirectory($folder) | Out-Null
+            $stream=[IO.File]::Open($temporary,[IO.FileMode]::CreateNew,[IO.FileAccess]::Write,[IO.FileShare]::None)
+            try{$stream.Write($bytes,0,$bytes.Length)}finally{$stream.Dispose()}
+        }catch [IO.IOException],[UnauthorizedAccessException],[NotSupportedException]{return}
+        Assert-A2PublicPath $expected
+        try{
+            if([IO.File]::Exists($expected)){[IO.File]::Replace($temporary,$expected,[NullString]::Value)}
+            else{[IO.File]::Move($temporary,$expected)}
+        }catch [IO.IOException],[UnauthorizedAccessException],[NotSupportedException]{return}
+    }finally{
+        if([IO.File]::Exists($temporary)){
+            Assert-A2PublicPath $temporary
+            try{[IO.File]::Delete($temporary)}catch [IO.IOException],[UnauthorizedAccessException],[NotSupportedException]{}
+        }
+    }
+}
+
+function Copy-A2ProviderStream($InputStream,[string]$Destination,[string]$Pin,
+        [long]$ExpectedLength=-1,[string]$Component=([IO.Path]::GetFileName($Destination)),
+        [double]$DeadlineMilliseconds=0,[scriptblock]$Clock={Get-A2DownloadMilliseconds},
+        [scriptblock]$Progress={param($name,$received,$expected) Write-A2DownloadProgress $name $received $expected},
+        [Threading.CancellationToken]$CancellationToken=[Threading.CancellationToken]::None,
+        [string]$ProgressRoot,[string]$ProgressPath) {
+    if($ExpectedLength -lt -1 -or $ExpectedLength -eq 0 -or $ExpectedLength -gt 180MB){throw 'Componentdownload heeft een ongeldige verwachte grootte.'}
+    if($DeadlineMilliseconds -eq 0){$DeadlineMilliseconds=(& $Clock)+600000}
     Assert-A2PublicPath $Destination
     $folder=Split-Path -Parent $Destination
     [IO.Directory]::CreateDirectory($folder) | Out-Null
@@ -47,15 +106,29 @@ function Copy-A2ProviderStream($InputStream,[string]$Destination,[string]$Pin) {
     try{
         $output=[IO.File]::Open($temporary,[IO.FileMode]::CreateNew,[IO.FileAccess]::Write,[IO.FileShare]::None)
         $buffer=New-Object byte[] 65536;$total=0L
+        $lastProgress=(& $Clock);$lastProgressBytes=0L
+        $null=& $Progress $Component $total $ExpectedLength
+        Write-A2ComponentState $ProgressRoot $ProgressPath 'downloading' $Component $total $ExpectedLength
         while($true){
-            $read=$InputStream.ReadAsync($buffer,0,$buffer.Length)
-            if(-not $read.Wait(30000)){throw 'Componentdownload reageert niet; probeer later opnieuw.'}
+            if((& $Clock) -ge $DeadlineMilliseconds){throw ('Downloadtijd verstreken voor '+$Component+'; probeer later opnieuw.')}
+            $read=$InputStream.ReadAsync($buffer,0,$buffer.Length,$CancellationToken)
+            Wait-A2DownloadTask $read $DeadlineMilliseconds $Clock $Component
             $count=$read.GetAwaiter().GetResult()
             if($count -eq 0){break}
             $total+=$count
             if($total -gt 180MB){throw 'Componentdownload is te groot; niets uitgepakt.'}
+            if($ExpectedLength -ge 0 -and $total -gt $ExpectedLength){throw ('Componentdownload is langer dan aangekondigd: '+$Component+'. Niets uitgepakt.')}
             $output.Write($buffer,0,$count)
+            $now=(& $Clock)
+            if($now-$lastProgress -ge 1000 -or $total-$lastProgressBytes -ge 1MB){
+                $null=& $Progress $Component $total $ExpectedLength
+                Write-A2ComponentState $ProgressRoot $ProgressPath 'downloading' $Component $total $ExpectedLength
+                $lastProgress=$now;$lastProgressBytes=$total
+            }
         }
+        if($ExpectedLength -ge 0 -and $total -ne $ExpectedLength){throw ('Componentdownload is onvolledig: '+$Component+'. Probeer later opnieuw.')}
+        $null=& $Progress $Component $total $ExpectedLength
+        Write-A2ComponentState $ProgressRoot $ProgressPath 'downloading' $Component $total $ExpectedLength
         $output.Dispose();$output=$null
         $null=Test-A2ProviderFile $temporary $Pin
         if([IO.File]::Exists($Destination)){$null=Test-A2ProviderFile $Destination $Pin}
@@ -69,33 +142,49 @@ function Copy-A2ProviderStream($InputStream,[string]$Destination,[string]$Pin) {
     }
 }
 
-function Install-A2PublicProviders([string]$Root,[switch]$OfflineCheck) {
+function Install-A2PublicProviders([string]$Root,[switch]$OfflineCheck,[string]$ProgressPath) {
     Assert-A2PublicPath $Root
     if(-not [IO.Directory]::Exists($Root)){throw 'De uitgepakte launchermap ontbreekt.'}
     Add-Type -AssemblyName System.Net.Http
     $client=New-Object Net.Http.HttpClient
     $client.Timeout=[TimeSpan]::FromMinutes(10)
-    $downloaded=0
+    $downloaded=0;$activeComponent=''
     try{
+        Write-A2ComponentState $Root $ProgressPath 'checking'
         foreach($provider in Get-A2PublicProviders){
+            $activeComponent=$provider.name
+            Write-A2ComponentState $Root $ProgressPath 'checking' $activeComponent
             $destination=Join-Path $Root ('payload\'+$provider.name)
             if(Test-A2ProviderFile $destination $provider.sha256){continue}
             if($OfflineCheck){throw ('Component ontbreekt: '+$provider.name+'. Open Launcher.cmd met internetverbinding voor de eerste voorbereiding.')}
             Write-Host ('Component voorbereiden: '+$provider.name)
-            $response=$null;$stream=$null
+            $response=$null;$stream=$null;$cancel=New-Object Threading.CancellationTokenSource
             try{
-                $response=$client.GetAsync($provider.url,[Net.Http.HttpCompletionOption]::ResponseHeadersRead).GetAwaiter().GetResult()
+                # ResponseHeadersRead ends HttpClient's body timeout. Keep one
+                # monotonic budget and cancellation token for headers AND body.
+                $deadline=(Get-A2DownloadMilliseconds)+600000
+                $cancel.CancelAfter(600000)
+                $request=$client.GetAsync($provider.url,[Net.Http.HttpCompletionOption]::ResponseHeadersRead,$cancel.Token)
+                Wait-A2DownloadTask $request $deadline {Get-A2DownloadMilliseconds} $provider.name
+                $response=$request.GetAwaiter().GetResult()
                 $response.EnsureSuccessStatusCode() | Out-Null
                 if($response.RequestMessage.RequestUri.Scheme -ne 'https'){throw 'Componentdownload heeft geen HTTPS-verbinding.'}
-                if($response.Content.Headers.ContentLength -gt 180MB){throw 'Componentdownload is te groot.'}
-                $stream=$response.Content.ReadAsStreamAsync().GetAwaiter().GetResult()
-                Copy-A2ProviderStream $stream $destination $provider.sha256
+                $length=if($null -eq $response.Content.Headers.ContentLength){-1L}else{[long]$response.Content.Headers.ContentLength}
+                if($length -lt -1 -or $length -eq 0 -or $length -gt 180MB){throw 'Componentdownload heeft een ongeldige verwachte grootte.'}
+                $opening=$response.Content.ReadAsStreamAsync()
+                Wait-A2DownloadTask $opening $deadline {Get-A2DownloadMilliseconds} $provider.name
+                $stream=$opening.GetAwaiter().GetResult()
+                Copy-A2ProviderStream $stream $destination $provider.sha256 -ExpectedLength $length -Component $provider.name -DeadlineMilliseconds $deadline -CancellationToken $cancel.Token -ProgressRoot $Root -ProgressPath $ProgressPath
                 $downloaded++
-            }finally{if($stream){$stream.Dispose()};if($response){$response.Dispose()}}
+            }finally{$cancel.Cancel();if($stream){$stream.Dispose()};if($response){$response.Dispose()};$cancel.Dispose()}
         }
+        Write-A2ComponentState $Root $ProgressPath 'complete'
+    }catch{
+        Write-A2ComponentState $Root $ProgressPath 'error' $activeComponent
+        throw
     }finally{$client.Dispose()}
     return @{components_downloaded=$downloaded;components_checked=5;game_downloaded=$false}
 }
 
-try {Install-A2PublicProviders $KitPath -OfflineCheck:$CheckOnly | ConvertTo-Json -Compress}
+try {Install-A2PublicProviders $KitPath -OfflineCheck:$CheckOnly -ProgressPath $ProgressPath | ConvertTo-Json -Compress}
 catch {Write-Error $_.Exception.Message;exit 1}

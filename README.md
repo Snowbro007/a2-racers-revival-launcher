@@ -4,13 +4,15 @@ Een fanproject voor de oude A2 Racer-games op moderne Windows-pc’s. I en II zi
 
 Deel III is voorlopig gepauzeerd: een proef liep vast en hield de muis vast. Start III niet in de oude beta 4; de volgende versie blokkeert deze starts totdat dit is opgelost.
 
-**[Download de launcher voor Windows 11 (.zip)](https://github.com/Snowbro007/a2-racers-revival-launcher/releases/download/v0.1.0-beta.4/A2-Racers-Revival-0.1.0-beta.4-Windows-x64.zip)**
+**[Download de bestaande Windows 11-testbeta (.zip)](https://github.com/Snowbro007/a2-racers-revival-launcher/releases/download/v0.1.0-beta.4/A2-Racers-Revival-0.1.0-beta.4-Windows-x64.zip)**
 
 1. Pak de ZIP helemaal uit via **Alles uitpakken**.
 2. Open **Launcher.cmd** in de uitgepakte map.
 3. Kies je game, voeg je eigen Nederlandse gamemap of volledige ZIP toe en kies **Aanbevolen → Spelen**.
 
-Geen aparte Python-installatie nodig. Alleen de eerste start gebruikt internet voor onderdelen; daarna speel je offline. Een gewone installer met A2-icoon en een installatiemap naar keuze wordt voorbereid.
+Geen aparte Python-installatie nodig. De eerste start gebruikt internet voor onderdelen; daarna kun je offline spelen. Download de releasebijlage, niet de broncode via **Code → Download ZIP**.
+
+**Distributiestatus:** de huidige beta is nog niet plug-and-play bevestigd. Er zijn antivirusmeldingen bekend en de nieuwere MSI is nog een concept. De aanbevolen vervolgstap is een ondertekende installer met een geteste eerste start. [Onderzoek en verbeteringen](https://github.com/Snowbro007/a2-racers-revival-launcher/blob/main/docs/fan-distribution-review-20261021.md) · [Hulp als de launcher verdwijnt of niet start](https://github.com/Snowbro007/a2-racers-revival-launcher/blob/main/docs/launcher-start-help.md).
 
 ### De games
 
