@@ -39,7 +39,9 @@ foreach($change in @(@{received=-1},@{received=$true},@{total=1},@{total='209715
 }
 [IO.File]::WriteAllText($path,'{broken')
 $partial=Read-LauncherComponentProgress $Root ([DateTime]::MinValue)
-@{valid=$valid;stale=$stale;unknown=$unknown;complete=$complete;invalid=$invalid;partial=$partial}|ConvertTo-Json -Depth 5 -Compress
+# Windows PowerShell 5.1 serializes AutomationNull as {} inside a hashtable;
+# test absence in PowerShell instead of depending on its JSON representation.
+@{valid=$valid;stale_is_absent=($null -eq $stale);unknown=$unknown;complete=$complete;invalid=$invalid;partial_is_absent=($null -eq $partial)}|ConvertTo-Json -Depth 5 -Compress
 '''
 
 
@@ -66,8 +68,8 @@ class LauncherComponentProgressTests(unittest.TestCase):
             self.assertIn('1 van 2 MB', data['valid']['message'])
             self.assertIn('ontvangen', data['unknown']['message'])
             self.assertIn('uitgepakt', data['complete']['message'])
-            self.assertIsNone(data['stale'])
-            self.assertIsNone(data['partial'])
+            self.assertTrue(data['stale_is_absent'])
+            self.assertTrue(data['partial_is_absent'])
             self.assertEqual(data['invalid'], 7)
 
     def test_reader_windows_powershell(self):
