@@ -2,10 +2,13 @@
 import json
 import os
 from pathlib import Path
+import hashlib
 import shutil
 import subprocess
 import tempfile
 import unittest
+from unittest.mock import patch
+import zipfile
 from tools import portable_test
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -122,6 +125,60 @@ $after=[IO.File]::ReadAllBytes($statePath)
 @{valid=(Test-A2ProviderFile $path $pin);bad_exists=[IO.File]::Exists($bad);hash_error=$hashError;offline_error=$offlineError;invalid_rejected=$invalidRejected;progress_preserved=([Convert]::ToBase64String($before) -eq [Convert]::ToBase64String($after));temporary=@(Get-ChildItem -LiteralPath $Folder -Recurse -Force -File|Where-Object {$_.Name -like '*.tmp' -or $_.Name -like '*.download'}).Count}|ConvertTo-Json -Compress
 '''
 
+STAGED_PROVIDERS_FIXTURE=LOAD_FUNCTIONS+r'''
+$all=@(Get-A2PublicProviders);$launcher=@(Get-A2PublicProviders -LauncherOnly)
+$data=[Text.Encoding]::UTF8.GetBytes('fixture');$pin=Pin $data
+$payload=Join-Path $Folder 'payload';[IO.Directory]::CreateDirectory($payload)|Out-Null
+[IO.File]::WriteAllBytes((Join-Path $payload 'python.zip'),$data)
+function Get-A2PublicProviders([switch]$LauncherOnly) {
+    $selected=@(@{name='python.zip';sha256=$pin;url='https://example.invalid/python.zip'})
+    if(-not $LauncherOnly){$selected+=@{name='game.zip';sha256=$pin;url='https://example.invalid/game.zip'}}
+    return $selected
+}
+$statePath=Join-Path $Folder 'local\launcher\component-progress.json'
+$minimal=Install-A2PublicProviders $Folder -OfflineCheck -LauncherOnly -ProgressPath $statePath
+$fullMissing=$false
+try{Install-A2PublicProviders $Folder -OfflineCheck -ProgressPath $statePath}catch{$fullMissing=$_.Exception.Message -like '*Component ontbreekt: game.zip*'}
+@{all_count=$all.Count;launcher_names=@($launcher|ForEach-Object {$_.name});minimal=$minimal;full_missing=$fullMissing}|ConvertTo-Json -Depth 5 -Compress
+'''
+
+
+class LauncherOnlySetupTests(unittest.TestCase):
+    def test_python_only_setup_never_inspects_games_or_requires_other_providers(self):
+        parent=ROOT/'local/test-fixtures';parent.mkdir(parents=True,exist_ok=True)
+        with tempfile.TemporaryDirectory(prefix='launcher-only é ',dir=parent) as folder:
+            root=Path(folder);provider=root/'payload/python.zip';provider.parent.mkdir()
+            with zipfile.ZipFile(provider,'x') as archive:
+                archive.writestr('python.exe',b'synthetic text, never executed')
+                archive.writestr('python313._pth',b'python313.zip\n.\n')
+            pin=hashlib.sha256(provider.read_bytes()).hexdigest()
+            # A foreign game-like directory must not be opened during launcher setup.
+            game=root/'local/games/a2racer1';game.mkdir(parents=True)
+            (game/'A2.EXE').write_bytes(b'unknown fixture, preserve')
+            providers={'python':('python.zip',pin,'unused'),
+                       'powershell':('missing.zip','0'*64,'unused')}
+            with patch.object(portable_test,'PAYLOADS',providers):
+                result=portable_test.setup_components(root,launcher_only=True)
+                self.assertTrue(result['launcher_ready']);self.assertFalse(result['components_ready'])
+                self.assertFalse(result['game_imported'])
+                self.assertEqual((root/'local/portable-runtime/python/python.exe').read_bytes(),b'synthetic text, never executed')
+                self.assertFalse((root/'local/portable-runtime/powershell').exists())
+                self.assertFalse((root/'local/components').exists())
+                self.assertEqual((game/'A2.EXE').read_bytes(),b'unknown fixture, preserve')
+                # A minimal success is not sufficient for the full game setup.
+                with self.assertRaises((OSError,ValueError)):
+                    portable_test.setup_components(root)
+                (root/'local/portable-runtime/python/python.exe').write_bytes(b'foreign runtime')
+                with self.assertRaisesRegex(ValueError,'gewijzigd'):
+                    portable_test.setup_components(root,launcher_only=True)
+                self.assertEqual((root/'local/portable-runtime/python/python.exe').read_bytes(),b'foreign runtime')
+
+    def test_launcher_only_flag_cannot_select_other_actions(self):
+        with patch('sys.argv',['portable_test.py','import','--launcher-only']):
+            with self.assertRaises(SystemExit) as error:
+                portable_test.main()
+        self.assertEqual(error.exception.code,1)
+
 @unittest.skipUnless(os.name=='nt','Windows public-bootstrap stream checks')
 class PublicBootstrapTests(unittest.TestCase):
     def fixture(self, text, runtime=None):
@@ -144,6 +201,30 @@ class PublicBootstrapTests(unittest.TestCase):
         self.assertEqual(result['state'],dict(schema=1,stage='downloading',component='fixture.zip',received=7,total=7))
         self.assertEqual(result['final'],dict(schema=1,stage='complete',component='',received=0,total=None))
         self.assertTrue(result['bad_path']);self.assertEqual(result['temporary'],0)
+
+    def test_launcher_stage_selects_python_and_does_not_claim_full_readiness(self):
+        result=self.fixture(STAGED_PROVIDERS_FIXTURE)
+        self.assertEqual(result['all_count'],5)
+        self.assertEqual(result['launcher_names'],['python-3.13.16-embed-amd64.zip'])
+        self.assertEqual(result['minimal'],dict(components_downloaded=0,components_checked=1,
+                                               game_downloaded=False,scope='launcher'))
+        self.assertTrue(result['full_missing'])
+
+    def test_launcher_only_start_refuses_game_options_before_any_setup(self):
+        runtime=shutil.which('pwsh')
+        if not runtime:self.skipTest('PowerShell runtime unavailable')
+        parent=ROOT/'local/test-fixtures';parent.mkdir(parents=True,exist_ok=True)
+        with tempfile.TemporaryDirectory(prefix='control-only é ',dir=parent) as folder:
+            script=Path(folder)/'tools/Start-A2Portable.ps1';script.parent.mkdir()
+            script.write_bytes((ROOT/'tools/Start-A2Portable.ps1').read_bytes())
+            for arguments in (['-LauncherOnly'],['-CheckOnly','-LauncherOnly','-GameArchive','synthetic.zip'],
+                              ['-CheckOnly','-LauncherOnly','-Diagnostic']):
+                result=subprocess.run([runtime,'-NoProfile','-File',str(script),*arguments],
+                                      capture_output=True,text=True,encoding='utf-8',timeout=15)
+                self.assertEqual(result.returncode,1,result.stdout+result.stderr)
+                self.assertIn('LauncherOnly is uitsluitend voor de launchercontrole',result.stdout)
+            self.assertEqual(sorted(p.relative_to(folder).as_posix() for p in Path(folder).rglob('*') if p.is_file()),
+                             ['tools/Start-A2Portable.ps1'])
 
     def test_dripping_body_is_bounded_by_total_deadline_and_read_budget(self):
         result=self.fixture(DEADLINE_FIXTURE)

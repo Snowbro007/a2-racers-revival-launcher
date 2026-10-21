@@ -21,6 +21,7 @@ sys.path.insert(0, str(ROOT))
 from tools.trial_manifest import EXPECTED_BINARIES, HD_DISPLAY_PROFILES, validate_ancestors, validate_slug
 from tools import ii_frontend_launcher, ii_original_launcher
 from tools import ii_launcher_graphics
+from tools import game_library
 
 # Version-1 presets are migration data only; new choices are independent.
 LEGACY_GRAPHICS = {
@@ -448,6 +449,7 @@ def ii_graphics_support(root: Path) -> dict:
 
 def snapshot(root: Path) -> dict:
     return {"settings": load_settings(root), "default_settings": deepcopy(DEFAULT_SETTINGS),
+            "game_library": game_library.describe_library(root),
             "graphics": GRAPHICS, "displays": DISPLAY_PROFILES, "cameras": CAMERA_PROFILES,
             "render_distances": RENDER_DISTANCES, "object_distances": OBJECT_DISTANCES,
             "textures": {profile: {**entry, **texture_availability(root, profile)}
@@ -617,6 +619,8 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="action", required=True)
     sub.add_parser("snapshot")
+    item = sub.add_parser('game-library-folder')
+    item.add_argument('--game', choices=('a2racer1', 'a2racer2'), required=True)
     sub.add_parser('ii-menu-plan')
     sub.add_parser('ii-original-menu-plan')
     for action in ("save", "create-session"):
@@ -655,6 +659,8 @@ def main() -> int:
     try:
         if args.action == "snapshot":
             result = snapshot(ROOT)
+        elif args.action == 'game-library-folder':
+            result = game_library.ensure_game_folder(ROOT, args.game)
         elif args.action == 'ii-original-menu-plan':
             result = ii_original_launcher.registered_menu(ROOT)
         elif args.action == 'ii-menu-plan':

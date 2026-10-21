@@ -3,7 +3,7 @@ param([switch]$CheckOnly, [switch]$Diagnostic, [switch]$Dismount, [string]$GameA
       [ValidateRange(-1, 120)][int]$RaceFPSLimit = -1,
       [ValidateSet('original', 'gdi', 'svga', 'no-dither')][string]$MapMode,
       [ValidateSet('original', 'borderless-4-3', 'hd-1280x960', 'hd-1280x960-fake', 'hd-1920x1440')][string]$DisplayProfile,
-      [string]$ProgressPath)
+      [string]$ProgressPath, [switch]$LauncherOnly)
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $kitRoot = Split-Path -Parent $PSScriptRoot
@@ -28,6 +28,10 @@ function Assert-PortablePath([string]$Path) {
 }
 
 try {
+    if ($LauncherOnly -and (-not $CheckOnly -or $Diagnostic -or $Dismount -or $GameArchive -or
+            $RaceFPSLimit -ge 0 -or $MapMode -or $DisplayProfile)) {
+        throw 'LauncherOnly is uitsluitend voor de launchercontrole; geen gameopties of gamestart toegestaan.'
+    }
     if (-not [Environment]::Is64BitOperatingSystem -or
         [Environment]::GetEnvironmentVariable('PROCESSOR_ARCHITECTURE', 'Machine') -eq 'ARM64') {
         throw 'Dit testpakket is voor Windows x64 op Intel/AMD.'
@@ -39,7 +43,7 @@ try {
         if ((Get-Item -LiteralPath $publicMarker).Length -gt 4096) { throw 'Openbaar releaserecord is te groot.' }
         $publicRelease = [IO.File]::ReadAllText($publicMarker) | ConvertFrom-Json
         if ($publicRelease.schema -ne 1 -or $publicRelease.component_delivery -ne 'verified-provider-download' -or $publicRelease.games_bundled -ne $false) { throw 'Onbekende openbare release.' }
-        & (Join-Path $PSScriptRoot 'Initialize-A2Public.ps1') -KitPath $kitRoot -ProgressPath $ProgressPath
+        & (Join-Path $PSScriptRoot 'Initialize-A2Public.ps1') -KitPath $kitRoot -ProgressPath $ProgressPath -LauncherOnly:$LauncherOnly
         if (-not $?) { throw 'Componentdownload of hashcontrole faalde; niets gestart.' }
     }
     $pythonArchive = Join-Path $kitRoot 'payload\python-3.13.16-embed-amd64.zip'
@@ -85,12 +89,18 @@ try {
         }
     } finally { $archive.Dispose() }
     $pythonPath = Join-Path $pythonRoot 'python.exe'
-    Write-Host 'Portable runtimes en compatibiliteitscomponenten controleren...'
-    & $pythonPath -B (Join-Path $PSScriptRoot 'portable_test.py') setup
+    $setupArguments = @('-B', (Join-Path $PSScriptRoot 'portable_test.py'), 'setup')
+    if ($LauncherOnly) { $setupArguments += '--launcher-only' }
+    Write-Host $(if ($LauncherOnly) { 'Launcheronderdelen controleren; er wordt nog geen game gecontroleerd.' } else { 'Speelonderdelen en compatibiliteitsbestanden controleren...' })
+    & $pythonPath @setupArguments
     if ($LASTEXITCODE -ne 0) { throw 'Componentvoorbereiding faalde; niets gestart.' }
     if (Test-Path -LiteralPath (Join-Path $kitRoot 'release-manifest.json')) {
         & $pythonPath -B (Join-Path $PSScriptRoot 'portable_launcher.py') setup-assets
         if ($LASTEXITCODE -ne 0) { throw 'Launcher-artvoorbereiding faalde; niets gestart.' }
+    }
+    if ($LauncherOnly) {
+        Write-Host 'De launcher is klaar. Speelonderdelen worden pas voorbereid wanneer je een game toevoegt of start.'
+        return
     }
     $pwshPath = Join-Path $kitRoot 'local\portable-runtime\powershell\pwsh.exe'
     $sessionArguments = @('-NoLogo', '-NoProfile', '-STA', '-ExecutionPolicy', 'Bypass', '-File',

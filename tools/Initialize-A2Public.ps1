@@ -1,17 +1,20 @@
 #Requires -Version 5.1
 [CmdletBinding()]
-param([string]$KitPath = (Split-Path -Parent $PSScriptRoot), [switch]$CheckOnly, [string]$ProgressPath)
+param([string]$KitPath = (Split-Path -Parent $PSScriptRoot), [switch]$CheckOnly, [string]$ProgressPath,
+      [switch]$LauncherOnly)
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-function Get-A2PublicProviders {
-    @(
+function Get-A2PublicProviders([switch]$LauncherOnly) {
+    $providers = @(
         @{name='python-3.13.16-embed-amd64.zip';sha256='97dae5274cc54867065e8d5a3226e48c35017ed332a0fdb0e27d5b5821961297';url='https://www.python.org/ftp/python/3.13.16/python-3.13.16-embed-amd64.zip'},
         @{name='PowerShell-7.6.5-win-x64.zip';sha256='32eb8f6cdce08f86e987d625a2733e54ac3e289ae7e1621b14c0b5bcec2434ea';url='https://github.com/PowerShell/PowerShell/releases/download/v7.6.5/PowerShell-7.6.5-win-x64.zip'},
         @{name='cnc-ddraw-v7.0.0.0.zip';sha256='f9640f69c2b8c012b97720ce0a9aac483989563908fc19446b9d1ba16e7239d6';url='https://github.com/FunkyFr3sh/cnc-ddraw/releases/download/v7.0.0.0/cnc-ddraw.zip'},
         @{name='dgVoodoo2_87_5.zip';sha256='5ffde6927f7355ca3fdd5d785b581256a8e6539fa13e395a891ade6ba1040850';url='https://github.com/dege-diosg/dgVoodoo2/releases/download/v2.87.5/dgVoodoo2_87_5.zip'},
         @{name='ffmpeg-9.0.2-essentials_build.zip';sha256='60f467265b1e312373dbcd92200c2618a74850f98d3d078e94296bb3fa2047ba';url='https://www.gyan.dev/ffmpeg/builds/packages/ffmpeg-9.0.2-essentials_build.zip'}
     )
+    if($LauncherOnly){return @($providers | Where-Object {$_.name -eq 'python-3.13.16-embed-amd64.zip'})}
+    return $providers
 }
 
 function Assert-A2PublicPath([string]$Path) {
@@ -142,7 +145,7 @@ function Copy-A2ProviderStream($InputStream,[string]$Destination,[string]$Pin,
     }
 }
 
-function Install-A2PublicProviders([string]$Root,[switch]$OfflineCheck,[string]$ProgressPath) {
+function Install-A2PublicProviders([string]$Root,[switch]$OfflineCheck,[string]$ProgressPath,[switch]$LauncherOnly) {
     Assert-A2PublicPath $Root
     if(-not [IO.Directory]::Exists($Root)){throw 'De uitgepakte launchermap ontbreekt.'}
     Add-Type -AssemblyName System.Net.Http
@@ -151,7 +154,8 @@ function Install-A2PublicProviders([string]$Root,[switch]$OfflineCheck,[string]$
     $downloaded=0;$activeComponent=''
     try{
         Write-A2ComponentState $Root $ProgressPath 'checking'
-        foreach($provider in Get-A2PublicProviders){
+        $providers=@(Get-A2PublicProviders -LauncherOnly:$LauncherOnly)
+        foreach($provider in $providers){
             $activeComponent=$provider.name
             Write-A2ComponentState $Root $ProgressPath 'checking' $activeComponent
             $destination=Join-Path $Root ('payload\'+$provider.name)
@@ -183,8 +187,9 @@ function Install-A2PublicProviders([string]$Root,[switch]$OfflineCheck,[string]$
         Write-A2ComponentState $Root $ProgressPath 'error' $activeComponent
         throw
     }finally{$client.Dispose()}
-    return @{components_downloaded=$downloaded;components_checked=5;game_downloaded=$false}
+    return @{components_downloaded=$downloaded;components_checked=$providers.Count;game_downloaded=$false;
+             scope=if($LauncherOnly){'launcher'}else{'game'}}
 }
 
-try {Install-A2PublicProviders $KitPath -OfflineCheck:$CheckOnly -ProgressPath $ProgressPath | ConvertTo-Json -Compress}
+try {Install-A2PublicProviders $KitPath -OfflineCheck:$CheckOnly -ProgressPath $ProgressPath -LauncherOnly:$LauncherOnly | ConvertTo-Json -Compress}
 catch {Write-Error $_.Exception.Message;exit 1}

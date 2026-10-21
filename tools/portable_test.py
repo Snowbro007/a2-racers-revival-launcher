@@ -212,7 +212,13 @@ def save_exact(path: Path, data: bytes) -> None:
         handle.write(data)
 
 
-def setup_components(root: Path) -> dict:
+def setup_components(root: Path, *, launcher_only: bool = False) -> dict:
+    if launcher_only:
+        # This stage never inspects or imports games and cannot imply game readiness.
+        archive = payload(root, "python")
+        extract_verified(archive, PAYLOADS["python"][1], root / "local/portable-runtime/python")
+        return {"launcher_ready": True, "components_ready": False, "game_imported": False,
+                "gameplay_status": "niet gecontroleerd", "downloads": False}
     from tools import trial_manifest as tm
     for kind in PAYLOADS:
         payload(root, kind)
@@ -364,14 +370,18 @@ def main() -> int:
     parser.add_argument("--output", type=Path)
     parser.add_argument("--include-game-archive", type=Path,
                         help="Alleen build: voeg de bekende originele ZIP toe aan een persoonlijk pakket.")
+    parser.add_argument("--launcher-only", action="store_true",
+                        help="Alleen setup: bereid uitsluitend de Python-runtime voor de launcher voor.")
     args = parser.parse_args()
     try:
         if args.include_game_archive is not None and args.action != "build":
             raise ValueError("--include-game-archive is uitsluitend voor build.")
+        if args.launcher_only and args.action != "setup":
+            raise ValueError("--launcher-only is uitsluitend voor setup.")
         if args.action == "settings":
             result = load_settings(ROOT)
         elif args.action == "setup":
-            result = setup_components(ROOT)
+            result = setup_components(ROOT, launcher_only=args.launcher_only)
         elif args.action == "import":
             if not args.archive:
                 raise ValueError("Geef --archive.")

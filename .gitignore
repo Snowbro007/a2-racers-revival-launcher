@@ -1,5 +1,6 @@
 # Player data, downloaded components and local output never belong in Git.
 /local/
+/Gamebestanden/
 /reports/
 /payload/
 /game-media/
