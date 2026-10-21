@@ -40,7 +40,10 @@ EXTRA_FILES = (
 
 def app_files(root: Path) -> list[str]:
     """Follow literal Python imports and script references from fixed entrypoints."""
-    names = {name for name in kit.APP_FILES if not name.startswith('docs/')}
+    # The private legacy test kit still supports its own shortcut script. The
+    # modern launcher uses Launcher.cmd or the MSI's native shortcuts instead.
+    names = {name for name in kit.APP_FILES
+             if not name.startswith('docs/') and name != 'Maak-snelkoppeling.ps1'}
     names.update(EXTRA_FILES)
     pending = list(names)
     while pending:

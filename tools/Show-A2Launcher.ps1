@@ -12,6 +12,7 @@ $script:operation = $null; $script:worker = $null; $script:sessionName = $null
 $script:catalog = $null; $script:settings = $null; $script:game = 'a2racer1'; $script:binding = $false
 $script:initialized = $false; $script:bootstrapAttempted = $false
 $script:releaseInitialized = $false
+$script:gameComponentsVerified = $false; $script:afterComponents = $null
 $script:installationScanAttempted = $false
 $script:installationScanNote = $null
 $script:developmentRuntimes = [bool](($PythonPath -and $PowerShellPath) -or
@@ -64,6 +65,7 @@ function Get-IIChoiceSupport([string]$Resolution,[string]$Hud) {
 
 function Update-Buttons {
     $isIIIPage = $ui.Pages.SelectedIndex -eq 3
+    $ui.OpenGameLibrary.Visibility = if ($isIIIPage) { 'Collapsed' } else { 'Visible' }
     for ($pageIndex = 0; $pageIndex -lt $ui.Pages.Items.Count; $pageIndex++) {
         $visible = if ($pageIndex -eq 3) { $isIIIPage } else { -not $isIIIPage }
         $ui.Pages.Items[$pageIndex].Visibility = if ($visible) { 'Visible' } else { 'Collapsed' }
@@ -88,7 +90,7 @@ function Update-Buttons {
     foreach ($name in @('SaveOptions','ResetOptions','GameOne','GameTwo','RefreshState','ImportGame','ChooseOptions','IntroChoice','DebugChoice')) {
         $ui[$name].IsEnabled = [bool]($idle -and $script:initialized)
     }
-    foreach ($name in @('DetectInstallations','ChooseInstallation','GetGame','InstallationChoice','PrepareGame')) {
+    foreach ($name in @('DetectInstallations','ChooseInstallation','GetGame','InstallationChoice','PrepareGame','OpenGameLibrary')) {
         $ui[$name].IsEnabled = [bool]($idle -and -not $running -and $script:initialized)
     }
     $ui.LinkInstallation.IsEnabled = [bool]($idle -and -not $running -and $script:initialized -and $ui.InstallationChoice.SelectedItem)
@@ -461,8 +463,8 @@ function Select-Game([string]$GameName) {
     $needsII = -not $one -and -not $script:catalog.ii_menus.revival.available
     $ui.InstallationPanel.Visibility = if ($ui.ImportGame.Visibility -eq 'Visible' -or $needsII) { 'Visible' } else { 'Collapsed' }
     if (-not $sourceReady) {
-        $ui.WelcomeTitle.Text = 'Eigen gamebestanden nodig'
-        $ui.WelcomeHint.Text = 'Heb je een volledige gamemap of een ZIP-bestand van je eigen ' + $ui.GameTitle.Text + '? Kies hieronder wat je hebt.'
+        $ui.WelcomeTitle.Text = 'Nog geen game toegevoegd'
+        $ui.WelcomeHint.Text = 'Deze launcher bevat geen games. Heb je je eigen volledige Nederlandse ' + $ui.GameTitle.Text + '? Kies hieronder je gamemap of ZIP. Nog geen game? Open Game nodig? voor uitleg.'
     } elseif ($needsII) {
         $ui.WelcomeTitle.Text = 'Maak A2 Racer II klaar'
         $ui.WelcomeHint.Text = 'Je gamebestanden zijn gevonden. Klik hieronder op Lokale speelkopie maken; kies daarna Aanbevolen en Spelen.'
@@ -485,13 +487,40 @@ function Select-Game([string]$GameName) {
     } else {
         $ui.InstallationNote.Text=if($sourceReady){'Gamebestanden gevonden. Maak nu een lokale speelkopie; je bron blijft intact.'}else{'Kies de volledige Nederlandse gamemap met DATA, of je eigen ZIP-bestand. Je bron blijft intact.'}
     }
+    Set-GameLibraryInfo $GameName $sourceReady
     $script:initialized = $true; $script:binding = $false
     Update-Summary; Update-Buttons
     if (-not $script:worker) {
-        $reason=if($one -or $preferences.menu_profile -eq 'original'){$script:catalog.games.($GameName).reason}else{$script:catalog.ii_menus.($preferences.menu_profile).reason}
+        $reason=if(-not $sourceReady){'Er is nog geen game toegevoegd. Kies je eigen volledige Nederlandse gamemap of ZIP-bestand.'}elseif($one -or $preferences.menu_profile -eq 'original'){$script:catalog.games.($GameName).reason}else{$script:catalog.ii_menus.($preferences.menu_profile).reason}
         $statusTitle = if (-not $sourceReady) { 'Gamebestanden nodig' } elseif ($needsII) { 'Game voorbereiden' } else { 'Klaar voor de start' }
         Set-Status $statusTitle $reason
     }
+}
+
+function Set-GameLibraryInfo([string]$GameName, [bool]$SourceReady) {
+    $label = if ($GameName -eq 'a2racer1') { 'A2 Racer I' } else { 'A2 Racer II' }
+    $ui.GameLibraryInputPath.Text = 'Gamebestanden / ' + $label
+    $ui.GameLibraryInputPath.ToolTip = Join-Path $workspacePath ('Gamebestanden\' + $label)
+    $ui.GameLibraryHelp.Text = if ($SourceReady) { 'Je game is toegevoegd. Je oorspronkelijke map of ZIP blijft intact. Deze optionele verzamelmap is voor je eigen bronbestanden:' } else { 'Je eigen game mag blijven waar hij staat. Kies hierboven je gamemap of ZIP, of zet hem eerst in deze verzamelmap en kies hem daarna. Alleen neerzetten importeert niets.' }
+    $ui.GameLibraryStorage.Text = 'Beheerde gamebestanden: local / games / ' + $GameName + '. Instellingen en voortgang worden door de launcher onder local beheerd; verplaats die mappen niet handmatig.'
+    if ($script:catalog.PSObject.Properties.Name -contains 'game_library') {
+        $entry = $script:catalog.game_library.games.($GameName)
+        if ($entry -and $entry.source_path) { $ui.GameLibraryStorage.Text += "`nGekozen bron: " + [string]$entry.source_path }
+    }
+}
+
+function Open-GameLibraryResult($Result) {
+    if ($Result.schema -ne 1 -or $Result.game -notin @('a2racer1','a2racer2')) { throw 'Onbekende gamebestandenmap.' }
+    $label = if ($Result.game -eq 'a2racer1') { 'A2 Racer I' } else { 'A2 Racer II' }
+    $expected = [IO.Path]::GetFullPath((Join-Path $workspacePath ('Gamebestanden\' + $label)))
+    if (-not [string]::Equals([IO.Path]::GetFullPath([string]$Result.path), $expected, [StringComparison]::OrdinalIgnoreCase)) { throw 'De gamebestandenmap wijkt af van deze launcher.' }
+    Assert-LauncherPath $expected
+    if (-not (Test-Path -LiteralPath $expected -PathType Container)) { throw 'De gamebestandenmap ontbreekt.' }
+    $info = New-Object Diagnostics.ProcessStartInfo
+    $info.FileName = $expected; $info.UseShellExecute = $true
+    $opened = [Diagnostics.Process]::Start($info)
+    if ($opened) { $opened.Dispose() }
+    Set-Status 'Gamebestandenmap geopend' 'Plaats hier je eigen volledige game of ZIP. Kies daarna Ik heb een gamemap of Ik heb een ZIP-bestand; er wordt niets automatisch geïmporteerd.'
 }
 
 function Preference-Arguments([string]$Action) {
@@ -564,7 +593,19 @@ function Start-Operation([string]$Kind, [string]$Executable, [string[]]$Argument
 }
 
 function Start-Model([string]$Kind, [string[]]$Arguments) {
+    if ($Kind -in @('import','iii-import','start') -and (Start-GameComponentPreparation $Kind $Arguments)) { return }
     Start-Operation $Kind $script:PythonPath (@('-B', (Join-Path $PSScriptRoot 'launcher_model.py')) + $Arguments)
+}
+
+function Start-GameComponentPreparation([string]$Kind, [string[]]$Arguments) {
+    if ($script:gameComponentsVerified -or -not (Test-Path -LiteralPath (Join-Path $workspacePath 'public-release.json'))) { return $false }
+    if ($script:operation) { return $true }
+    $script:afterComponents = @{kind=$Kind;arguments=[string[]]$Arguments}
+    Set-Status 'Spelonderdelen voorbereiden' 'Je hebt een game gekozen. Nu worden de onderdelen voor beeld, geluid en starten opgehaald; je game wordt niet gedownload.'
+    $progress = Join-Path $workspacePath 'local\launcher\component-progress.json'
+    Start-Operation 'game-components' (Join-Path $env:SystemRoot 'System32\WindowsPowerShell\v1.0\powershell.exe') @('-NoLogo','-NoProfile','-STA','-ExecutionPolicy','Bypass','-File',(Join-Path $PSScriptRoot 'Start-A2Portable.ps1'),'-CheckOnly','-ProgressPath',$progress)
+    if (-not $script:operation) { $script:afterComponents = $null }
+    return $true
 }
 
 function Start-IIIGame {
@@ -592,7 +633,7 @@ function Start-IIIGame {
 
 function Open-Devtools {
     try {
-        if (-not (Load-Runtimes)) { throw 'Runtimes ontbreken voor de devtools.' }
+        if (-not (Load-Runtimes -RequireGameRuntime)) { throw 'Runtimes voor de devtools ontbreken. Voeg eerst je eigen game toe om de spelonderdelen voor te bereiden.' }
         $viewerPath = Join-Path $workspacePath 'tools\Show-A2Devtools.ps1'
         Assert-LauncherPath $viewerPath
         $viewer = New-LauncherProcess $script:PowerShellPath @('-NoLogo','-NoProfile','-STA','-WindowStyle','Hidden',
@@ -616,7 +657,7 @@ function Open-GameSource {
         'Welke gamebestanden heb ik nodig?', 'OK', 'Information')
 }
 
-function Load-Runtimes {
+function Load-Runtimes([switch]$RequireGameRuntime) {
     $config = Join-Path $workspacePath 'local\launcher\runtimes.json'
     if ((-not $script:PythonPath -or -not $script:PowerShellPath) -and (Test-Path -LiteralPath $config)) {
         Assert-LauncherPath $config
@@ -628,7 +669,10 @@ function Load-Runtimes {
     if (-not $script:PythonPath) { $script:PythonPath = Join-Path $workspacePath 'local\portable-runtime\python\python.exe' }
     if (-not $script:PowerShellPath) { $script:PowerShellPath = Join-Path $workspacePath 'local\portable-runtime\powershell\pwsh.exe' }
     foreach ($path in @($script:PythonPath, $script:PowerShellPath)) { Assert-LauncherPath $path }
-    return [bool]((Test-Path -LiteralPath $script:PythonPath -PathType Leaf) -and (Test-Path -LiteralPath $script:PowerShellPath -PathType Leaf))
+    # The interface and its model need Python only. Game actions must complete
+    # Start-GameComponentPreparation before using the larger runtime bundle.
+    return [bool]((Test-Path -LiteralPath $script:PythonPath -PathType Leaf) -and
+        (-not $RequireGameRuntime -or (Test-Path -LiteralPath $script:PowerShellPath -PathType Leaf)))
 }
 
 function Start-InitialCheck {
@@ -637,14 +681,16 @@ function Start-InitialCheck {
         $publicRelease = Test-Path -LiteralPath (Join-Path $workspacePath 'public-release.json')
         if (-not $script:developmentRuntimes -and -not $script:bootstrapAttempted -and ((Test-Path -LiteralPath $payload) -or $publicRelease)) {
             $script:bootstrapAttempted = $true
-            Set-Status 'Eerste voorbereiding' $(if ($publicRelease) { 'De componenten worden bij hun leveranciers opgehaald en gecontroleerd. De eerste start vereist internet.' } else { 'De lokale runtimes worden gecontroleerd. Dit kan even duren.' })
+            Set-Status 'Launcher voorbereiden' $(if ($publicRelease) { 'Alleen de launcherbasis wordt opgehaald en gecontroleerd. Games worden niet meegeleverd; spelonderdelen volgen wanneer je een game toevoegt.' } else { 'De onderdelen in je eigen complete testpakket worden gecontroleerd en klaargezet.' })
             $progress = Join-Path $workspacePath 'local\launcher\component-progress.json'
-            Start-Operation 'bootstrap' (Join-Path $env:SystemRoot 'System32\WindowsPowerShell\v1.0\powershell.exe') @('-NoLogo','-NoProfile','-STA','-ExecutionPolicy','Bypass','-File',(Join-Path $PSScriptRoot 'Start-A2Portable.ps1'),'-CheckOnly','-ProgressPath',$progress)
+            $bootstrapArguments = @('-NoLogo','-NoProfile','-STA','-ExecutionPolicy','Bypass','-File',(Join-Path $PSScriptRoot 'Start-A2Portable.ps1'),'-CheckOnly','-ProgressPath',$progress)
+            if ($publicRelease) { $bootstrapArguments += '-LauncherOnly' }
+            Start-Operation 'bootstrap' (Join-Path $env:SystemRoot 'System32\WindowsPowerShell\v1.0\powershell.exe') $bootstrapArguments
             return
         }
         if (Load-Runtimes) {
             if (-not $script:releaseInitialized -and (Test-Path -LiteralPath (Join-Path $workspacePath 'release-manifest.json'))) {
-                Set-Status 'Eerste voorbereiding' 'Launcherbestanden controleren en een meegeleverd persoonlijk gamearchief lokaal importeren…'
+                Set-Status 'Launcherbestanden controleren' $(if ($publicRelease) { 'De launcher wordt klaargezet. Heb je nog geen game? Je kunt straks je eigen gamemap of ZIP toevoegen.' } else { 'Het eigen testpakket wordt klaargezet; een expliciet meegeleverd persoonlijk archief wordt geïmporteerd.' })
                 Start-Operation 'initialize' $script:PythonPath @('-B',(Join-Path $PSScriptRoot 'portable_launcher.py'),'initialize')
                 return
             }
@@ -777,7 +823,7 @@ function Poll-Launcher {
     $pending = $null
     try {
         if ($script:operation -and $script:operation.ContainsKey('kind') -and
-                $script:operation.kind -eq 'bootstrap' -and $script:operation.ContainsKey('started')) {
+                $script:operation.kind -in @('bootstrap','game-components') -and $script:operation.ContainsKey('started')) {
             $progress = Read-LauncherComponentProgress $workspacePath $script:operation.started
             if ($progress) { Set-Status $progress.title $progress.message }
         }
@@ -787,6 +833,15 @@ function Poll-Launcher {
             $code = $pending.process.ExitCode; $pending.process.Dispose()
             if ($code -ne 0) { throw $errorText.Substring(0, [Math]::Min($errorText.Length, 1600)) }
             if ($pending.kind -eq 'bootstrap') { Start-InitialCheck; return }
+            if ($pending.kind -eq 'game-components') {
+                if (-not (Load-Runtimes) -or -not (Test-Path -LiteralPath $script:PowerShellPath -PathType Leaf)) { throw 'Spelonderdelen zijn niet volledig klaargezet; je game is niet gestart.' }
+                $script:gameComponentsVerified = $true
+                $next = $script:afterComponents; $script:afterComponents = $null
+                if (-not $next) { throw 'Er staat geen gameactie klaar na de voorbereiding.' }
+                Set-Status 'Gekozen game verwerken' 'De spelonderdelen staan klaar. Nu worden uitsluitend de door jou gekozen gamebestanden gecontroleerd.'
+                Start-Model $next.kind $next.arguments
+                return
+            }
             if ($pending.kind -eq 'initialize') { $script:releaseInitialized = $true; Start-InitialCheck; return }
             if ($pending.kind -in @('import','iii-import')) { Start-Model 'snapshot' @('snapshot'); return }
             $result = $output | ConvertFrom-Json
@@ -796,12 +851,11 @@ function Poll-Launcher {
                     if (-not $script:settings) { $script:settings = $result.settings; $script:game = $result.settings.selected_game }
                     Select-Game $script:game
                     if (-not $script:sessionName -and $result.latest_session) { Restore-Session $result.latest_session }
-                    if (-not $result.games.a2racer1.ready -and -not $script:installationScanAttempted) {
-                        $script:installationScanAttempted = $true
-                        Start-Model 'detect' @('detect-installations'); return
-                    }
+                    # Searching registered Windows installations is explicit:
+                    # a fresh launcher can open even when the user owns no game yet.
                 }
                 'detect' { Show-Installations $result }
+                'library-folder' { Open-GameLibraryResult $result }
                 'save' { $script:settings = $result; Set-Status 'Opties opgeslagen' 'Deze keuzes gelden bij je volgende start.' }
                 'start' {
                     if ($result.run_name -notmatch '^launcher-[a-z0-9-]{1,35}$') { throw 'Ongeldige sessienaam.' }
@@ -827,6 +881,7 @@ function Poll-Launcher {
         }
         Update-Buttons
     } catch {
+        if ($pending -and $pending.kind -eq 'game-components') { $script:afterComponents = $null; $script:gameComponentsVerified = $false }
         $title = if ($pending -and $pending.kind -eq 'iii-import') { 'Deel III kon niet koppelen' } else { 'Kon niet doorgaan' }
         Set-Status $title $_.Exception.Message; $ui.LogText.Text = $_.Exception.Message; Update-Buttons
     }
@@ -842,7 +897,8 @@ try {
             'GraphicsNote','ResolutionChoice','ResolutionNote','CameraNote','DistanceChoice','DistanceNote','ObjectDistanceChoice','ObjectDistanceNote','TextureChoice','TextureNote','MenuChoice','MenuNote',
             'HorizonChoice','FocusRecoveryChoice','FocusRecoveryNote','ChooseOptions','RecommendedOptions','OverviewResolution','OverviewFps','OverviewDistance','OverviewObjects','OverviewDetailLabel','SelectionNote','AdvancedOptions','StartScroll','SupportScroll','OptionsScroll','DashboardChoice','FpsChoice','FpsNote','IntroChoice','DebugChoice',
             'OriginalProfile','MaxProfile','SaveOptions','ResetOptions','OpenLogs','OpenDevtools','RefreshState','LogText','StatusTitle','StatusMessage','PlayButton','LauncherVersion','CheckUpdates',
-            'InstallationPanel','InstallationTitle','InstallationChoice','InstallationNote','InstallationFoundSection','InstallationSourceChoices','InstallationFolderHint','DetectInstallations','ChooseInstallation','LinkInstallation','GetGame','PrepareGame')) {
+            'InstallationPanel','InstallationTitle','InstallationChoice','InstallationNote','InstallationFoundSection','InstallationSourceChoices','InstallationFolderHint','DetectInstallations','ChooseInstallation','LinkInstallation','GetGame','PrepareGame',
+            'GameLibraryPanel','GameLibraryHelp','GameLibraryInputPath','GameLibraryStorage','OpenGameLibrary')) {
         $ui[$name] = $window.FindName($name)
         if (-not $ui[$name]) { throw ('Ontbrekend launcherelement: ' + $name) }
     }
@@ -963,6 +1019,7 @@ try {
     $ui.PlayButton.Add_Click({ if ($ui.Pages.SelectedIndex -eq 3) { Start-IIIGame } else { Start-Model 'start' (Preference-Arguments 'create-session') } })
     $ui.RefreshState.Add_Click({ Start-Model 'snapshot' @('snapshot') })
     $ui.OpenDevtools.Add_Click({ Open-Devtools })
+    $ui.OpenGameLibrary.Add_Click({ Start-Model 'library-folder' @('game-library-folder','--game',$script:game) })
     $ui.OpenLogs.Add_Click({
         try {
             $folder = Join-Path $workspacePath 'local\launcher'

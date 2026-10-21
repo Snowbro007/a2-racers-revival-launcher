@@ -13,7 +13,9 @@ from tools import game_installation as gi, local_game_data as data
 
 class InstallationTests(unittest.TestCase):
     def setUp(self):
-        self.temp = tempfile.TemporaryDirectory()
+        parent = Path(__file__).resolve().parents[1] / 'local/test-fixtures'
+        parent.mkdir(parents=True, exist_ok=True)
+        self.temp = tempfile.TemporaryDirectory(prefix='installation-', dir=parent)
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name) / 'Revival é'
         self.root.mkdir()

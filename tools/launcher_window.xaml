@@ -244,10 +244,13 @@
         <Border Grid.Column="2" CornerRadius="10" Background="#F5111D2C" BorderBrush="#33465B" BorderThickness="1" Padding="24,20,24,18">
           <Grid>
             <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-            <StackPanel Margin="0,0,0,10">
+            <DockPanel Margin="0,0,0,10">
+              <Button x:Name="OpenGameLibrary" Content="Gamebestandenmap openen" DockPanel.Dock="Right" VerticalAlignment="Center" Style="{StaticResource SetupHelpButton}" Margin="16,0,0,0" ToolTip="Opent de map voor je eigen gamekopie. Games worden niet meegeleverd of automatisch geïmporteerd."/>
+              <StackPanel>
               <TextBlock x:Name="GameTitle" Text="A2 Racer I" FontFamily="Bahnschrift" FontWeight="SemiBold" FontSize="30"/>
               <TextBlock x:Name="GameSubtitle" Text="Revived-instellingen voor A2 Racer I." Foreground="#A6B8CE" TextWrapping="Wrap" FontSize="12" LineHeight="18" Margin="0,5,0,0"/>
-            </StackPanel>
+              </StackPanel>
+            </DockPanel>
             <TabControl x:Name="Pages" Grid.Row="1" Background="Transparent" BorderThickness="0" Padding="0,10,0,0" Foreground="#F2F4FB">
               <TabItem Header="Spelen"><Grid>
                 <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
@@ -256,8 +259,8 @@
                     <Grid Height="104"><Grid.ColumnDefinitions><ColumnDefinition Width="175"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                       <Image x:Name="CoverPreview" Stretch="UniformToFill" IsHitTestVisible="False" Focusable="False" AutomationProperties.Name="A2-sfeerbeeld met een auto op de snelweg"/>
                       <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="18,8,16,8">
-                        <TextBlock x:Name="WelcomeTitle" Text="Je game wordt gecontroleerd" Foreground="#FFE66D" FontFamily="Bahnschrift" FontSize="20" FontWeight="SemiBold"/>
-                        <TextBlock x:Name="WelcomeHint" Text="Even wachten; de launcher controleert welke gamebestanden al klaarstaan." Foreground="#E0E9F6" FontSize="12" TextWrapping="Wrap" LineHeight="17" Margin="0,5,0,0"/>
+                        <TextBlock x:Name="WelcomeTitle" Text="Welkom bij A2 Racers Revival" Foreground="#FFE66D" FontFamily="Bahnschrift" FontSize="20" FontWeight="SemiBold"/>
+                        <TextBlock x:Name="WelcomeHint" Text="De launcher wordt geopend. Games zijn niet inbegrepen; je kunt straks je eigen gamemap of ZIP-bestand toevoegen." Foreground="#E0E9F6" FontSize="12" TextWrapping="Wrap" LineHeight="17" Margin="0,5,0,0"/>
                       </StackPanel>
                     </Grid>
                   </Border>
@@ -286,6 +289,12 @@
                       <WrapPanel Margin="0,8,0,0"><TextBlock Text="ANDERE HULP" Foreground="#AFC8E2" FontSize="10" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,10,0"/><Button x:Name="DetectInstallations" Content="Bekende Windows-installatie zoeken" Style="{StaticResource SetupHelpButton}" ToolTip="Zoekt alleen geregistreerde A2 Racer I-installaties in Windows; scant niet alle schijven." Margin="0,0,7,0"/><Button x:Name="GetGame" Content="Game nodig?" Style="{StaticResource SetupHelpButton}" ToolTip="Welke bestanden heb je nodig en waar vind je meer informatie? De launcher bevat geen games."/></WrapPanel>
                     </StackPanel>
                     <Button x:Name="PrepareGame" Content="Lokale speelkopie maken" Visibility="Collapsed" HorizontalAlignment="Left" Margin="0,5,0,0"/>
+                  </StackPanel></Border>
+                  <Border x:Name="GameLibraryPanel" Style="{StaticResource SettingsCard}" Margin="0,0,0,14"><StackPanel>
+                    <TextBlock Text="Waar zet ik mijn gamebestanden?" FontWeight="SemiBold" FontSize="14" Foreground="#F2F4FB"/>
+                    <TextBlock x:Name="GameLibraryHelp" Text="Je eigen volledige Nederlandse game mag blijven waar hij staat. Kies hierboven je gamemap of ZIP. Je kunt hem ook in deze verzamelmap zetten en daarna kiezen:" TextWrapping="Wrap" FontSize="12" Foreground="#C6DCF0" Margin="0,5,0,6"/>
+                    <TextBlock x:Name="GameLibraryInputPath" Text="Gamebestanden / A2 Racer I" FontSize="12" Foreground="#FFE66D" TextWrapping="Wrap"/>
+                    <TextBlock x:Name="GameLibraryStorage" Text="Na toevoegen beheert de launcher zelf een speelkopie; je oorspronkelijke map of ZIP blijft intact." TextWrapping="Wrap" FontSize="11" Foreground="#A6B8CE" Margin="0,4,0,0"/>
                   </StackPanel></Border>
                   <TextBlock x:Name="PlayNote" TextWrapping="Wrap" Foreground="#A6B8CE" FontSize="12" LineHeight="18" Margin="0,0,0,8"/>
                   <TextBlock x:Name="SelectionNote" TextWrapping="Wrap" Foreground="#FFE057" FontSize="12" LineHeight="18" Margin="0,0,0,8"/>
@@ -452,8 +461,8 @@
             <Border Grid.Row="2" BorderBrush="#33465B" BorderThickness="0,1,0,0" Margin="0,12,0,0" Padding="0,12,0,0">
               <Grid>
                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="230"/></Grid.ColumnDefinitions>
-                <StackPanel VerticalAlignment="Center" Margin="0,0,18,0"><TextBlock x:Name="StatusTitle" Text="Controleren…" Foreground="#C4D5EA" FontWeight="SemiBold" FontSize="13"/>
-                  <TextBlock x:Name="StatusMessage" Text="Lokale startbestanden controleren." Foreground="#A6B8CE" FontSize="11" TextWrapping="Wrap" LineHeight="17" Margin="0,5,0,0"/>
+                <StackPanel VerticalAlignment="Center" Margin="0,0,18,0"><TextBlock x:Name="StatusTitle" Text="Launcher openen…" Foreground="#C4D5EA" FontWeight="SemiBold" FontSize="13"/>
+                  <TextBlock x:Name="StatusMessage" Text="De launcherbasis wordt klaargezet. Je hoeft nog geen game te hebben toegevoegd." Foreground="#A6B8CE" FontSize="11" TextWrapping="Wrap" LineHeight="17" Margin="0,5,0,0"/>
                 </StackPanel>
                 <Button x:Name="PlayButton" Grid.Column="1" Content="Speel A2 Racer I" BorderBrush="#FFE057" Foreground="#142038" FontWeight="SemiBold" FontSize="18" VerticalAlignment="Center" IsEnabled="False" Padding="15,15">
                   <Button.Background><LinearGradientBrush StartPoint="0,0" EndPoint="0,1"><GradientStop Color="#FFE66D" Offset="0"/><GradientStop Color="#EFC339" Offset="1"/></LinearGradientBrush></Button.Background>

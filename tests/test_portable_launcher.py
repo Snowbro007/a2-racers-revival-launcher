@@ -47,7 +47,8 @@ class PortableLauncherTests(unittest.TestCase):
 
     def test_clean_download_excludes_agents_prompts_reports_saves_and_old_tests(self):
         for name in ('AGENTS.md', '.git/config', 'prompts.txt', 'local/launcher/settings.json',
-                     'local/experiments/old/game.DAT', 'reports/user.json', 'tests/test_secret.py'):
+                     'local/experiments/old/game.DAT', 'reports/user.json', 'tests/test_secret.py',
+                     'Gamebestanden/A2 Racer I/own-source.txt'):
             self.write(name, b'personal fixture excluded')
         output, result = self.build()
         self.assertFalse(result['game_archive_included'])
@@ -56,12 +57,18 @@ class PortableLauncherTests(unittest.TestCase):
             self.assertIn(release.PREFIX + 'Launcher.cmd', names)
             self.assertIn(release.PREFIX + 'tools/dependency.py', names)
             self.assertIn(release.PREFIX + assets.package_path(self.target), names)
-            self.assertFalse(any('AGENTS' in n or '/local/' in n or '/tests/' in n or '/reports/' in n or '/.git/' in n for n in names))
+            self.assertFalse(any('AGENTS' in n or '/local/' in n or '/Gamebestanden/' in n or '/tests/' in n or '/reports/' in n or '/.git/' in n for n in names))
             manifest = json.loads(archive.read(release.PREFIX + 'release-manifest.json'))
             self.assertEqual(manifest['audience'], 'launcher-only')
         self.assertEqual(release.audit(output, self.root), result['files_checked'])
         self.assertIn(result['sha256'], output.with_suffix('.zip.sha256').read_text())
         with self.assertRaises(ValueError):release.build(self.root, output)
+
+    def test_public_source_rejects_game_input_folder_even_if_added_to_package_list(self):
+        path = self.write('Gamebestanden/A2 Racer I/own-source.txt', b'synthetic private source')
+        with patch.object(release, 'records', return_value=[('Gamebestanden/A2 Racer I/own-source.txt', path, None)]):
+            with self.assertRaisesRegex(ValueError, 'Persoonlijk/game/componentbestand'):
+                public_release.source_files(self.root)
 
     def test_public_download_omits_all_provider_binaries_and_game_archives(self):
         for name in release.PUBLIC_FILES:
@@ -83,6 +90,23 @@ class PortableLauncherTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'gamearchief'):
             release.build(self.root,self.root/'forbidden.zip',game,public=True)
         self.assertFalse((self.root/'forbidden.zip').exists())
+
+    def test_public_package_and_source_do_not_require_legacy_shortcut_helper(self):
+        # Retain the private kit's list, but do not require its old user helper
+        # in a public source copy or pass it through into an MSI payload.
+        self.seed.append('Maak-snelkoppeling.ps1')
+        for name in release.PUBLIC_FILES:
+            self.write(name, b'synthetic public documentation')
+        self.write('docs/public-release.json', b'{"schema":1,"games_bundled":false}')
+        self.assertFalse((self.root/'Maak-snelkoppeling.ps1').exists())
+        names = {name for name, _, _ in public_release.source_files(self.root)}
+        self.assertNotIn('Maak-snelkoppeling.ps1', names)
+        output = self.root/'public-without-legacy.zip'
+        result = release.build(self.root, output, public=True)
+        with zipfile.ZipFile(output) as archive:
+            self.assertNotIn(release.PREFIX+'Maak-snelkoppeling.ps1', archive.namelist())
+        self.assertEqual(release.audit(output, self.root), result['files_checked'])
+        self.assertIn('Maak-snelkoppeling.ps1', release.kit.APP_FILES)
 
     def test_public_source_copy_is_separate_complete_and_rebuildable(self):
         for name in release.PUBLIC_FILES:

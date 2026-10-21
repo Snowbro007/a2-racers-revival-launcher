@@ -12,7 +12,7 @@ if str(ROOT) not in sys.path:sys.path.insert(0,str(ROOT))
 from tools import portable_launcher as package
 from tools.trial_manifest import validate_ancestors
 
-FORBIDDEN_PARTS={'.git','.codex','.agents','local','reports','game-media','payload','prompts'}
+FORBIDDEN_PARTS={'.git','.codex','.agents','local','reports','game-media','gamebestanden','payload','prompts'}
 FORBIDDEN_SUFFIXES={'.exe','.dll','.zip','.iso','.bin','.cue','.sav','.dat','.img','.ind','.smk','.avi','.wav','.mp3'}
 
 def source_files(root:Path):
