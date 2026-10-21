@@ -37,6 +37,8 @@ De lokale archiefset die bij deze vaste providernamen hoort is samen 244.474.942
 
 Robin noemt tijdens dit onderzoek **Bitdefender** als het blokkerende product. De detectienaam en exacte bestandsversie zijn nog onbekend. Een historische online scan met de vermelding Undetected verklaart een lokale blokkade niet. Bitdefender beschrijft zelf beoordeling van verdachte false positives; er is in dit onderzoek niets ingestuurd. [Bitdefender: detecties onderzoeken](https://www.bitdefender.com/business/support/en/77212-343054-resolving-legitimate-applications-detected-as-threats-by-bitdefender.html).
 
+Er is daarnaast een historische Bitdefender-melding voor de aparte ontwikkeltesthelper `Harness.exe`: `Gen:Variant.MSILHeracles.213981`. Die native test is bewust uitgeschakeld gebleven. Dit identificeert niet het bestand dat bij Robin uit de fandownload verdwijnt; de helper is geen bewijs over de launcher-EXE in die release.
+
 ## Vergelijking van distributieroutes
 
 | Route | Gemak voor fans | Advies voor dit project |
