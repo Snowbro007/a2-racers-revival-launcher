@@ -33,6 +33,8 @@ De lokale Windows 11-installatie van beta 7 slaagde, maar de eerste start rondde
 
 Een verdwijnend bestand kan quarantaine zijn, maar dat vereist het AV-log: product, detectienaam, exact pad, hash en tijdstip. SmartScreen is een reputatiecontrole bij downloaden/starten; het is niet hetzelfde als een AV-detectie. [Microsoft developer FAQ](https://learn.microsoft.com/en-us/defender-xdr/developer-faq).
 
+De lokale archiefset die bij deze vaste providernamen hoort is samen 244.474.942 bytes, circa 244 MB, boven op de launcherdownload. PowerShell neemt circa 106 MB in en FFmpeg circa 115 MB. Dit is een meting van de lokale archieven, geen nieuwe netwerkdownload of verwachting van de actuele netwerksnelheid.
+
 Robin noemt tijdens dit onderzoek **Bitdefender** als het blokkerende product. De detectienaam en exacte bestandsversie zijn nog onbekend. Een historische online scan met de vermelding Undetected verklaart een lokale blokkade niet. Bitdefender beschrijft zelf beoordeling van verdachte false positives; er is in dit onderzoek niets ingestuurd. [Bitdefender: detecties onderzoeken](https://www.bitdefender.com/business/support/en/77212-343054-resolving-legitimate-applications-detected-as-threats-by-bitdefender.html).
 
 ## Vergelijking van distributieroutes
