@@ -12,7 +12,7 @@ Deel III is voorlopig gepauzeerd: een proef liep vast en hield de muis vast. Sta
 
 Geen aparte Python-installatie nodig. De eerste start gebruikt internet voor onderdelen; daarna kun je offline spelen. Download de releasebijlage, niet de broncode via **Code → Download ZIP**.
 
-**Distributiestatus:** de huidige beta is nog niet plug-and-play bevestigd. Er zijn antivirusmeldingen bekend en de nieuwere MSI is nog een concept. De aanbevolen vervolgstap is een ondertekende installer met een geteste eerste start. [Onderzoek en verbeteringen](docs/fan-distribution-review-20261021.md) · [Hulp als de launcher verdwijnt of niet start](docs/launcher-start-help.md).
+**Distributiestatus:** de huidige beta is nog niet plug-and-play bevestigd. Er zijn antivirusmeldingen bekend en de nieuwere MSI is nog een concept. De aanbevolen vervolgstap is een ondertekende installer met een geteste eerste start. [Onderzoek en verbeteringen](https://github.com/Snowbro007/a2-racers-revival-launcher/blob/main/docs/fan-distribution-review-20261021.md) · [Hulp als de launcher verdwijnt of niet start](https://github.com/Snowbro007/a2-racers-revival-launcher/blob/main/docs/launcher-start-help.md).
 
 ### De games
 
