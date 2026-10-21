@@ -11,6 +11,7 @@ ROOT=Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:sys.path.insert(0,str(ROOT))
 from tools import portable_launcher as package
 from tools.trial_manifest import validate_ancestors
+from tools.check_public_docs import check_paths
 
 FORBIDDEN_PARTS={'.git','.codex','.agents','local','reports','game-media','gamebestanden','payload','prompts'}
 FORBIDDEN_SUFFIXES={'.exe','.dll','.zip','.iso','.bin','.cue','.sav','.dat','.img','.ind','.smk','.avi','.wav','.mp3'}
@@ -24,6 +25,7 @@ def source_files(root:Path):
             raise ValueError('Persoonlijk/game/componentbestand in openbare bestandsset: '+name)
         if name.casefold() in names:raise ValueError('Dubbele openbare bestandsnaam.')
         names.add(name.casefold())
+    check_paths(row[0] for row in result)
     return result
 
 def freeze(root:Path,destination:Path):

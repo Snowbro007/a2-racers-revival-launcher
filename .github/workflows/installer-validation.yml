@@ -19,6 +19,11 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
+      - name: Check public documentation boundary
+        shell: pwsh
+        run: |
+          python tools/check_public_docs.py
+          if ($LASTEXITCODE -ne 0) { throw 'Internal documentation is not allowed in public source.' }
       - name: Run full synthetic launcher test suite
         shell: pwsh
         run: |

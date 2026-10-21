@@ -57,8 +57,7 @@ command-line value. Fresh quiet installs may supply `INSTALLDIR` explicitly.
 
 Version `0.1.5` uses UpgradeCode
 `{8630F56B-38D8-5D0E-A1C1-E17B6DC9C84D}` and ProductCode
-`{4487EC10-5D13-5E01-9C91-CCBBAD2C4E8D}`, matching the reviewed beta5
-candidate. Keep the namespace, UpgradeCode and component identifiers stable.
+`{4487EC10-5D13-5E01-9C91-CCBBAD2C4E8D}`, identifying that MSI version. Keep the namespace, UpgradeCode and component identifiers stable.
 Raise the numeric three-part MSI version for later major upgrades. The
 ProductCode changes per version; PackageCode changes per build. A rebuilt
 MSI is a new artifact with a new hash and needs its own review. No attempt is
@@ -77,16 +76,6 @@ selection/validation/cancel events, prior-folder discovery and stable registry
 ownership, dialog navigation, and a synthetic multi-block MSZIP cabinet.
 Test fixtures remain under `test-output/`;
 that directory and bytecode caches are excluded by `.gitignore`.
-
-The folder-picker/error-dialog variant passed thirteen synthetic tests. The MSI authoring smoke
-test built a 28,672-byte MSI from two synthetic sentinel files through the
-explicitly selected bundled PowerShell 7. Windows PowerShell initially refused
-the adjacent writer script because of its local execution policy. No policy was
-changed or bypassed; the PS7 build also used ordinary `-File` execution. The
-synthetic MSI was neither installed nor executed. The earlier
-local candidate passed database/CAB/hash audits and read-only MSI engine
-costing; this does not prove installation, UI, upgrade or uninstall behavior.
-Those require separate Windows VM tests. No antivirus outcome is asserted.
 
 Authoring references: Microsoft's [Browse Dialog](https://learn.microsoft.com/en-us/windows/win32/msi/browse-dialog),
 [SetTargetPath](https://learn.microsoft.com/en-us/windows/win32/msi/settargetpath-controlevent),
@@ -113,11 +102,10 @@ settings, progress and cache files must survive unchanged. The test registry
 keys, product GUIDs and shortcuts are isolated from actual A2 installations.
 Without `--execute`, it only builds and audits the two synthetic MSI databases.
 
-On 17 October 2026, this lifecycle passed locally and on a clean GitHub-hosted
-Windows runner: [run 39051596665](https://github.com/Snowbro007/a2-racers-revival-launcher/actions/runs/39051596665).
-This verifies the installer engine path with text fixtures. It does not verify
-interactive folder-picker behavior, the full installed launcher, game starts,
-SmartScreen or antivirus acceptance. The native test helper remains disabled.
+The lifecycle check verifies the installer engine path with text fixtures. It
+does not verify interactive folder-picker behavior, game starts, SmartScreen
+or antivirus acceptance. The native test helper remains disabled.
 `read_test_shortcuts.ps1` is the read-only shortcut inspector used by this test.
-The release workflow requires successful lifecycle evidence before it creates
-a draft release. New public releases still need their own exact-file review.
+The release workflow requires successful lifecycle evidence before creating a
+draft. Public releases also require the exact-file acceptance in
+[the release procedure](../../../docs/releasing.md).

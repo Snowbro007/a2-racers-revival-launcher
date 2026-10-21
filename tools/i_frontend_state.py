@@ -1,6 +1,6 @@
 """Separate A2-I HD-menu profiles and the version-bound INFIO race bridge.
 
-No original SLOT/SCORE/OPTIE files are written. See docs/a2-racer-i-hd-menu.md.
+No original SLOT/SCORE/OPTIE files are written.
 """
 from __future__ import annotations
 import argparse

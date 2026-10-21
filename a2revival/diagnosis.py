@@ -134,6 +134,6 @@ def render_report(manifest: dict, diagnosis: dict) -> str:
     if len(ordered_issues) > 40:
         lines += [f"- Eerste 40 van {len(ordered_issues)} meldingen getoond; alle meldingen staan in manifest.json."]
     lines += ["", "## Grenzen en volgende proef", ""] + [f"- {note}" for note in diagnosis["notes"]]
-    lines += ["- Gebruik per game een afzonderlijke werkkopie en het Windows-testprotocol in docs/windows-testprotocol.md.",
+    lines += ["- Zie README.md en docs/launcher-start-help.md voor hulp bij het toevoegen en starten van je eigen game.",
               "- Onbekende bestandstypen en asset-candidates vereisen formaatonderzoek; deze scan decodeert geen game-assets.", ""]
     return "\n".join(lines)
