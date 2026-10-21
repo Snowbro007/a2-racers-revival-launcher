@@ -1,7 +1,7 @@
 """Known A2-I option fields, derived from the supplied menu/race version.
 
 Only prepare bytes for a fresh trial; never write or execute game sources.
-See docs/launcher.md for the field evidence and runtime limitations.
+Only the known binary versions and option fields are accepted.
 """
 from __future__ import annotations
 

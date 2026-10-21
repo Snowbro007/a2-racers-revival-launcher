@@ -1,17 +1,16 @@
-# A2 Racers Revival — 0.1.0-beta.5
+# A2 Racers Revival — 0.1.0-beta.4
 
-**Installatiekandidaat: nog niet uitgebracht.**
+De huidige openbare Windows 11-download is een portable ZIP. Pak hem volledig uit en open `Launcher.cmd`. Gebruik de releasebijlage; **Code → Download ZIP** bevat de broncode.
 
-Deze beta krijgt een gewone Windows-installer (.msi), een herkenbaar A2-icoon en snelkoppelingen op je bureaublad en in het startmenu. Je kiest zelf de installatiemap. Nieuwe versies werken de bestaande launcher bij met behoud van je instellingen en eigen gamebestanden.
+- Launcher voor A2 Racer I en II met aanpasbare beeld- en spelinstellingen.
+- Eigen ondersteunde Nederlandse gamemap of volledig ZIP-archief vereist; games worden niet meegeleverd of gedownload.
+- De eerste start gebruikt internet en haalt circa 244 MB aan hulponderdelen op. Na volledige voorbereiding kun je offline spelen.
+- Je oorspronkelijke bestanden blijven intact. De launcher beheert kopieën, instellingen en voortgang onder `local/`; bewaar die map bij een portable update.
+- **Start deel III niet in deze beta:** het kan vastlopen en de muis vasthouden.
+- De download is niet digitaal ondertekend. Er zijn antivirusmeldingen bekend; een foutloze start op iedere pc is niet gegarandeerd.
 
-Je hoeft Python niet zelf te installeren. De eerste start haalt gecontroleerde onderdelen op bij hun leveranciers; daarna kun je offline spelen. Voeg zelf een ondersteunde Nederlandse gamemap of volledige ZIP toe. Er worden geen games meegeleverd of opgehaald. Voor II staat in de [uitleg](README.md#de-games) een externe gamepagina.
+Lees [de gebruiksinstructies](https://github.com/Snowbro007/a2-racers-revival-launcher/blob/main/README.md) voor de downloadroute en het toevoegen van je gamebestanden. [Download en SHA-256](https://github.com/Snowbro007/a2-racers-revival-launcher/releases/tag/v0.1.0-beta.4).
 
-I en II zijn speelbaar. Deel III is voorlopig geblokkeerd na een vastloper die de muis vasthield. Je kunt wel een gamemap kiezen en de bestanden voorbereiden. Deze stop bewijst nog geen opgeloste race of muisvrijgave. Start III niet in de oude beta 4. Deel IV en multiplayer zijn plannen voor later.
+Hulp: [GitHub Issues](https://github.com/Snowbro007/a2-racers-revival-launcher/issues) of [HeySnowdude@pm.me](mailto:HeySnowdude@pm.me). Deel fouttekst zonder persoonlijke gegevens of gamebestanden. Zet je beveiliging niet uit om een blokkade te omzeilen.
 
-De MSI en launcher zijn nog niet digitaal ondertekend. Windows kan ze waarschuwen of blokkeren. Een foutloze installatie, update en verwijdering op een gewone Windows-pc moeten nog worden bevestigd; een nieuw scanrapport van precies deze bestanden ontbreekt nog. De eerdere zelfuitpakkende Setup.exe had 7/69 VirusTotal-detecties en wordt niet uitgebracht. Die uitslag is niet als een bewezen vals alarm aangemerkt.
-
-Bij publicatie horen de SHA-256 en een link naar de scan van de uiteindelijke MSI op deze releasepagina. Een rapport van een oudere beta geldt niet voor deze download.
-
-Een lokale synthetische testhulp is door Bitdefender geblokkeerd als `Gen:Variant.MSILHeracles.213981`. Deze helper wordt niet meegeleverd en de uitvoerbare test staat uit. Dit moet verder worden onderzocht; een vals alarm is niet bevestigd. De nieuwe installer blijft ongepubliceerd.
-
-Onofficieel fanproject; oorspronkelijke rechten blijven bij de rechthebbenden. Eigen rechtmatig verkregen games vereist. MIT geldt alleen voor eigen code; zie THIRD-PARTY-NOTICES.md. Beta zonder garantie. Gebouwd met hulp van LLM’s.
+Onofficieel fanproject, zonder steun van de rechthebbenden. [MIT](https://github.com/Snowbro007/a2-racers-revival-launcher/blob/main/LICENSE) geldt voor eigen code; oorspronkelijke games en merken blijven van de rechthebbenden. Zie [overige licenties](https://github.com/Snowbro007/a2-racers-revival-launcher/blob/main/THIRD-PARTY-NOTICES.md). Beta zonder garantie, gebouwd met hulp van LLM’s.

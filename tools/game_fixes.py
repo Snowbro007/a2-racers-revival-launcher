@@ -1,8 +1,8 @@
 """Version-checked startup/keyboard fixes for fresh A2-I trial copies only.
 
 Offsets and original instruction bytes were read from the supplied binaries;
-see docs/playtest-fixes.md and docs/render-distance.md. This module never
-starts a game. CD checks and original sources stay unchanged. The optional
+this module applies only to those known binary versions and never starts
+a game. CD checks and original sources stay unchanged. The optional
 renderer experiment changes two data fields while retaining gameplay code.
 """
 from __future__ import annotations

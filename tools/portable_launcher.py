@@ -19,6 +19,7 @@ from tools.trial_manifest import validate_ancestors
 PREFIX = 'A2-Racers-Revival/'
 MAX_PACKAGE_BYTES = 1024 * 1024**2
 PUBLIC_FILES = ('LICENSE', 'VERSION.txt', 'tools/prepare_public_release.py', 'docs/public-readme.md',
+                'tools/check_public_docs.py',
                 'docs/release-third-party-notices.md', 'docs/public-release.json',
                 'docs/public-gitignore.txt', 'docs/public-release-notes.md',
                 'tools/build_windows_release.py',

@@ -1,31 +1,13 @@
-# Updates in de launcher
+# Updates
 
-Vanaf beta 7 staat bij Support een updatevak. De openbare launcher controleert
-na zijn voorbereiding eenmaal per start op nieuwere releases. Automatisch
-controleren kun je uitzetten; handmatig controleren kan altijd. Alleen GitHub
-ontvangt de normale netwerkaanvraag, geen gamemappen, saves of instellingen.
-Zonder internet kun je blijven spelen. Downloaden en installeren gebeuren nooit
-automatisch.
+De beschikbare openbare download staat in [README](../README.md). Beta 4 heeft geen ingebouwde updatefunctie. Bewaar bij een portable update je eigen gamebronnen en `local/` met instellingen en voortgang.
 
-De controle slaat concepten, oudere versies en releases zonder goedgekeurde MSI
-over. Beta-versies worden numeriek vergeleken. Zowel het vrijgavebestand als de
-installer moeten exact overeenkomen met GitHubs bestandsgrootte en SHA-256.
-Downloads komen in een eigen cachemap en houden hun Windows-internetherkomst.
-Bij installeren wordt de openbare vrijgave opnieuw gecontroleerd. Een veranderde
-download of ingetrokken update wordt geweigerd. Installeren is geblokkeerd
-tijdens een game of voorbereiding.
+## Updatefunctie in de launcherbron
 
-Na bevestiging sluit de launcher en opent de gewone Windows-installer. Er wordt
-geen beveiliging uitgezet, blokkade omzeild of bestand gedeblokkeerd. Een ongeldige
-handtekening wordt geweigerd; bij een niet-ondertekende MSI staat dit expliciet
-in de bevestiging. Een SHA-256 bewijst de herkomst binnen deze releaseketen,
-niet dat software veilig is.
+Het updatevak onder **Support** kan GitHub controleren op nieuwere goedgekeurde installerversies. Automatisch controleren kan uit; downloaden en installeren vragen altijd een gebruikersactie. Er worden geen gamemappen, saves of instellingen naar GitHub verstuurd. Zonder internet blijft lokaal spelen mogelijk.
 
-De MSI houdt dezelfde productfamilie en onthoudt de installatiemap. Alleen
-beheerde programmabestanden worden bijgewerkt. Lokale gamekopieën, voorkeuren,
-voortgang en gedownloade onderdelen vallen buiten het MSI-bestandsmanifest.
-De updatevoorkeur staat apart in `local/launcher/update-settings.json`.
+Concepten, oudere versies en releases zonder geldige vrijgave worden overgeslagen. Grootte en SHA-256 moeten overeenkomen met de release. Downloads behouden hun Windows-internetherkomst. Vóór installatie wordt de openbare vrijgave opnieuw gecontroleerd; ingetrokken of gewijzigde updates worden geweigerd. Installeren is geblokkeerd tijdens spelen of voorbereiden.
 
-De bestaande beta 4 krijgt deze functie niet vanzelf: daarvoor moet je eenmaal
-de nieuwe installer installeren zodra die openbaar is vrijgegeven. De updater
-installeert ook geen oudere beta-5-kandidaat.
+Na bevestiging sluit de launcher en opent de gewone Windows-installer. Een ongeldige handtekening wordt geweigerd. De updater zet geen beveiliging uit en deblokkeert geen bestanden. Een hashcontrole is geen veiligheidsverklaring.
+
+De MSI behoudt de installatiemap en beheert alleen programmabestanden. Lokale gamekopieën, voorkeuren, voortgang en gedownloade onderdelen blijven apart. De updatevoorkeur staat in `local/launcher/update-settings.json`.

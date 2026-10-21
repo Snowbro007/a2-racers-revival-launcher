@@ -5,6 +5,16 @@
 /payload/
 /game-media/
 /artifacts/
+/docs/*
+!/docs/launcher-start-help.md
+!/docs/public-gitignore.txt
+!/docs/public-readme.md
+!/docs/public-release-notes.md
+!/docs/public-release.json
+!/docs/release-acceptance.example.json
+!/docs/release-third-party-notices.md
+!/docs/releasing.md
+!/docs/updates.md
 /.agents/
 /.codex/
 AGENTS.md
