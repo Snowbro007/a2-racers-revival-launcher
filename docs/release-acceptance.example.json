@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "evidence_kind": "human-release-acceptance",
+  "reviewed_by": "",
+  "reviewed_at": "",
+  "msi_sha256": "",
+  "launcher_sha256": "",
+  "windows11": {
+    "interactive": false,
+    "first_start": false,
+    "cached_start": false,
+    "game_import_and_return": false,
+    "update_with_save_preservation": false,
+    "uninstall_with_save_preservation": false,
+    "evidence_reference": ""
+  },
+  "signatures": {
+    "installer": {"status": "NotSigned", "thumbprint": "", "publisher": ""},
+    "launcher": {"status": "NotSigned", "thumbprint": "", "publisher": ""}
+  },
+  "antivirus": {
+    "installer": {"sha256": "", "reviewed": false, "open_detections": null, "product": "", "evidence_reference": ""},
+    "launcher": {"sha256": "", "reviewed": false, "open_detections": null, "product": "", "evidence_reference": ""}
+  }
+}

@@ -7,6 +7,7 @@ import os
 from pathlib import Path
 import re
 import shutil
+import time
 import uuid
 
 from tools.local_game_data import check_local_source, MAX_BYTES, MAX_FILES
@@ -106,7 +107,7 @@ def copy_file(source: Path, target: Path) -> None:
             raise ValueError('Installatie veranderde tijdens koppelen.')
 
 
-def promote_import(stage: Path, destination: Path, receipt: Path, data: dict) -> None:
+def promote_import(stage: Path, destination: Path, receipt: Path, data: dict, *, verify_stage=None) -> None:
     """Finish metadata before publishing game data; roll back only our own record.
 
     A record and game directory are separate filesystem entries. This handles
@@ -118,6 +119,8 @@ def promote_import(stage: Path, destination: Path, receipt: Path, data: dict) ->
     if destination.exists() or receipt.exists():
         raise ValueError('Gamegegevens of koppelingsrecord bestaan al; overschrijven geweigerd.')
     owned_record = None
+    owned_text = json.dumps(data, ensure_ascii=True, indent=2)
+    record_complete = False
     promoted = False
     try:
         # Exclusive creation preserves any competing or pre-existing record.
@@ -128,11 +131,32 @@ def promote_import(stage: Path, destination: Path, receipt: Path, data: dict) ->
             json.dump(data, handle, ensure_ascii=True, indent=2)
             handle.flush()
             os.fsync(handle.fileno())
+        record_complete = True
         validate_ancestors(destination)
         if destination.exists():
             raise ValueError('Gamegegevens zijn intussen toegevoegd; import gestopt.')
-        stage.rename(destination)
-        promoted = True
+        for attempt, delay in enumerate((0, 0.05, 0.1, 0.2, 0.4)):
+            if delay:
+                time.sleep(delay)
+                for path in (stage, destination, receipt):
+                    validate_ancestors(path)
+                if destination.exists():
+                    raise ValueError('Gamegegevens zijn intussen toegevoegd; import gestopt.')
+                metadata = receipt.stat()
+                if ((metadata.st_dev, metadata.st_ino) != owned_record or metadata.st_nlink != 1
+                        or receipt.read_text(encoding='utf-8') != owned_text):
+                    raise ValueError('Koppelingsrecord is intussen veranderd; import gestopt.')
+                verify_stage()
+            try:
+                stage.rename(destination)
+                promoted = True
+                break
+            except OSError as error:
+                # Only known Windows sharing/access errors, with 750 ms total
+                # backoff. Callers must supply a complete staged-content check.
+                if (verify_stage is None or getattr(error, 'winerror', None) not in (5, 32, 33)
+                        or attempt == 4):
+                    raise
     finally:
         if owned_record is not None and not promoted:
             validate_ancestors(receipt)
@@ -142,7 +166,8 @@ def promote_import(stage: Path, destination: Path, receipt: Path, data: dict) ->
                 pass
             else:
                 if ((metadata.st_dev, metadata.st_ino) != owned_record
-                        or not receipt.is_file() or metadata.st_nlink != 1):
+                        or not receipt.is_file() or metadata.st_nlink != 1
+                        or (record_complete and receipt.read_text(encoding='utf-8') != owned_text)):
                     raise ValueError('Koppelingsrecord is intussen veranderd; opruimen geweigerd.')
                 receipt.unlink()
 
@@ -209,7 +234,12 @@ def import_installation(root: Path, source: Path, game: str = 'a2racer1') -> dic
             raise ValueError('Lokale gamebestanden zijn intussen toegevoegd; import gestopt.')
         data = {'schema': 1, 'game': game, 'source_path': str(source),
                 'source_tree_sha256': inspected['source_tree_sha256'], 'source_unchanged': True}
-        promote_import(stage, destination, receipt, data)
+        def recheck_stage():
+            current = inspect_installation(stage, game) if game != 'a2racer1' else inspect_installation(stage)
+            if current['source_tree_sha256'] != inspected['source_tree_sha256']:
+                raise ValueError('Gamebestanden veranderden tijdens koppelen.')
+
+        promote_import(stage, destination, receipt, data, verify_stage=recheck_stage)
         return {**data, 'game_imported': True, 'game_started': False, 'disc_image_required': False}
     finally:
         # Only this uniquely named staging directory inside our own game cache.

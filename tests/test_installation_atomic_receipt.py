@@ -38,6 +38,85 @@ class ImportReceiptTransactionTests(unittest.TestCase):
             gi.promote_import(self.stage, self.target, self.receipt, self.data)
         self.assertEqual((self.target / 'fixture.txt').read_bytes(), b'synthetic text fixture')
 
+    def test_transient_windows_error_rechecks_content_and_keeps_complete_receipt(self):
+        rename = Path.rename
+        error = PermissionError('Synthetic Windows sharing error')
+        error.winerror = 32
+        attempts = []
+
+        def transient(stage, target):
+            attempts.append(stage)
+            if len(attempts) == 1:
+                raise error
+            return rename(stage, target)
+
+        def verify():
+            self.assertEqual((self.stage / 'fixture.txt').read_bytes(), b'synthetic text fixture')
+            self.assertEqual(json.loads(self.receipt.read_text()), self.data)
+
+        with patch.object(Path, 'rename', autospec=True, side_effect=transient), patch.object(gi.time, 'sleep') as wait:
+            gi.promote_import(self.stage, self.target, self.receipt, self.data, verify_stage=verify)
+        self.assertEqual(len(attempts), 2)
+        wait.assert_called_once_with(0.05)
+        self.assertTrue(self.target.exists())
+        self.assertEqual(json.loads(self.receipt.read_text()), self.data)
+
+    def test_persistent_windows_error_is_bounded_and_rolls_back_only_own_record(self):
+        error = PermissionError('Synthetic permanent Windows error')
+        error.winerror = 5
+        with patch.object(Path, 'rename', side_effect=error) as rename, patch.object(gi.time, 'sleep') as wait:
+            with self.assertRaisesRegex(PermissionError, 'permanent Windows'):
+                gi.promote_import(self.stage, self.target, self.receipt, self.data, verify_stage=lambda: None)
+        self.assertEqual(rename.call_count, 5)
+        self.assertAlmostEqual(sum(call.args[0] for call in wait.call_args_list), 0.75)
+        self.assertFalse(self.receipt.exists())
+        self.assertFalse(self.target.exists())
+        self.assertTrue(self.stage.exists())
+
+    def test_foreign_destination_during_retry_is_never_overwritten(self):
+        error = PermissionError('Synthetic sharing error')
+        error.winerror = 33
+
+        def competing(stage, target):
+            target.mkdir()
+            (target / 'personal.txt').write_text('preserve')
+            raise error
+
+        with patch.object(Path, 'rename', autospec=True, side_effect=competing) as rename, patch.object(gi.time, 'sleep'):
+            with self.assertRaisesRegex(ValueError, 'intussen toegevoegd'):
+                gi.promote_import(self.stage, self.target, self.receipt, self.data, verify_stage=lambda: None)
+        self.assertEqual(rename.call_count, 1)
+        self.assertEqual((self.target / 'personal.txt').read_text(), 'preserve')
+        self.assertFalse(self.receipt.exists())
+
+    def test_changed_staging_cannot_pass_recheck_during_retry(self):
+        error = PermissionError('Synthetic sharing error')
+        error.winerror = 32
+        with patch.object(Path, 'rename', side_effect=error) as rename, patch.object(gi.time, 'sleep'):
+            with self.assertRaisesRegex(ValueError, 'Synthetic changed source'):
+                gi.promote_import(self.stage, self.target, self.receipt, self.data,
+                                  verify_stage=lambda: (_ for _ in ()).throw(ValueError('Synthetic changed source')))
+        self.assertEqual(rename.call_count, 1)
+        self.assertFalse(self.receipt.exists())
+        self.assertFalse(self.target.exists())
+
+    def test_receipt_changed_in_place_during_retry_is_preserved(self):
+        error = PermissionError('Synthetic sharing error')
+        error.winerror = 32
+        changed = '{"personal":"preserve changed metadata"}'
+
+        def change_receipt(stage, target):
+            self.receipt.write_text(changed, encoding='utf-8')
+            raise error
+
+        with patch.object(Path, 'rename', autospec=True, side_effect=change_receipt) as rename, patch.object(gi.time, 'sleep'):
+            with self.assertRaisesRegex(ValueError, 'opruimen geweigerd'):
+                gi.promote_import(self.stage, self.target, self.receipt, self.data, verify_stage=lambda: None)
+        self.assertEqual(rename.call_count, 1)
+        self.assertEqual(self.receipt.read_text(encoding='utf-8'), changed)
+        self.assertFalse(self.target.exists())
+        self.assertTrue(self.stage.exists())
+
     def test_partial_record_write_failure_rolls_back_only_own_record(self):
         def interrupted(data, handle, **kwargs):
             handle.write('{"partial":')

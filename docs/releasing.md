@@ -33,7 +33,7 @@ Beta 4 blijft de openbare download totdat een opvolger is goedgekeurd.
    overgeslagen. Werk de README-downloadknop pas bij na publicatie.
 
 ```powershell
-python tools/create_update_review.py --installer "pad/naar/A2-Racers-Revival-0.1.7-beta7.msi" --build-review "pad/naar/build-review.json" --app-test "pad/naar/app-install-result.json" --output "pad/naar/release-review.json" --approve
+python tools/create_update_review.py --installer "pad/naar/A2-Racers-Revival-0.1.7-beta7.msi" --build-review "pad/naar/build-review.json" --app-test "pad/naar/app-install-result.json" --acceptance "pad/naar/human-acceptance.json" --output "pad/naar/release-review.json" --approve
 ```
 
 De opdracht controleert de exacte MSI-hash, bron/payloadcontrole en eerste en
@@ -57,3 +57,28 @@ Er worden uitsluitend officiële GitHub Actions, Python, .NET Framework,
 Windows Installer COM en `makecab` gebruikt. Geen aparte installer-toolchain,
 zelfuitpakkende Setup.exe of uitvoerbare Harness-testhelper. Geen wijzigingen
 aan antivirus, SmartScreen, systeembeleid of permissies.
+
+
+## Aanvullende vrijgavegrens vanaf 21 oktober 2026
+
+`--approve` en het automatische app-testbestand zijn samen onvoldoende.
+`--acceptance` is verplicht: een afzonderlijke menselijke verklaring voor de
+exacte MSI- en launcherhash. Het moet een interactieve Windows 11-proef, twee
+geldige handtekeningen van dezelfde uitgever/certificaatthumbprint en een
+beoordeling van AV-resultaten voor beide bestanden zonder open detecties
+bevatten. Kopieer [het lege voorbeeld](release-acceptance.example.json) naar een
+lokale werkmap en vul het uitsluitend met werkelijk vastgesteld bewijs in.
+Het lege voorbeeld wordt bewust geweigerd. Publiceer geen persoonlijke
+reviewgegevens, gamegegevens of logs bij een release.
+
+De verklaring is menselijke input; het script controleert structuur, types en
+samenhang met de uiteindelijke bytes. Het voert geen Windows-acceptatie,
+handtekeningcontrole of antivirusscan uit en garandeert geen veiligheid. De
+bestaande updaterindeling blijft gelijk; eerdere reviews worden niet achteraf
+ingetrokken. Momenteel bestaat geen ondertekende, interactief geaccepteerde
+nieuwe installer.
+
+De signingstap moet nog op de bouwroute worden aangesloten: eerst eigen EXE
+ondertekenen, dan de MSI bouwen en ondertekenen, daarna de definitieve bytes
+auditen en testen. Het huidige unsigned buildbewijs is niet voldoende.
+Zie [distributieonderzoek](fan-distribution-review-20261021.md).
