@@ -105,7 +105,7 @@ function Update-Buttons {
     if ($script:game -eq 'a2racer2') {
         $maxSupport = Get-IIChoiceSupport '4k' 'hd'
         $ui.MaxProfile.IsEnabled = $ui.MaxProfile.IsEnabled -and $maxSupport.available
-        $ui.MaxProfile.ToolTip = '4K, 60 FPS, 60 baanstukken, egale lucht en HD HUD. Deze combinatie moet nog worden speelgetest.'
+        $ui.MaxProfile.ToolTip = 'untested · 4K, 60 FPS, 60 baanstukken, egale lucht en HD HUD. Deze combinatie moet nog worden speelgetest.'
         if (-not $maxSupport.available) { $ui.MaxProfile.ToolTip += "`nNiet beschikbaar: " + $maxSupport.reason }
     }
     $ui.IIMenuChoice.IsEnabled=[bool]($idle -and $script:initialized -and $script:game -eq 'a2racer2')
@@ -122,7 +122,7 @@ function Update-Buttons {
         }
     }
     if ($script:initialized -and $script:game -eq 'a2racer2') {
-        $ui.IIHudNote.Text = 'HD HUD vereist 1080p of 4K. Radar en meldingen blijven een proef.'
+        $ui.IIHudNote.Text = 'HD HUD vereist 1080p of 4K. Radar en meldingen: untested.'
         if ($ui.IIResolutionChoice.SelectedItem.Tag -eq '720p') {
             $ui.IIHudNote.Text = 'Kies 1080p of 4K om HD HUD te gebruiken.'
         } else {
@@ -167,7 +167,7 @@ function Update-Buttons {
         $ui.GameOne.BorderBrush = '#356E95'; $ui.GameTwo.BorderBrush = '#356E95'
         $ui.GameOneSelected.Visibility = 'Collapsed'; $ui.GameTwoSelected.Visibility = 'Collapsed'
         if (-not $running -and -not $script:operation -and $ui.StatusTitle.Text -notin @('Start onderbroken','Deel III kon niet starten','Deel III kon niet koppelen','Kon niet doorgaan')) {
-            if ($iiiBlocked) { Set-Status 'Start tijdelijk geblokkeerd' 'Een deel-III-proef liep vast en hield de muis vast. Voorbereiden blijft mogelijk.' }
+            if ($iiiBlocked) { Set-Status 'Start tijdelijk geblokkeerd' 'unstable · Deel III liep vast en hield de muis vast. Voorbereiden blijft mogelijk.' }
             elseif ($iiiReady) { Set-Status 'Deel III voorbereid' 'Start zonder cd beschikbaar; de speeltest volgt apart.' }
             elseif (-not $iiiHasMap) { Set-Status 'Gamemap nodig' 'Kies eerst de volledige gamemap van deze tour.' }
             else { Set-Status 'Beeldvariant niet beschikbaar' $ui.IIIProfileNote.Text }
@@ -358,7 +358,7 @@ function Update-Summary {
             $notes += 'Deze objectafstand is optioneel; de ronde rand van de map kan zichtbaar worden.'
         }
         if ($preferences.display_profile -eq 'hd-1280x960-fake') {
-            $notes += 'Deze oude schermproef is vervallen. Kies een andere resolutie om te spelen.'
+            $notes += 'Deze oude unstable schermvariant is vervallen. Kies een andere resolutie om te spelen.'
         }
         if ($preferences.fps -eq 30) {
             $ui.FpsNote.Text = '30 FPS is een alternatief. De game kan sneller lopen; 20 FPS blijft aanbevolen.'
@@ -385,7 +385,7 @@ function Update-Summary {
         if ($wide -and $preferences.race_resolution -eq '4k' -and $preferences.race_hud -eq 'hd' -and $preferences.sky_mode -eq 'flat' -and $preferences.race_distance -eq '60') {
             $notes += 'De MAX-combinatie moet nog worden speelgetest.'
         }
-        if ($wide -and $preferences.race_hud -eq 'hd-map') { $notes += 'Uitgebreide radar en meldingen zijn een proef.' }
+        if ($wide -and $preferences.race_hud -eq 'hd-map') { $notes += 'Uitgebreide radar en meldingen: untested.' }
         if(-not $iiMenu.available){$notes+=$iiMenu.reason}
         if ($preferences.menu_profile -eq 'revival' -and $preferences.race_display -eq 'widescreen' -and -not (Get-IIChoiceSupport $preferences.race_resolution $preferences.race_hud).available) {
             $notes+='Deze HUD-variant is hier nog niet voorbereid. Kies Originele HUD of bereid de game eerst voor.'
@@ -428,7 +428,7 @@ function Select-Game([string]$GameName) {
     $ui.RecommendedOptions.Visibility = 'Visible'
     $ui.OriginalProfile.ToolTip = if ($one) { '640 × 480, 20 FPS, originele zichtafstand, horizon, textures en menu.' } else { 'Klassieke 640 × 480-race, originele HUD en wereld via het Revival-menu.' }
     $ui.RecommendedOptions.ToolTip = if ($one) { '1080p, 20 FPS, verder wegzicht, horizon uit en dashboard aan. HD blijft optioneel.' } else { 'Full HD (1920 × 1080), 60 FPS, 60 baanstukken, egale lucht en originele HUD via het Revival-menu.' }
-    $ui.MaxProfile.ToolTip = if ($one) { '4K, 30 FPS, alle geladen objecten, HD-textures en HD-menu. Meer belasting; de ronde maprand kan zichtbaar zijn.' } else { '4K, 60 FPS, 60 baanstukken, egale lucht en HD HUD. Deze combinatie moet nog worden speelgetest.' }
+    $ui.MaxProfile.ToolTip = if ($one) { '4K, 30 FPS, alle geladen objecten, HD-textures en HD-menu. Meer belasting; de ronde maprand kan zichtbaar zijn.' } else { 'untested · 4K, 60 FPS, 60 baanstukken, egale lucht en HD HUD. Deze combinatie moet nog worden speelgetest.' }
     $ui.GameOne.BorderBrush = if ($one) { '#FFDD4A' } else { '#356E95' }
     $ui.GameTwo.BorderBrush = if ($one) { '#356E95' } else { '#FFDD4A' }
     foreach ($name in @('GraphicsChoice','ResolutionChoice','FpsChoice','DistanceChoice','ObjectDistanceChoice','TextureChoice','MenuChoice','HorizonChoice')) { $ui[$name].Items.Clear() }
@@ -465,7 +465,7 @@ function Select-Game([string]$GameName) {
         Select-Choice $ui.IIRaceDisplayChoice $preferences.race_display
         $iiChoices=@{
             IIResolutionChoice=@(@('1280 × 720 · 16:9','720p'),@('1920 × 1080 · 16:9','1080p'),@('3840 × 2160 · 16:9','4k'));
-            IIHudChoice=@(@('Originele HUD','native'),@('HD HUD · tekst en kaders','hd'),@('HD HUD + radar en meldingen · proef','hd-map'));
+            IIHudChoice=@(@('Originele HUD','native'),@('HD HUD · tekst en kaders','hd'),@('HD HUD + radar en meldingen · untested','hd-map'));
             IISkyChoice=@(@('Originele horizon en lucht','original'),@('Horizon uit · wolken behouden','horizon-off'),@('Egale lucht · aanbevolen','flat'));
             IIDistanceChoice=@(@('Origineel · automatische afstand','auto'),@('Ver vooruit · 50 baanstukken','50'),@('Maximaal · 60 baanstukken · aanbevolen','60'))}
         foreach($name in $iiChoices.Keys){$ui[$name].Items.Clear();foreach($choice in $iiChoices[$name]){Add-Choice $ui[$name] $choice[0] $choice[1]}}
@@ -949,9 +949,9 @@ try {
     } finally { $iconStream.Dispose() }
     Add-Choice $ui.IIITourChoice 'Tour 1' '1'; Add-Choice $ui.IIITourChoice 'Tour 2' '2'
     $ui.IIITourChoice.SelectedIndex = 0
-    Add-Choice $ui.IIIProfileChoice 'Compatibiliteit · proef' 'compat'
-    Add-Choice $ui.IIIProfileChoice '1080p · horizon en wolken uit · proef' 'fullhd-skyoff'
-    Add-Choice $ui.IIIProfileChoice 'Origineel · crash gemeld' 'original'
+    Add-Choice $ui.IIIProfileChoice 'Compatibiliteit · untested' 'compat'
+    Add-Choice $ui.IIIProfileChoice '1080p · horizon en wolken uit · untested' 'fullhd-skyoff'
+    Add-Choice $ui.IIIProfileChoice 'Origineel · unstable' 'original'
     $ui.IIIProfileChoice.SelectedIndex = 0
     if ($CheckOnly -or $PreviewPath) {
         if (-not $script:developmentRuntimes) {

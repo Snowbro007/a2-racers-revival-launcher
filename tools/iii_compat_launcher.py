@@ -25,10 +25,10 @@ from tools.local_game_data import launch_environment
 from tools import iii_start_safety
 
 PROFILES={
-    'compat':{'label':'Compatibiliteit · originele resolutie',
-              'description':'Proef tegen de schermfout bij racestart. Originele graphics en lucht; speelbaarheid nog te bevestigen.'},
-    'fullhd-skyoff':{'label':'1080p · horizon en wolken uit · proef',
-                    'description':'Horizon en wolken uit. De HUD houdt voorlopig zijn oorspronkelijke grootte. Deze 1080p-proef moet nog worden speelgetest.'},
+    'compat':{'label':'Compatibiliteit · originele resolutie · untested',
+              'description':'untested · Variant voor de schermfout bij racestart. Originele graphics en lucht; speelbaarheid nog te bevestigen.'},
+    'fullhd-skyoff':{'label':'1080p · horizon en wolken uit · untested',
+                    'description':'Horizon en wolken uit. De HUD houdt voorlopig zijn oorspronkelijke grootte. Deze 1080p-variant is untested.'},
 }
 MUTABLE={'game.ini','raser.ini','menu.ini','scores.dat','current.rcr','memreport.ini','debug.txt'}
 FONT_CACHE_LIMITS={'menufont1.dat':65536,'menufont2.dat':65536,

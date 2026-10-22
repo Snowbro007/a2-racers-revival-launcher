@@ -107,6 +107,6 @@ def select_stage(root: Path, stage: str) -> dict:
 def availability(root: Path) -> dict:
     try:
         registered_menu(root)
-        return {'available': True, 'reason': 'Gerestaureerd menu met oorspronkelijke handcursor. Raceovergang en Alt+Tab nog te testen.'}
+        return {'available': True, 'reason': 'Gerestaureerd menu met oorspronkelijke handcursor. Raceovergang en Alt+Tab: untested.'}
     except (OSError, ValueError, KeyError, TypeError) as exc:
         return {'available': False, 'reason': 'Kies Game voorbereiden voor het oorspronkelijke menu. '+str(exc)}

@@ -50,7 +50,7 @@ DISPLAY_PROFILES = {
     "hd-2880x2160": {"label": "2880 × 2160 · 4:3", "description": "2160 pixels hoog met oorspronkelijke 4:3-verhouding. Interne renderresolutie nog niet gemeten.", "native_graphics": "accelerated-640", "camera_profile": "original"},
     "hd-1920x1080-camera": {"label": "1080p · 1920 × 1080 · 16:9 (aanbevolen)", "description": "Aanbevolen Full HD-breedbeeld, door de speler bevestigd werkend.", "native_graphics": "accelerated-640", "camera_profile": "camera-16-9"},
     "hd-3840x2160-camera": {"label": "4K · 3840 × 2160 · 16:9", "description": "4K-breedbeeld, door de speler bevestigd werkend. Vraagt meer van je pc.", "native_graphics": "accelerated-640", "camera_profile": "camera-16-9"},
-    "hd-1280x960-fake": {"label": "1280 × 960 · oude Alt+Tab-proef", "description": "Deze mislukte schermproef is vervallen. Kies een andere resolutie om te spelen; de eerder opgeslagen keuze blijft bewaard tot je zelf kiest.", "native_graphics": "accelerated-640", "camera_profile": "original", "launcher_visible": False},
+    "hd-1280x960-fake": {"label": "1280 × 960 · unstable (vervallen)", "description": "Deze unstable schermvariant is vervallen. Kies een andere resolutie om te spelen; de eerder opgeslagen keuze blijft bewaard tot je zelf kiest.", "native_graphics": "accelerated-640", "camera_profile": "original", "launcher_visible": False},
 }
 CAMERA_PROFILES = {
     "original": {"label": "Oorspronkelijke 4:3-camera", "description": "Oorspronkelijke projectie; geen camera-aanpassing."},
@@ -68,10 +68,10 @@ OBJECT_DISTANCES = {
 }
 TEXTURE_PROFILES = {
     "original": {"label": "Origineel", "description": "Standaard: HD uit. Alle oorspronkelijke textures blijven behouden: weg, omgeving, auto's en cockpit."},
-    "hd-road-256": {"label": "HD-weg · 256 × 256", "description": "Oude wegtextureproef. Kies Origineel of HD textures om te spelen; deze eerdere keuze blijft bewaard tot je zelf kiest.", "launcher_visible": False},
-    "hd-road-512": {"label": "HD-weg · 512 × 512", "description": "Oude wegtextureproef. Kies Origineel of HD textures om te spelen; deze eerdere keuze blijft bewaard tot je zelf kiest.", "launcher_visible": False},
-    "hd-scenery-1024": {"label": "HD-omgeving", "description": "Oude omgevingsproef. Kies Origineel of HD textures om te spelen; deze eerdere keuze blijft bewaard tot je zelf kiest.", "launcher_visible": False},
-    "hd-scenery-cockpit": {"label": "HD-omgeving + cockpit", "description": "Oude cockpitproef. Kies Origineel of HD textures om te spelen; deze eerdere keuze blijft bewaard tot je zelf kiest.", "launcher_visible": False},
+    "hd-road-256": {"label": "HD-weg · 256 × 256", "description": "Vervallen wegtexturevariant. Kies Origineel of HD textures om te spelen; deze eerdere keuze blijft bewaard tot je zelf kiest.", "launcher_visible": False},
+    "hd-road-512": {"label": "HD-weg · 512 × 512", "description": "Vervallen wegtexturevariant. Kies Origineel of HD textures om te spelen; deze eerdere keuze blijft bewaard tot je zelf kiest.", "launcher_visible": False},
+    "hd-scenery-1024": {"label": "HD-omgeving", "description": "Vervallen omgevingsvariant. Kies Origineel of HD textures om te spelen; deze eerdere keuze blijft bewaard tot je zelf kiest.", "launcher_visible": False},
+    "hd-scenery-cockpit": {"label": "HD-omgeving + cockpit", "description": "Vervallen cockpitvariant. Kies Origineel of HD textures om te spelen; deze eerdere keuze blijft bewaard tot je zelf kiest.", "launcher_visible": False},
     "hd-expanded-v1": {"label": "HD textures · eerdere versie", "description": "Eerdere HD-textureversie. Kies Origineel of HD textures · aanbevolen voor de nieuwste keuze; deze opgeslagen versie blijft bewaard tot je zelf kiest.", "launcher_visible": False},
     "hd-revival-v1": {"label": "HD textures · aanbevolen", "description": "Optionele visuele upgrade: scherpere weg, omgeving, borden, tankstation en voertuigen, plus HD-dashboard, stuur, meters en boetekaart. HD staat standaard uit. Alt+Tab in deze nieuwste versie is nog niet bevestigd.",
                       "native_texture_profile": "hd-expanded-v1", "hud_profile": "hd-cockpit-v3",
@@ -80,8 +80,8 @@ TEXTURE_PROFILES = {
 LEGACY_PREFERENCE_KEYS = {"graphics", "dashboard", "fps", "intro", "debug"}
 MENU_PROFILES = {
     "original": {"label": "Origineel · venster", "description": "Standaard: het oorspronkelijke spelmenu in een venster."},
-    "classic-fullscreen": {"label": "Classic · fullscreen (proef)", "description": "Klassiek menu in echte 640 × 480-fullscreen, met originele bediening en herstel voor het naamveld. Vereist ondersteuning van deze schermmodus. HD tijdens racen staat hier los van."},
-    "refreshed-fullscreen": {"label": "Refreshed · fullscreen (proef)", "description": "Optioneel: opgefriste achtergronden en klassieke indeling in echte 640 × 480-fullscreen. De bediening blijft origineel, met herstel voor het naamveld. Vereist ondersteuning van deze schermmodus; dit is geen HD-menu. HD tijdens racen staat hier los van."},
+    "classic-fullscreen": {"label": "Classic · fullscreen (untested)", "description": "Klassiek menu in echte 640 × 480-fullscreen, met originele bediening en herstel voor het naamveld. Vereist ondersteuning van deze schermmodus. HD tijdens racen staat hier los van."},
+    "refreshed-fullscreen": {"label": "Refreshed · fullscreen (untested)", "description": "Optioneel: opgefriste achtergronden en klassieke indeling in echte 640 × 480-fullscreen. De bediening blijft origineel, met herstel voor het naamveld. Vereist ondersteuning van deze schermmodus; dit is geen HD-menu. HD tijdens racen staat hier los van."},
     "hd-fullscreen": {"label": "HD menu · fullscreen", "description": "Bevestigd werkend, schermvullend menu met scherpe knoppen en naamvelden. Eigen HD-spelers; grafische opties kies je in de launcher."},
 }
 DEFAULT_SETTINGS = {
@@ -416,8 +416,8 @@ def iii_preparation(root: Path) -> dict:
         profiles = {name: {**entry, **(available(root, number, name) if launch_ready else
                      {'available': False, 'reason': 'Koppel eerst de volledige gamemap van deze tour.'})}
                     for name,entry in PROFILES.items()}
-        profiles['original'] = {'available': launch_ready, 'label': 'Origineel',
-                                'reason': 'Originele schermmodus; de racecrash is gemeld bij Tour 1.'}
+        profiles['original'] = {'available': launch_ready, 'label': 'Origineel · unstable',
+                                'reason': 'unstable · Originele schermmodus; de racecrash is gemeld bij Tour 1.'}
         from tools.iii_start_safety import BLOCK_REASON
         for profile in profiles.values():
             profile.update(available=False, reason=BLOCK_REASON)
