@@ -1,16 +1,14 @@
-# A2 Racers Revival — 0.1.0-beta.4
+# A2 Racers Revival — 0.1.0-beta.8
 
-De huidige openbare Windows 11-download is een portable ZIP. Pak hem volledig uit en open `Launcher.cmd`. Gebruik de releasebijlage; **Code → Download ZIP** bevat de broncode.
+Draagbare Windows 11-testbeta voor A2 Racer I en II. Pak de ZIP helemaal uit en open **Launcher.cmd**. Je eigen volledige ondersteunde Nederlandse gamebestanden zijn nodig; games worden niet meegeleverd of gedownload.
 
-- Launcher voor A2 Racer I en II met aanpasbare beeld- en spelinstellingen.
-- Eigen ondersteunde Nederlandse gamemap of volledig ZIP-archief vereist; games worden niet meegeleverd of gedownload.
-- De eerste start gebruikt internet en haalt circa 244 MB aan hulponderdelen op. Na volledige voorbereiding kun je offline spelen.
-- Je oorspronkelijke bestanden blijven intact. De launcher beheert kopieën, instellingen en voortgang onder `local/`; bewaar die map bij een portable update.
-- **Start deel III niet in deze beta:** het kan vastlopen en de muis vasthouden.
-- De download is niet digitaal ondertekend. Er zijn antivirusmeldingen bekend; een foutloze start op iedere pc is niet gegarandeerd.
+- Knoppen en HUD-keuzes geven duidelijk aan welke lokale bronnen ontbreken. Beschikbare keuzes blijven klikbaar.
+- **Gamebestandenmap openen** maakt een optionele plek voor je eigen games. De eerste start downloadt alleen de kleine launcherbasis; overige hulponderdelen volgen bij het voorbereiden van je game.
+- Deel II heeft **Origineel menu · gerestaureerd**, met het oorspronkelijke artwork en de handcursor. Kies **Game voorbereiden** om de aparte kopie op te bouwen. Het menu is visueel getest; raceovergang en Alt+Tab zijn nog te testen. Het Revival-menu blijft aanbevolen.
+- De losse snelkoppeling-helper is verwijderd. Deel III blijft geblokkeerd wegens de gemelde muis- en stabiliteitsproblemen. Lokale textureproeven zitten niet in de download.
 
-Lees [de gebruiksinstructies](https://github.com/Snowbro007/a2-racers-revival-launcher/blob/main/README.md) voor de downloadroute en het toevoegen van je gamebestanden. [Download en SHA-256](https://github.com/Snowbro007/a2-racers-revival-launcher/releases/tag/v0.1.0-beta.4).
+Bewaar bij een portable update je map `local/` en je eigen `Gamebestanden/`. Voortgang van het oorspronkelijke menu en het Revival-menu staat in afzonderlijke kopieën.
 
-Hulp: [GitHub Issues](https://github.com/Snowbro007/a2-racers-revival-launcher/issues) of [HeySnowdude@pm.me](mailto:HeySnowdude@pm.me). Deel fouttekst zonder persoonlijke gegevens of gamebestanden. Zet je beveiliging niet uit om een blokkade te omzeilen.
+Deze ZIP is niet digitaal ondertekend en is geen goedgekeurde MSI-installer of automatische update. Er is geen nieuw antivirusrapport beschikbaar; er zijn eerdere antivirusmeldingen bekend. Zet je beveiliging niet uit bij een blokkade. De installer- en updater-vrijgavevoorwaarden blijven gelden.
 
-Onofficieel fanproject, zonder steun van de rechthebbenden. [MIT](https://github.com/Snowbro007/a2-racers-revival-launcher/blob/main/LICENSE) geldt voor eigen code; oorspronkelijke games en merken blijven van de rechthebbenden. Zie [overige licenties](https://github.com/Snowbro007/a2-racers-revival-launcher/blob/main/THIRD-PARTY-NOTICES.md). Beta zonder garantie, gebouwd met hulp van LLM’s.
+Onofficieel fanproject, zonder steun van de rechthebbenden. Games en merken blijven van hen; MIT geldt voor eigen code. Beta zonder garantie, gemaakt met hulp van LLM’s. Hulp via [GitHub Issues](https://github.com/Snowbro007/a2-racers-revival-launcher/issues).
