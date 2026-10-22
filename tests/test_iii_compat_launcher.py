@@ -127,15 +127,11 @@ class CompatibilityTests(unittest.TestCase):
             self.assertIn(b'clouds=0',(folder/'game.ini').read_bytes())
             saved=(folder/'game.ini').read_bytes().replace(b'clouds=0',b'clouds=1')
             (folder/'game.ini').write_bytes(saved)
-            child=Mock();child.wait.return_value=9
-            # Synthetic dormant-route contract; default starts are blocked.
-            with patch.object(launcher.iii_start_safety,'assert_start_allowed'),patch.object(launcher.subprocess,'Popen',return_value=child) as spawn:
+            with patch.object(launcher.iii_guarded_start,'run',return_value=9) as guarded,patch.object(launcher.subprocess,'Popen') as spawn:
                 self.assertEqual(launcher.start(self.root,1,'fullhd-skyoff'),9)
-                self.assertEqual(spawn.call_args.kwargs['cwd'],folder)
-                self.assertEqual(spawn.call_args.kwargs['env']['NOCD'],folder.drive[0])
+                guarded.assert_called_once_with(self.root,1,'fullhd-skyoff',folder)
+                spawn.assert_not_called()
             self.assertEqual((folder/'game.ini').read_bytes(),saved.replace(b'clouds=1',b'clouds=0'))
-            report=json.loads((self.root/'reports/a2racer3/compatibility-runs/tour1-fullhd-skyoff-last.json').read_text())
-            self.assertFalse(report['runtime_verified']);self.assertEqual(report['parent_exit_code'],9)
 
 
 if __name__=='__main__':unittest.main()

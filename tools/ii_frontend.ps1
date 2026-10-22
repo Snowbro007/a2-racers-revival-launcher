@@ -389,9 +389,15 @@ function Show-Page([string]$Page) {
             foreach($item in $script:Catalog.cars){
                 $panel=New-GarageCard $item.name '' $wrap
                 $preview=Make-CarView $item.id;$preview.Height=155;$null=$panel.Children.Add($preview)
-                $null=$panel.Children.Add((New-Text ($item.speed.ToString()+' km/u · '+(Money-Text $item.price)) 20))
-                $button=Add-Action $(if($item.id -eq $p.car){'Jouw auto'}else{'Auto kopen'}) 'buy' $item.id $panel
-                $button.IsEnabled=$item.id -ne $p.car -and $p.money -ge $item.price
+                $returning=$p.car -eq 7 -and $item.id -eq $p.normal_vehicle.car
+                $bonus=$item.PSObject.Properties['bonus'] -and $item.bonus
+                $null=$panel.Children.Add((New-Text ($item.speed.ToString()+' km/u · '+$(if($bonus){'Optionele bonusauto'}elseif($returning){'Jouw bewaarde auto'}else{Money-Text $item.price})) 20))
+                if($bonus){
+                    $null=$panel.Children.Add((New-Text $item.description 17))
+                    $null=$panel.Children.Add((New-Text 'Sportauto-afstelling · acceleratie 80 · remmen 90 · wegligging 80' 17))
+                }
+                $button=Add-Action $(if($item.id -eq $p.car){'Geselecteerd'}elseif($bonus){'Vector selecteren'}elseif($returning){'Terug naar jouw auto'}else{'Auto kopen'}) 'buy' $item.id $panel
+                $button.IsEnabled=$item.id -ne $p.car -and ($returning -or $p.money -ge $item.price)
             }
         }
         'Controls' {
@@ -505,6 +511,11 @@ function Start-MenuRace {
             $script:Session=[AtlasIIOwnedSession]::Begin()
             $info=[Diagnostics.ProcessStartInfo]::new()
             $binary=if($script:Model.pending.race_display -eq 'widescreen'){'SPEL-WIDE.DAT'}else{'SPEL.DAT'}
+            if($script:Model.pending.PSObject.Properties['binary']){
+                $chosen=[string]$script:Model.pending.binary
+                if($chosen -notin @('SPEL-VECTOR.DAT','SPEL-VECTOR-WIDE.DAT')){throw 'Onbekende bonusrace.'}
+                $binary=$chosen
+            }
             $info.FileName=Join-Path $PSScriptRoot ('game/DATA/'+$binary)
             $info.WorkingDirectory=Join-Path $PSScriptRoot 'game/DATA'
             $info.UseShellExecute=$false;$info.Environment['NOCD']=[IO.Path]::GetPathRoot($PSScriptRoot).Substring(0,1)
@@ -514,7 +525,7 @@ function Start-MenuRace {
             $script:ChunkClock=[Diagnostics.Stopwatch]::StartNew();$script:NextChunkRead=1000
             Write-MenuEvent 'race-started' @{pid=$script:Race.Id;track=$script:Model.track;car=(Current-Profile).car;
                 race_display=$script:Model.pending.race_display;binary=$binary;
-                requested_canvas=$(if($binary -eq 'SPEL-WIDE.DAT'){@(1280,720)}else{@(640,480)})}
+                requested_canvas=$(if($script:Model.pending.race_display -eq 'widescreen'){@(1280,720)}else{@(640,480)})}
         }
         $script:StopClock=$null
         $script:CloseRequested=$false;$script:ForcedClose=$false
@@ -711,8 +722,8 @@ public sealed class AtlasIIFakeSession : IDisposable {
         $stream=[IO.File]::Create($RenderPath);try{$encoder.Save($stream)}finally{$stream.Dispose()}
         @{rendered=$RenderPath;game_started=$false;window_shown=$false}|ConvertTo-Json
     }elseif($UiCheck){
-        $script:Controls.PlayerName.Text='Fixture Player';$script:Controls.SaveName.RaiseEvent([Windows.RoutedEventArgs]::new([Windows.Controls.Button]::ClickEvent))
-        if((Current-Profile).name -cne 'Fixture Player'){throw 'Naamknop slaagt niet.'}
+        $script:Controls.PlayerName.Text='Fixture Robin';$script:Controls.SaveName.RaiseEvent([Windows.RoutedEventArgs]::new([Windows.Controls.Button]::ClickEvent))
+        if((Current-Profile).name -cne 'Fixture Robin'){throw 'Naamknop slaagt niet.'}
         if($script:Controls.TrackChoice.Items.Count -ne 1 -or $script:Model.track -ne 0){throw 'Nieuwe speler kan vergrendelde etappes kiezen.'}
         foreach($page in @('Garage','Cars','Controls','Options','Records','Players')){Show-Page $page}
         Show-Page 'Players';$script:NewName.Text='Tweede speler';Invoke-Action 'new-player'

@@ -12,6 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from tools import i_frontend_state as state
 from tools import trial_manifest
+from tools import launcher_cheats
 
 
 def validate_art(root: Path) -> None:
@@ -23,8 +24,18 @@ def validate_art(root: Path) -> None:
 
 
 def prepare(root: Path, run_name: str, python: str, choices: dict | None = None, debug: bool = False,
-            isolated_state: bool = False) -> dict:
+            isolated_state: bool = False, *, cheats: dict | None = None) -> dict:
     root = root.absolute()
+    cheats = launcher_cheats.validate('a2racer1', launcher_cheats.DEFAULTS['a2racer1'] if cheats is None else cheats)
+    cheat_session = launcher_cheats.active('a2racer1', cheats)
+    cheat_state = None
+    if cheat_session:
+        normal = root / 'local/launcher/i-hd-menu/players.json'
+        state.safe_path(normal)
+        ordinary_state = (json.loads(state.read_regular(normal)) if normal.exists()
+                          else state.initial_state())
+        cheat_state = launcher_cheats.prepare_state('a2racer1', ordinary_state, cheats)
+        isolated_state = True
     trial_manifest.validate_slug(run_name)
     state.safe_path(Path(python))
     if not Path(python).is_absolute() or not Path(python).is_file():
@@ -55,6 +66,10 @@ def prepare(root: Path, run_name: str, python: str, choices: dict | None = None,
                         'DASHBORD', 'DETAIL', 'CAMERA', 'VMUZIEK', 'VEFFECT'), fields))
     files = []
     paths = [base / name for name in ('Menu.ps1', 'Backend.py', 'OwnedSession.ps1')]
+    if cheat_session:
+        marker = base / launcher_cheats.SESSION_MARKER
+        marker.write_text(json.dumps(launcher_cheats.session_metadata('a2racer1', cheats), indent=2), encoding='utf-8')
+        paths.append(marker)
     paths += list(assets.iterdir())
     # Immutable race resources/configs, not native save files or outputs.
     paths += [p for p in (base / 'game').rglob('*') if p.is_file()
@@ -70,10 +85,15 @@ def prepare(root: Path, run_name: str, python: str, choices: dict | None = None,
            'display': values['display_profile'].removeprefix('hd-').removesuffix('-camera'),
            'options': options, 'files': files, 'optional': True, 'default_enabled': False,
            'race_choices': values, 'runtime_verified': False}
+    if cheat_session:
+        cfg['launcher_cheats'] = cheats
     (base / 'Frontend.json').write_text(json.dumps(cfg, indent=2), encoding='utf-8')
+    if cheat_state is not None:
+        state.save(cfg, cheat_state)
     result = {'base': str(base), 'script': str(base / 'Menu.ps1'), 'game': 'a2racer1',
               'native_menu_used': False, 'game_started': False, 'runtime_verified': False,
               'optional': True, 'state_path': cfg['state_path'], 'race_choices': values,
+              'cheat_session': cheat_session,
               'source_snapshot': str(Path(descriptor['report_path']) / 'source-before.json')}
     (Path(descriptor['report_path']) / 'hd-menu-prepared.json').write_text(json.dumps(result, indent=2), encoding='utf-8')
     return result
@@ -86,10 +106,13 @@ def main() -> int:
     parser.add_argument('--choices', default='{}')
     parser.add_argument('--debug', action='store_true')
     parser.add_argument('--isolated-state', action='store_true')
+    parser.add_argument('--cheats', default=None)
     args = parser.parse_args()
     try:
+        cheats = (launcher_cheats.validate('a2racer1',json.loads(args.cheats))
+                  if args.cheats is not None else None)
         print(json.dumps(prepare(ROOT, args.run_name, args.python_path, json.loads(args.choices), args.debug,
-                                 args.isolated_state)))
+                                 args.isolated_state, cheats=cheats)))
         return 0
     except (OSError, ValueError, KeyError, TypeError) as error:
         parser.exit(1, str(error) + '\n')

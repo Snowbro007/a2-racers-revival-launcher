@@ -1,4 +1,4 @@
-"""No native execution: III must stop before preparing or launching a process."""
+"""Tour 2 stops before writes; Tour 1 can only enter the mandatory guard."""
 import contextlib
 import io
 import os
@@ -18,7 +18,7 @@ class IIIStartSafetyTests(unittest.TestCase):
         parent.mkdir(parents=True,exist_ok=True)
         with tempfile.TemporaryDirectory(prefix='iii-start-block-',dir=parent) as directory:
             root=Path(directory)
-            for tour in (1,2):
+            for tour in (2,):
                 routes=[(local,(root,tour))]+[(compat,(root,tour,profile)) for profile in compat.PROFILES]
                 for runner,args in routes:
                     with self.subTest(tour=tour,runner=runner.__name__,args=args),patch.object(runner,'prepare') as prepare,patch.object(runner.subprocess,'Popen') as spawn:
@@ -29,7 +29,7 @@ class IIIStartSafetyTests(unittest.TestCase):
 
     def test_cli_starts_also_stop_before_preparation_and_leave_environment_intact(self):
         before=dict(os.environ)
-        for runner,args in ((local,['start','--tour','1']),
+        for runner,args in ((local,['start','--tour','2']),
                             (compat,['start','--tour','2','--profile','fullhd-skyoff'])):
             with self.subTest(runner=runner.__name__),patch('sys.argv',['synthetic.py',*args]),patch.object(runner,'prepare') as prepare,patch.object(runner.subprocess,'Popen') as spawn,contextlib.redirect_stderr(io.StringIO()) as errors:
                 self.assertEqual(runner.main(),1)
@@ -52,14 +52,20 @@ class IIIStartSafetyTests(unittest.TestCase):
                 pin.return_value.hexdigest.return_value='4754e7d6374563103ff56ead0eeb685f8e90bcd8e211c9cd30bf37f92eb00f8d'
                 status=model.iii_preparation(root)
             self.assertTrue(status['tours']['1']['launch_ready'])
-            for tour in status['tours'].values():
-                self.assertTrue(tour['start_blocked'])
-                for profile in tour['profiles'].values():
-                    self.assertFalse(profile['available'])
-                    self.assertEqual(profile['reason'],safety.BLOCK_REASON)
+            first,second=status['tours']['1'],status['tours']['2']
+            self.assertFalse(first['start_blocked'])
+            self.assertTrue(first['guard_required'])
+            self.assertTrue(all(profile['available'] for profile in first['profiles'].values()))
+            self.assertTrue(second['start_blocked'])
+            for profile in second['profiles'].values():
+                self.assertFalse(profile['available'])
+                self.assertEqual(profile['reason'],safety.BLOCK_REASON)
 
     def test_no_user_environment_override_can_enable_the_stop(self):
         with patch.dict(os.environ,{'A2_REVIVAL_III_START':'1','A2_REVIVAL_III_SAFE':'true'}):
-            self.assertFalse(safety.status()['start_allowed'])
-            self.assertTrue(safety.status()['start_blocked'])
-            with self.assertRaises(ValueError):safety.assert_start_allowed()
+            self.assertFalse(safety.status(2,'compat')['start_allowed'])
+            self.assertTrue(safety.status(2,'compat')['start_blocked'])
+            with self.assertRaises(ValueError):safety.assert_start_allowed(2,'compat')
+            self.assertTrue(safety.status(1,'compat')['guard_required'])
+            for tour,profile in ((True,'compat'),(1,'unknown'),(None,None)):
+                with self.assertRaises(ValueError):safety.assert_start_allowed(tour,profile)

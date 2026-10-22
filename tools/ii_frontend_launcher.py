@@ -10,8 +10,8 @@ from tools.trial_manifest import EXPECTED_BINARIES, validate_slug
 MENU_PROFILES = {
     'revival': {'label': 'Revival-menu (aanbevolen)',
                 'description': 'Schermvullend menu met één Windows-cursor, eigen spelers, garage en records. Aanbevolen 16:9-race zonder cd-image: 60 baanstukken, egale lucht, horizon en wolken uit. Klassieke 4:3-keuze bij Opties.'},
-    'original': {'label': 'Origineel menu · gerestaureerd · race untested',
-                 'description': 'Het oorspronkelijke artwork en de handcursor, met cursorherstel in een klassiek venster. Eigen voortgang blijft in deze menukopie. Raceovergang en Alt+Tab zijn untested; beeldopties kies je in dit menu.'},
+    'original': {'label': 'Origineel menu · gerestaureerd · unstable (Alt+Tab)',
+                 'description': 'Gerestaureerd oorspronkelijk artwork en handcursor in een klassiek venster. Alt+Tab blijft unstable. Voortgang blijft in deze eigen menukopie; beeldopties kies je in dit menu.'},
 }
 SOURCE_FILES = {'Menu.ps1': 'ii_frontend.ps1', 'Menu.xaml': 'ii_frontend.xaml',
                 'Backend.py': 'ii_frontend_state.py', 'OwnedSession.ps1': 'ii_owned_session.ps1'}
@@ -20,7 +20,11 @@ PART_ART_FILES = {f'assets/part-{name}.png' for name in PART_ART_NAMES}
 RACE_DISPLAY_FILES = {'game/DATA/SPEL-WIDE.DAT','profiles/classic.conf','profiles/widescreen.conf'}
 
 
-def registered_menu(root: Path) -> dict:
+class StaleMenuSources(ValueError):
+    """A sealed menu copy predates our current menu source, not damaged game data."""
+
+
+def registered_menu(root: Path, *, allow_stale_sources: bool = False) -> dict:
     registration = json.loads(read_regular(root/'local/ii-parallel/frontend-current.json', 4096))
     if (not isinstance(registration, dict) or set(registration) != {'schema','run_name','frontend_sha256'}
             or type(registration['schema']) is not int or registration['schema'] != 1):
@@ -73,8 +77,8 @@ def registered_menu(root: Path) -> dict:
             from tools.ii_menu_music import TRACK_SHA256
             if entry['sha256'] != TRACK_SHA256.get(entry['path'].split('/')[-1]):
                 raise ValueError('Andere originele menumuziek.')
-        if entry['path'] in SOURCE_FILES and content != read_regular(root/'tools'/SOURCE_FILES[entry['path']], 1024*1024):
-            raise ValueError('Revival-menu moet opnieuw worden voorbereid: '+entry['path'])
+        if not allow_stale_sources and entry['path'] in SOURCE_FILES and content != read_regular(root/'tools'/SOURCE_FILES[entry['path']], 1024*1024):
+            raise StaleMenuSources('Revival-menu moet opnieuw worden voorbereid: '+entry['path'])
         if entry['path'] == 'game/DATA/SPEL.DAT' and entry['sha256'] != EXPECTED_BINARIES['a2racer2']['DATA/SPEL.DAT']:
             raise ValueError('Andere deel-II-racebinary.')
         if entry['path'] == 'game/DATA/SPEL-WIDE.DAT' and entry['sha256'] != race_binary_sha(config, 'widescreen', RACE_DISPLAYS['widescreen']['sha256']):

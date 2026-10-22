@@ -15,6 +15,7 @@ $script:releaseInitialized = $false
 $script:gameComponentsVerified = $false; $script:mediaComponentsVerified = $false; $script:afterComponents = $null
 $script:installationScanAttempted = $false
 $script:installationScanNote = $null
+$script:cheatControls = @{}
 $script:developmentRuntimes = [bool](($PythonPath -and $PowerShellPath) -or
     (Test-Path -LiteralPath (Join-Path $workspacePath 'local\launcher\runtimes.json')))
 
@@ -121,6 +122,18 @@ function Update-Buttons {
             $ready=$ready -and (Get-IIChoiceSupport ([string]$ui.IIResolutionChoice.SelectedItem.Tag) ([string]$ui.IIHudChoice.SelectedItem.Tag)).available
         }
     }
+    if ($script:initialized) {
+        $cheats = Get-CheatPreferences $script:game
+        if (Test-ActiveCheats $cheats) {
+            $selectedMenu = if ($script:game -eq 'a2racer1') { [string]$ui.MenuChoice.SelectedItem.Tag } else { [string]$ui.IIMenuChoice.SelectedItem.Tag }
+            $ready = $ready -and $selectedMenu -eq $script:catalog.cheats.($script:game).requires_menu
+        }
+        $prefix = if ($script:game -eq 'a2racer1') { 'I' } else { 'II' }
+        if ($ui.ContainsKey($prefix+'CheatsEnabled')) {
+            $ui[($prefix+'CheatsEnabled')].IsEnabled = [bool]($idle -and -not $running)
+            $ui[($prefix+'CheatsPanel')].IsEnabled = [bool]($idle -and -not $running -and $ui[($prefix+'CheatsEnabled')].IsChecked)
+        }
+    }
     $ui.PlayButton.IsEnabled = [bool]($idle -and -not $running -and $ready)
     foreach ($name in @('SaveOptions','ResetOptions','GameOne','GameTwo','RefreshState','ImportGame','ChooseOptions','IntroChoice','DebugChoice')) {
         $ui[$name].IsEnabled = [bool]($idle -and $script:initialized)
@@ -138,13 +151,16 @@ function Update-Buttons {
         $ui[$name].Visibility = 'Visible'
     }
     if ($script:game -eq 'a2racer2') {
-        $maxSupport = Get-IIChoiceSupport '4k' 'hd'
+        $maxSupport = Get-IIChoiceSupport '4k' 'hd-map'
         $ui.MaxProfile.IsEnabled = $ui.MaxProfile.IsEnabled -and $maxSupport.available
-        $ui.MaxProfile.ToolTip = 'untested · 4K, 60 FPS, 60 baanstukken, egale lucht en HD HUD. Deze combinatie moet nog worden speelgetest.'
+        $ui.MaxProfile.ToolTip = '4K, 60 FPS, 60 baanstukken, egale lucht en HD HUD met grotere kaart. De volledige MAX-combinatie blijft untested.'
         if (-not $maxSupport.available) { $ui.MaxProfile.ToolTip += "`nNiet beschikbaar: " + $maxSupport.reason }
     }
     $ui.IIMenuChoice.IsEnabled=[bool]($idle -and $script:initialized -and $script:game -eq 'a2racer2')
     $ui.IIRaceDisplayChoice.IsEnabled=[bool]($idle -and $script:initialized -and $script:game -eq 'a2racer2' -and $ui.IIMenuChoice.SelectedItem.Tag -eq 'revival')
+    $ui.IIDeveloperChoice.IsEnabled=$ui.IIRaceDisplayChoice.IsEnabled
+    $vectorReady=$script:catalog -and $script:catalog.PSObject.Properties['ii_vector_car'] -and $script:catalog.ii_vector_car.available
+    $ui.IIVectorChoice.IsEnabled=[bool]($ui.IIRaceDisplayChoice.IsEnabled -and $vectorReady)
     foreach($name in @('IIResolutionChoice','IIHudChoice','IISkyChoice','IIDistanceChoice')){
         $ui[$name].IsEnabled=[bool]($ui.IIRaceDisplayChoice.IsEnabled -and $ui.IIRaceDisplayChoice.SelectedItem.Tag -eq 'widescreen')
     }
@@ -157,7 +173,9 @@ function Update-Buttons {
         }
     }
     if ($script:initialized -and $script:game -eq 'a2racer2') {
-        $ui.IIHudNote.Text = 'HD HUD vereist 1080p of 4K. Radar en meldingen: untested.'
+        $ui.IIHudNote.Text = if ($ui.IIResolutionChoice.SelectedItem.Tag -eq '4k') {
+            'Grotere 4K-kaart bevestigd. Uitgebreide meldingen blijven untested.'
+        } else { 'HD HUD vereist 1080p of 4K. Radar en meldingen op 1080p: untested.' }
         if ($ui.IIResolutionChoice.SelectedItem.Tag -eq '720p') {
             $ui.IIHudNote.Text = 'Kies 1080p of 4K om HD HUD te gebruiken.'
         } else {
@@ -184,25 +202,28 @@ function Update-Buttons {
         $iiiReady = $false
         $iiiHasMap = $false
         $iiiBlocked = $false
+        $iiiGuarded = $false
         if ($script:catalog -and $ui.IIITourChoice.SelectedItem) {
             $tourState = $script:catalog.iii_preparation.tours.([string]$ui.IIITourChoice.SelectedItem.Tag)
-            $iiiHasMap = ($tourState.PSObject.Properties.Name -contains 'launch_ready') -and $tourState.launch_ready
             $iiiBlocked = $tourState.PSObject.Properties['start_blocked'] -and $tourState.start_blocked
+            $iiiGuarded = $tourState.PSObject.Properties['guard_required'] -and $tourState.guard_required
+            $iiiHasMap = ($tourState.PSObject.Properties.Name -contains 'launch_ready') -and $tourState.launch_ready
             if ($ui.IIIProfileChoice.SelectedItem) {
                 $profileState = $tourState.profiles.([string]$ui.IIIProfileChoice.SelectedItem.Tag)
-                $iiiReady = $profileState -and $profileState.available -and -not $iiiBlocked
+                $iiiReady = -not $iiiBlocked -and $profileState -and $profileState.available
             }
         }
         $ui.PlayButton.IsEnabled = [bool]($idle -and -not $running -and $iiiReady)
-        $ui.PlayButton.Content = if ($iiiBlocked) { 'Start geblokkeerd' } elseif ($iiiReady) { 'Start deze variant' } else { 'Gamemap nodig' }
-        $ui.PlayNote.Text = if ($iiiReady) { 'Origineel menu en race · lokale bestanden · geen cd-mount.' } else { 'Deel III is voorbereid; er wordt nog geen game gestart.' }
+        $ui.PlayButton.Content = if ($iiiBlocked) { 'Start geblokkeerd' } elseif ($iiiReady -and $iiiGuarded) { 'Start bewaakt' } elseif ($iiiReady) { 'Start deze variant' } else { 'Gamemap nodig' }
+        $ui.PlayNote.Text = if ($iiiReady -and $iiiGuarded) { 'untested · Bewaakte start met vrije muis. Noodstop: Ctrl+Shift+F8. Alt+Tab blijft mogelijk. Maximaal vier uur per sessie.' } elseif ($iiiReady) { 'Origineel menu en race · lokale bestanden · geen cd-mount.' } else { 'Kies de gamemap; Tour 2 blijft voorlopig geblokkeerd.' }
         $ui.GameTitle.Text = 'A2 Racer III'
         $ui.GameSubtitle.Text = 'Europa Tour · Tour 1 en Tour 2'
         $ui.GameThree.BorderBrush = '#FFDD4A'
         $ui.GameOne.BorderBrush = '#356E95'; $ui.GameTwo.BorderBrush = '#356E95'
         $ui.GameOneSelected.Visibility = 'Collapsed'; $ui.GameTwoSelected.Visibility = 'Collapsed'
         if (-not $running -and -not $script:operation -and $ui.StatusTitle.Text -notin @('Start onderbroken','Deel III kon niet starten','Deel III kon niet koppelen','Kon niet doorgaan')) {
-            if ($iiiBlocked) { Set-Status 'Start tijdelijk geblokkeerd' 'unstable · Deel III liep vast en hield de muis vast. Voorbereiden blijft mogelijk.' }
+            if ($iiiBlocked) { Set-Status 'Tour 2 tijdelijk geblokkeerd' 'unstable · Tour 2 liep vast en hield de muis vast. Voorbereiden blijft mogelijk.' }
+            elseif ($iiiReady -and $iiiGuarded) { Set-Status 'Tour 1 klaar voor bewaakte start' 'Deze tour was eerder speelbaar. De nieuwe bewaker is met testprocessen gecontroleerd; een nieuwe speeltest volgt.' }
             elseif ($iiiReady) { Set-Status 'Deel III voorbereid' 'Start zonder cd beschikbaar; de speeltest volgt apart.' }
             elseif (-not $iiiHasMap) { Set-Status 'Gamemap nodig' 'Kies eerst de volledige gamemap van deze tour.' }
             else { Set-Status 'Beeldvariant niet beschikbaar' $ui.IIIProfileNote.Text }
@@ -307,13 +328,58 @@ function Update-GraphicsChoices {
     Update-Summary; Update-Buttons
 }
 
+function Get-CheatPreferences([string]$GameName) {
+    $prefix = if ($GameName -eq 'a2racer1') { 'I' } else { 'II' }
+    if (-not $ui.ContainsKey($prefix+'CheatsEnabled') -or -not $script:catalog -or
+        $script:catalog.PSObject.Properties.Name -notcontains 'cheats') { return $null }
+    $choices = [ordered]@{ enabled = [bool]$ui[($prefix+'CheatsEnabled')].IsChecked }
+    foreach ($entry in $script:catalog.cheats.($GameName).options) {
+        $choices[$entry.id] = [bool]$script:cheatControls[($GameName+'/'+$entry.id)].IsChecked
+    }
+    return [PSCustomObject]$choices
+}
+
+function Test-ActiveCheats($Choices) {
+    if (-not $Choices -or -not $Choices.enabled) { return $false }
+    return @($Choices.PSObject.Properties | Where-Object { $_.Name -ne 'enabled' -and $_.Value -eq $true }).Count -gt 0
+}
+
+function Set-CheatChoices([string]$GameName, $Preferences) {
+    $prefix = if ($GameName -eq 'a2racer1') { 'I' } else { 'II' }
+    if (-not $ui.ContainsKey($prefix+'CheatsPanel') -or
+        $script:catalog.PSObject.Properties.Name -notcontains 'cheats') { return }
+    $entry = $script:catalog.cheats.($GameName)
+    $choices = if ($Preferences.PSObject.Properties.Name -contains 'cheats') { $Preferences.cheats } else { $entry.defaults }
+    $ui[($prefix+'CheatsEnabled')].IsChecked = [bool]$choices.enabled
+    $panel = $ui[($prefix+'CheatsPanel')]; $panel.Children.Clear()
+    foreach ($option in $entry.options) {
+        $control = New-Object Windows.Controls.CheckBox
+        $control.Content = [string]$option.label; $control.ToolTip = [string]$option.description
+        $control.Margin = New-Object Windows.Thickness 0,5,0,4
+        $control.IsChecked = [bool]$choices.($option.id)
+        $control.Add_Click({ Update-Summary; Update-Buttons })
+        $script:cheatControls[$GameName+'/'+$option.id] = $control
+        $null = $panel.Children.Add($control)
+        $description = New-Object Windows.Controls.TextBlock
+        $description.Text = [string]$option.description; $description.TextWrapping = 'Wrap'
+        $description.FontSize = 11; $description.Foreground = '#A6B8CE'
+        $description.Margin = New-Object Windows.Thickness 25,0,0,5
+        $null = $panel.Children.Add($description)
+    }
+}
+
 function Current-Preferences {
     if ($script:game -eq 'a2racer2') {
-        return [PSCustomObject]@{ graphics='native'; dashboard=$null; fps=0; intro=[bool]$ui.IntroChoice.IsChecked; debug=[bool]$ui.DebugChoice.IsChecked;menu_profile=[string]$ui.IIMenuChoice.SelectedItem.Tag;race_display=[string]$ui.IIRaceDisplayChoice.SelectedItem.Tag;
+        $preferences = [PSCustomObject]@{ graphics='native'; dashboard=$null; fps=0; intro=[bool]$ui.IntroChoice.IsChecked; debug=[bool]$ui.DebugChoice.IsChecked;menu_profile=[string]$ui.IIMenuChoice.SelectedItem.Tag;race_display=[string]$ui.IIRaceDisplayChoice.SelectedItem.Tag;
             race_resolution=[string]$ui.IIResolutionChoice.SelectedItem.Tag;race_hud=[string]$ui.IIHudChoice.SelectedItem.Tag;
-            sky_mode=[string]$ui.IISkyChoice.SelectedItem.Tag;race_distance=[string]$ui.IIDistanceChoice.SelectedItem.Tag }
+            sky_mode=[string]$ui.IISkyChoice.SelectedItem.Tag;race_distance=[string]$ui.IIDistanceChoice.SelectedItem.Tag;
+            developer_mode=[bool]($ui.IIDeveloperChoice.IsChecked -and $ui.IIMenuChoice.SelectedItem.Tag -eq 'revival');
+            vector_car=[bool]($ui.IIVectorChoice.IsChecked -and $ui.IIMenuChoice.SelectedItem.Tag -eq 'revival') }
+        $cheats = Get-CheatPreferences 'a2racer2'
+        if ($null -ne $cheats) { $preferences | Add-Member -NotePropertyName cheats -NotePropertyValue $cheats }
+        return $preferences
     }
-    return [PSCustomObject]@{ graphics=[string]$ui.GraphicsChoice.SelectedItem.Tag; dashboard=[bool]$ui.DashboardChoice.IsChecked;
+    $preferences = [PSCustomObject]@{ graphics=[string]$ui.GraphicsChoice.SelectedItem.Tag; dashboard=[bool]$ui.DashboardChoice.IsChecked;
         display_profile=[string]$ui.ResolutionChoice.SelectedItem.Tag;
         camera_profile=[string]$script:catalog.displays.([string]$ui.ResolutionChoice.SelectedItem.Tag).camera_profile;
         render_distance_profile=[string]$ui.DistanceChoice.SelectedItem.Tag;
@@ -322,6 +388,9 @@ function Current-Preferences {
         menu_profile=[string]$ui.MenuChoice.SelectedItem.Tag;
         native_horizon=[int]$ui.HorizonChoice.SelectedItem.Tag; race_focus_recovery=[bool]$ui.FocusRecoveryChoice.IsChecked;
         fps=[int]$ui.FpsChoice.SelectedItem.Tag; intro=[bool]$ui.IntroChoice.IsChecked; debug=[bool]$ui.DebugChoice.IsChecked }
+    $cheats = Get-CheatPreferences 'a2racer1'
+    if ($null -ne $cheats) { $preferences | Add-Member -NotePropertyName cheats -NotePropertyValue $cheats }
+    return $preferences
 }
 
 function Get-ResolutionOverview([string]$Graphics, [string]$DisplayProfile) {
@@ -406,7 +475,7 @@ function Update-Summary {
         $ui.OverviewResolution.Text = if ($wide) { [string]$ui.IIResolutionChoice.SelectedItem.Content } elseif ($preferences.menu_profile -eq 'revival') { '640 × 480 · 4:3' } else { 'Via spelmenu' }
         $ui.OverviewFps.Text = if ($preferences.menu_profile -eq 'revival') { '60 FPS' } else { 'Origineel tempo' }
         $ui.OverviewDistance.Text = if (-not $wide -or $preferences.race_distance -eq 'auto') { 'Origineel' } else { $preferences.race_distance + ' baanstukken' }
-        $ui.OverviewObjects.Text = if (-not $wide -or $preferences.race_hud -eq 'native') { 'Origineel' } elseif ($preferences.race_hud -eq 'hd') { 'HD HUD' } else { 'HD HUD + radar' }
+        $ui.OverviewObjects.Text = if (-not $wide -or $preferences.race_hud -eq 'native') { 'Origineel' } elseif ($preferences.race_hud -eq 'hd') { 'HD HUD' } elseif ($preferences.race_resolution -eq '4k') { 'HD HUD + grotere kaart' } else { 'HD HUD + radar' }
         $iiMenu=$script:catalog.ii_menus.($preferences.menu_profile)
         $ui.PlaySummary.Text=$iiMenu.label
         if($preferences.menu_profile -eq 'revival'){
@@ -415,15 +484,19 @@ function Update-Summary {
             }else{$ui.PlaySummary.Text+=' · 4:3 · 640 × 480 · originele HUD'}
         }
         $ui.PlayNote.Text=if($preferences.menu_profile -eq 'revival'){'Je gekozen beeldopties gelden bij de volgende start. Speler, auto, baan, audio en bediening kies je in het spelmenu.'}else{$iiMenu.description}
+        if($preferences.developer_mode){$ui.PlaySummary.Text+=' · Ontwikkelaarsmodus aan';$ui.PlayNote.Text+=' Tijdens de race: Tab voor het automenu, F12 voor FPS.'}
+        if($preferences.vector_car){$ui.PlaySummary.Text+=' · Vector beschikbaar';$ui.PlayNote.Text+=' Selecteer de bonusauto in de showroom.'}
         $ui.IIMenuNote.Text=$iiMenu.description
         $ui.IIMenuNote.Visibility=if($preferences.menu_profile -eq 'revival'){'Collapsed'}else{'Visible'}
-        if ($wide -and $preferences.race_resolution -eq '4k' -and $preferences.race_hud -eq 'hd' -and $preferences.sky_mode -eq 'flat' -and $preferences.race_distance -eq '60') {
+        if ($wide -and $preferences.race_resolution -eq '4k' -and $preferences.race_hud -eq 'hd-map' -and $preferences.sky_mode -eq 'flat' -and $preferences.race_distance -eq '60') {
             $notes += 'De MAX-combinatie moet nog worden speelgetest.'
         }
-        if ($wide -and $preferences.race_hud -eq 'hd-map') { $notes += 'Uitgebreide radar en meldingen: untested.' }
-        if(-not $iiMenu.available){$notes+=$iiMenu.reason}
-        if ($preferences.menu_profile -eq 'revival' -and $preferences.race_display -eq 'widescreen' -and -not (Get-IIChoiceSupport $preferences.race_resolution $preferences.race_hud).available) {
-            $notes+='Deze HUD-variant is hier nog niet voorbereid. Kies Originele HUD of bereid de game eerst voor.'
+        if ($iiMenu.available -and $wide -and $preferences.race_hud -eq 'hd-map') {
+            $notes += if ($preferences.race_resolution -eq '4k') { 'Grotere 4K-kaart bevestigd; uitgebreide meldingen blijven untested.' } else { 'Uitgebreide radar en meldingen op 1080p: untested.' }
+        }
+        if(-not $iiMenu.available){$notes+='Klik op Game voorbereiden om de lokale speelkopie bij te werken.'}
+        if ($iiMenu.available -and $preferences.menu_profile -eq 'revival' -and $preferences.race_display -eq 'widescreen' -and -not (Get-IIChoiceSupport $preferences.race_resolution $preferences.race_hud).available) {
+            $notes+='Deze HUD-keuze is niet beschikbaar: ' + (Get-IIChoiceSupport $preferences.race_resolution $preferences.race_hud).reason
         }
         $ui.GraphicsNote.Text = 'Beeldopties wijzig je in het originele deel-II-menu.'
         $ui.ResolutionNote.Text = 'Deel II gebruikt zijn eigen oorspronkelijke instellingen.'
@@ -433,6 +506,24 @@ function Update-Summary {
         $ui.ObjectDistanceNote.Text = 'Objectafstand voor deel II is nog niet onderzocht.'
         $ui.TextureNote.Text = 'HD-wegtextures zijn voorlopig uitsluitend beschikbaar voor deel I.'
         $ui.FocusRecoveryNote.Text = 'Alt+Tab-herstel voor deel II is in deze launcher nog niet beschikbaar.'
+    }
+    $cheats = Get-CheatPreferences $script:game
+    if ($null -ne $cheats) {
+        $prefix = if ($script:game -eq 'a2racer1') { 'I' } else { 'II' }
+        $spec = $script:catalog.cheats.($script:game)
+        $ui[($prefix+'CheatsNote')].Text = $spec.isolation_note
+        if ($cheats.enabled) {
+            if (Test-ActiveCheats $cheats) {
+                $ui.PlaySummary.Text += ' · Cheatsessie'
+                $ui.PlayNote.Text += ' Gewone voortgang wordt niet bijgewerkt.'
+                if ($preferences.menu_profile -ne $spec.requires_menu) {
+                    $reason = if ($script:game -eq 'a2racer1') { 'Kies HD menu · fullscreen om cheats te gebruiken.' } else { 'Kies het Revival-menu om cheats te gebruiken.' }
+                    $ui[($prefix+'CheatsNote')].Text += ' '+$reason
+                    $notes += $reason
+                }
+            } else { $ui[($prefix+'CheatsNote')].Text += ' Kies hieronder minstens één cheat.' }
+        }
+        $ui[($prefix+'CheatsNote')].Text += ' De nieuwe cheatopties moeten nog in de race worden getest.'
     }
     $ui.SelectionNote.Text = $notes -join ' '
     $ui.SelectionNote.Visibility = if ($notes.Count) { 'Visible' } else { 'Collapsed' }
@@ -500,7 +591,7 @@ function Select-Game([string]$GameName) {
         Select-Choice $ui.IIRaceDisplayChoice $preferences.race_display
         $iiChoices=@{
             IIResolutionChoice=@(@('1280 × 720 · 16:9','720p'),@('1920 × 1080 · 16:9','1080p'),@('3840 × 2160 · 16:9','4k'));
-            IIHudChoice=@(@('Originele HUD','native'),@('HD HUD · tekst en kaders','hd'),@('HD HUD + radar en meldingen · untested','hd-map'));
+            IIHudChoice=@(@('Originele HUD','native'),@('HD HUD · tekst en kaders','hd'),@('HD HUD + grotere kaart en meldingen · untested','hd-map'));
             IISkyChoice=@(@('Originele horizon en lucht','original'),@('Horizon uit · wolken behouden','horizon-off'),@('Egale lucht · aanbevolen','flat'));
             IIDistanceChoice=@(@('Origineel · automatische afstand','auto'),@('Ver vooruit · 50 baanstukken','50'),@('Maximaal · 60 baanstukken · aanbevolen','60'))}
         foreach($name in $iiChoices.Keys){$ui[$name].Items.Clear();foreach($choice in $iiChoices[$name]){Add-Choice $ui[$name] $choice[0] $choice[1]}}
@@ -508,6 +599,8 @@ function Select-Game([string]$GameName) {
         Select-Choice $ui.IIHudChoice $preferences.race_hud
         Select-Choice $ui.IISkyChoice $preferences.sky_mode
         Select-Choice $ui.IIDistanceChoice $preferences.race_distance
+        $ui.IIDeveloperChoice.IsChecked=$preferences.developer_mode
+        $ui.IIVectorChoice.IsChecked=$preferences.vector_car
     }
     Select-Choice $ui.FpsChoice ([string]$preferences.fps)
     $ui.DashboardChoice.IsChecked = [bool]$preferences.dashboard; $ui.IntroChoice.IsChecked = $preferences.intro; $ui.DebugChoice.IsChecked = $preferences.debug
@@ -545,6 +638,7 @@ function Select-Game([string]$GameName) {
         $ui.InstallationNote.Text=if($sourceReady){'Gamebestanden gevonden. Maak nu een lokale speelkopie; je bron blijft intact.'}else{'Kies de volledige Nederlandse gamemap met DATA, of je eigen ZIP-bestand. Je bron blijft intact.'}
     }
     Set-GameLibraryInfo $GameName $sourceReady
+    Set-CheatChoices $GameName $preferences
     $script:initialized = $true; $script:binding = $false
     Update-Summary; Update-Buttons
     if (-not $script:worker) {
@@ -593,7 +687,9 @@ function Preference-Arguments([string]$Action) {
             '--native-horizon', [string]$preferences.native_horizon, '--race-focus-recovery', [string][int]$preferences.race_focus_recovery)
     }
     else{$arguments+=@('--menu-profile',$preferences.menu_profile,'--race-display',$preferences.race_display,
-        '--race-resolution',$preferences.race_resolution,'--race-hud',$preferences.race_hud,'--sky-mode',$preferences.sky_mode,'--race-distance',$preferences.race_distance)}
+        '--race-resolution',$preferences.race_resolution,'--race-hud',$preferences.race_hud,'--sky-mode',$preferences.sky_mode,'--race-distance',$preferences.race_distance,
+        '--developer-mode',[string][int]$preferences.developer_mode,'--vector-car',[string][int]$preferences.vector_car)}
+    if ($preferences.PSObject.Properties.Name -contains 'cheats') { $arguments += @('--cheats', ($preferences.cheats | ConvertTo-Json -Compress)) }
     return $arguments
 }
 
@@ -677,7 +773,7 @@ function Start-IIIGame {
     if ($script:operation -or ($script:worker -and -not $script:worker.process.HasExited)) { return }
     try {
         if (-not (Load-Runtimes)) { throw 'Python-runtime ontbreekt.' }
-        foreach ($relative in @('local/experiments','local/ii-parallel','local/iii-play','local/iii-trials')) {
+        foreach ($relative in @('local/experiments','local/ii-parallel','local/iii-play','local/iii-trials','local/iii-mouse','local/iii-research')) {
             if (@(Get-LauncherProcesses (Join-Path $workspacePath $relative)).Count) {
                 throw 'Sluit de eerdere game eerst normaal af voordat je deel III start.'
             }
@@ -966,7 +1062,7 @@ try {
     try { $window = [Windows.Markup.XamlReader]::Load($reader) } finally { $reader.Close() }
     $ui = @{}
     foreach ($name in @('CoverBackdrop','CoverPreview','LauncherBadge','WelcomeTitle','WelcomeHint','GameOne','GameTwo','GameThree','GameOneAvailability','GameTwoAvailability','IIITourChoice','IIIStatus','IIIStartScroll','IIIOverviewPanel','IIITourOverview','IIIReadyOverview','IIIResolutionOverview','IIIProfileChoice','IIIProfileNote','IIIChooseInstallation','GameOneSelected','GameTwoSelected','GameTitle','GameSubtitle','OptionsGameTitle',
-            'IOptionsPanel','IIOptionsNotice','IOverviewPanel','IIOverviewPanel','IIMenuChoice','IIRaceDisplayChoice','IIResolutionChoice','IIHudChoice','IIHudNote','IISkyChoice','IIDistanceChoice','IIMenuNote','Pages','PlaySummary','PlayNote','ImportGame','GraphicsChoice',
+            'IOptionsPanel','IIOptionsNotice','IOverviewPanel','IIOverviewPanel','IIMenuChoice','IIRaceDisplayChoice','IIResolutionChoice','IIHudChoice','IIHudNote','IIDeveloperChoice','IIVectorChoice','ICheatsPanel','IICheatsPanel','ICheatsEnabled','IICheatsEnabled','ICheatsNote','IICheatsNote','IISkyChoice','IIDistanceChoice','IIMenuNote','Pages','PlaySummary','PlayNote','ImportGame','GraphicsChoice',
             'GraphicsNote','ResolutionChoice','ResolutionNote','CameraNote','DistanceChoice','DistanceNote','ObjectDistanceChoice','ObjectDistanceNote','TextureChoice','TextureNote','MenuChoice','MenuNote',
             'HorizonChoice','FocusRecoveryChoice','FocusRecoveryNote','ChooseOptions','RecommendedOptions','OverviewResolution','OverviewFps','OverviewDistance','OverviewObjects','OverviewDetailLabel','SelectionNote','AdvancedOptions','StartScroll','SupportScroll','OptionsScroll','DashboardChoice','FpsChoice','FpsNote','IntroChoice','DebugChoice',
             'OriginalProfile','MaxProfile','SaveOptions','ResetOptions','OpenLogs','OpenDevtools','RefreshState','LogText','StatusTitle','StatusMessage','SupportDetails','PlayButton','LauncherVersion','CheckUpdates',
@@ -1080,8 +1176,11 @@ try {
     foreach ($name in @('ResolutionChoice','FpsChoice','DistanceChoice','ObjectDistanceChoice','TextureChoice','MenuChoice','IIMenuChoice','IIRaceDisplayChoice','HorizonChoice')) {
         $ui[$name].Add_SelectionChanged({ Update-Summary; if ($script:initialized -and -not $script:binding) { Update-Buttons } })
     }
-    foreach ($name in @('DashboardChoice','FocusRecoveryChoice','IntroChoice','DebugChoice')) {
+    foreach ($name in @('DashboardChoice','FocusRecoveryChoice','IntroChoice','DebugChoice','IIDeveloperChoice','IIVectorChoice')) {
         $ui[$name].Add_Click({ Update-Summary; if ($script:initialized -and -not $script:binding) { Update-Buttons } })
+    }
+    foreach ($name in @('ICheatsEnabled','IICheatsEnabled')) {
+        $ui[$name].Add_Click({ Update-Summary; Update-Buttons })
     }
     $ui.SaveOptions.Add_Click({ Start-Model 'save' (Preference-Arguments 'save') })
     $ui.ResetOptions.Add_Click({ Reset-Preferences })
