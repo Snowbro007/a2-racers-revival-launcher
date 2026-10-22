@@ -1,12 +1,14 @@
 # Hulp bij starten
 
-Download de releasebijlage via [README](../README.md), pak de ZIP helemaal uit en open `Launcher.cmd`. **Code → Download ZIP** bevat de broncode. De draagbare beta 9 is niet digitaal ondertekend.
+Download de releasebijlage via [README](../README.md), pak de ZIP helemaal uit en open `Launcher.cmd`. **Code → Download ZIP** bevat de broncode. De draagbare beta 10 is niet digitaal ondertekend.
 
 ## De eerste voorbereiding duurt lang
 
-Beta 9 haalt bij de eerste start circa 11,4 MB aan launcherbasis op. Overige hulponderdelen volgen pas wanneer je een game toevoegt of voorbereidt. De melding over controleren kan daarbij zichtbaar blijven. Er worden geen games gedownload. Na volledige voorbereiding kun je offline spelen.
+De eerste start haalt circa 11,4 MB aan launcherbasis op. Overige hulponderdelen volgen pas wanneer je een game toevoegt of voorbereidt. Bij deel II wordt de grote introspeler van 109,5 MiB overgeslagen. Die is alleen nodig voor deel I met ingeschakelde intro. De muziek van deel II komt uit je eigen gamebestanden. Er worden geen games gedownload. Na volledige voorbereiding kun je offline spelen.
 
-Controleer bij een fout je verbinding en de melding onder **Support**. Een onderdeel met een verkeerde grootte of SHA-256 wordt geweigerd. Wis hiervoor geen voortgang of geïmporteerde games.
+Bij een onderbroken download kun je opnieuw proberen. Gedeeltelijk ontvangen bestanden kunnen verdergaan als de server dat ondersteunt; eerder opgehaalde onderdelen blijven bewaard. De launcher controleert de volledige download vóór gebruik.
+
+Controleer bij een fout je verbinding en de melding onder **Support**. Beta 10 toont ook de foutdetails wanneer een eerdere versie alleen “Kon niet doorgaan” meldde. Een onderdeel met een verkeerde grootte of SHA-256 wordt geweigerd. Wis hiervoor geen voortgang of geïmporteerde games.
 
 ## Welke gamebestanden moet ik kiezen?
 

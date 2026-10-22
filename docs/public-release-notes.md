@@ -1,12 +1,17 @@
-# A2 Racers Revival — 0.1.0-beta.9
+# A2 Racers Revival — 0.1.0-beta.10
 
-Deze beta verhelpt de te strikte ZIP-herkenning bij **A2 Racer II**. Eerder accepteerde de launcher slechts één exact verpakte ZIP. Nu wordt ook een anders verpakte ZIP herkend als het BIN/CUE- of ISO-image zelf exact overeenkomt met de ondersteunde Nederlandse v1.01-versie.
+Beta 10 maakt het toevoegen en voorbereiden van je eigen **A2 Racer II** duidelijker en voorkomt een grote onnodige download.
 
-Kies de volledige **A2-Racer-II_Win_NL.zip** via **Gamearchief kiezen**. Je hoeft BIN/CUE niet zelf uit te pakken, te mounten of via de oude installer te installeren. Andere versies, gewijzigde of onvolledige images worden geweigerd. Een ZIP met een NRG-image krijgt een duidelijke melding dat dat formaat nog niet ondersteund wordt.
+- **Kies je eigen gamebestanden:** de volledige Nederlandse gamemap met `DATA`, of je eigen volledige `A2-Racer-II_Win_NL.zip`. De ondersteunde v1.01-cd wordt aan zijn inhoud herkend, ook als de ZIP anders verpakt is. BIN/CUE hoef je niet zelf uit te pakken, te mounten of te installeren. NRG en andere versies zijn niet ondersteund.
+- **Minder downloaden:** toevoegen en voorbereiden van games en starten van deel II halen de introspeler van 109,5 MiB niet meer op. Die is alleen nodig als je deel I met intro start. De menumuziek van deel II komt uit je eigen gamebestanden.
+- **Verder na een onderbreking:** gedeeltelijke downloads kunnen bij een nieuwe poging hervatten wanneer de server dit ondersteunt. De volledige download wordt vóór gebruik gecontroleerd. Reeds opgehaalde onderdelen blijven bewaard.
+- **Duidelijke foutdetails:** download- en voorbereidingsfouten tonen hun oorzaak en zijn terug te vinden via **Support**, ook wanneer de eerdere melding alleen “Kon niet doorgaan” was.
 
-De statuslabels uit de nieuwste broncode zitten er ook in: **untested** voor onbevestigde opties en **unstable** bij bekende crash- of hangproblemen. Deel III blijft geblokkeerd. De import- en speelroute van deel I is behouden.
+Pak de launcher-ZIP helemaal uit en open **Launcher.cmd**. Kies deel I of II, voeg je eigen ondersteunde game toe en kies **Aanbevolen → Spelen**. De launcher bevat en downloadt geen games. Python hoef je niet zelf te installeren; benodigde hulponderdelen worden bij hun leveranciers opgehaald.
 
-Pak de launcher-ZIP helemaal uit en open **Launcher.cmd**. Je eigen volledige ondersteunde Nederlandse gamebestanden zijn nodig; games worden niet meegeleverd of gedownload. Bewaar bij een portable update je map `local/` met instellingen en voortgang en je eigen gamebronnen. Na een mislukte poging hoef je je bronarchief niet te hernoemen of aan te passen.
+Bewaar bij een portable update je map `local/` met instellingen en voortgang en je eigen gamebronnen. Je oorspronkelijke map of ZIP blijft behouden.
+
+**untested** betekent nog niet tijdens spelen bevestigd; **unstable** betekent een bekend crash- of hangprobleem. Niet-beschikbare beeldopties blijven uitgeschakeld. Deel III blijft geblokkeerd. Deze beta voegt geen nieuwe deel-II-HD-texturetestset toe; de bestaande speelopties blijven beschikbaar.
 
 Dit is een niet-ondertekende, draagbare testbeta. Er is geen nieuwe MSI-installer, antivirusbeoordeling of automatische update vrijgegeven. Eerdere antivirusmeldingen blijven open; zet je beveiliging niet uit bij een blokkade. De installer- en updater-vrijgavevoorwaarden blijven gelden.
 
