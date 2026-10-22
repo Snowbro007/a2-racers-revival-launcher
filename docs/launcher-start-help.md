@@ -1,10 +1,10 @@
 # Hulp bij starten
 
-Download de releasebijlage via [README](../README.md), pak de ZIP helemaal uit en open `Launcher.cmd`. **Code → Download ZIP** bevat de broncode. De openbare beta 4 is niet digitaal ondertekend.
+Download de releasebijlage via [README](../README.md), pak de ZIP helemaal uit en open `Launcher.cmd`. **Code → Download ZIP** bevat de broncode. De draagbare beta 8 is niet digitaal ondertekend.
 
 ## De eerste voorbereiding duurt lang
 
-Beta 4 haalt bij de eerste start circa 244 MB aan hulponderdelen op, ook zonder toegevoegde game. De melding over controleren kan daarbij zichtbaar blijven. Deze stap bereidt de launcher voor; er worden geen games gedownload. Na volledige voorbereiding kun je offline spelen.
+Beta 8 haalt bij de eerste start circa 11,4 MB aan launcherbasis op. Overige hulponderdelen volgen pas wanneer je een game toevoegt of voorbereidt. De melding over controleren kan daarbij zichtbaar blijven. Er worden geen games gedownload. Na volledige voorbereiding kun je offline spelen.
 
 Controleer bij een fout je verbinding en de melding onder **Support**. Een onderdeel met een verkeerde grootte of SHA-256 wordt geweigerd. Wis hiervoor geen voortgang of geïmporteerde games.
 
@@ -12,7 +12,7 @@ Controleer bij een fout je verbinding en de melding onder **Support**. Een onder
 
 Spelen vereist je eigen volledige ondersteunde Nederlandse gamemap of ZIP. Je bron mag op zijn bestaande plek blijven. Kies de volledige map of het ondersteunde archief in de launcher. Voor deel II hoort `DATA` bij die map; een losse EXE is onvoldoende.
 
-Je kunt je eigen bronnen desgewenst bewaren onder `Gamebestanden/A2 Racer I/` en `Gamebestanden/A2 Racer II/`. Selecteer ze daarna nog in de launcher; neerzetten importeert niets automatisch. Zet geen gamebestanden in `tools`, `assets` of `payload`.
+Met **Gamebestandenmap openen** maak je desgewenst een plek voor je eigen bronnen onder `Gamebestanden/A2 Racer I/` en `Gamebestanden/A2 Racer II/`. Selecteer ze daarna nog in de launcher; neerzetten importeert niets automatisch. Zet geen gamebestanden in `tools`, `assets` of `payload`.
 
 De launcher maakt eigen kopieën en behoudt je bron. Laat hem `local/` beheren en bewaar die map met instellingen en voortgang bij een portable update.
 
@@ -26,4 +26,10 @@ Een Windows-melding over een onbekende uitgever of weinig gedownload bestand is 
 
 Gebruik [GitHub Issues](https://github.com/Snowbro007/a2-racers-revival-launcher/issues) of [HeySnowdude@pm.me](mailto:HeySnowdude@pm.me). Vermeld versie, Windows-versie, betrokken game en relevante fouttekst. Verwijder je gebruikersnaam en persoonlijke paden uit screenshots. Deel geen gamebestanden of volledige logs met privégegevens.
 
-**Start deel III niet in beta 4:** het kan vastlopen en de muis vasthouden.
+## Een menu- of beeldkeuze is grijs
+
+Bij deel II toont een grijze HUD/MAX-keuze welke lokale bronnen ontbreken. De openbare voorbereiding bouwt de originele HUD op voor 720p, 1080p en 4K; aanvullende lokale HD HUD-bronnen worden niet meegeleverd.
+
+Voor **Origineel menu · gerestaureerd** gebruik je eerst **Game voorbereiden**. Deze keuze behoudt het oorspronkelijke artwork en de handcursor in een klassiek venster. Raceovergang en Alt+Tab zijn nog te testen. Voortgang blijft in de eigen oorspronkelijke-menukopie, apart van het Revival-menu. Het Revival-menu blijft aanbevolen.
+
+**Deel III blijft geblokkeerd:** het kan vastlopen en de muis vasthouden.
