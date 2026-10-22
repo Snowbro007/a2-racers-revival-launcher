@@ -32,6 +32,12 @@ Dit script controleert de verklaring en samenhang van hashes en bewijs. Het onde
 
 Publiceer pas na expliciete vrijgave van de beheerder dezelfde gecontroleerde conceptrelease met MSI, `.sha256`, `build-review.json` en `release-review.json`. Controleer de hashes nogmaals. Werk daarna de README-downloadlink bij. De updater slaat concepten en releases zonder geldige vrijgave over en controleert die vrijgave opnieuw vóór installatie.
 
+## Draagbare ZIP-testbeta
+
+**Publish game-free portable beta** publiceert na een expliciete opdracht de bestaande draagbare ZIP-route: launcherbron met `Launcher.cmd` en SHA-256, zonder games, EXE, MSI of andere meegeleverde runtimes. De workflow controleert versie, synthetische tests, documenten en de daadwerkelijke ZIP-inhoud. Bestaande tags en downloads worden niet vervangen.
+
+Deze ZIP is een niet-ondertekende testbeta. Vermeld ontbrekende antivirus- en runtimebeoordeling in de releasetekst. De bovenstaande MSI-vrijgavevoorwaarden blijven gelden; de updater accepteert deze ZIP niet als goedgekeurde installerupdate. Gebruik voor een volgende installer een nieuwe, hogere versie. Werk de README-downloadlink pas bij nadat de ZIP-release geslaagd is.
+
 ## Versie-identiteit
 
 De numerieke MSI-versie is `major.minor.(patch × 1000 + beta)`: `0.1.0-beta.7` wordt `0.1.7`. Beta is 1–999, patch 0–64, major/minor maximaal 255. Het stabiele versieslot is `patch × 1000 + 1000`; de workflow bouwt alleen beta's.

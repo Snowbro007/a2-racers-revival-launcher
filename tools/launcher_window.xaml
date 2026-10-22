@@ -30,6 +30,7 @@
       <GradientStop Color="#083677" Offset="1"/>
     </LinearGradientBrush>
     <Style TargetType="Button">
+      <Setter Property="ToolTipService.ShowOnDisabled" Value="True"/>
       <Setter Property="Foreground" Value="#ECF2FA"/><Setter Property="Background" Value="#152A49"/>
       <Setter Property="BorderBrush" Value="#3E597B"/><Setter Property="BorderThickness" Value="1"/>
       <Setter Property="Padding" Value="16,10"/><Setter Property="Cursor" Value="Hand"/>
@@ -85,11 +86,13 @@
       </ControlTemplate></Setter.Value></Setter>
     </Style>
     <Style TargetType="ComboBoxItem"><Setter Property="Foreground" Value="#ECF2FA"/><Setter Property="Padding" Value="12,10"/>
+      <Setter Property="ToolTipService.ShowOnDisabled" Value="True"/>
       <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ComboBoxItem">
         <Border x:Name="ItemSurface" Padding="{TemplateBinding Padding}" Background="#132744"><ContentPresenter/></Border>
         <ControlTemplate.Triggers>
           <Trigger Property="IsHighlighted" Value="True"><Setter TargetName="ItemSurface" Property="Background" Value="#1E5187"/></Trigger>
           <Trigger Property="IsSelected" Value="True"><Setter Property="Foreground" Value="#FFE057"/></Trigger>
+          <Trigger Property="IsEnabled" Value="False"><Setter Property="Foreground" Value="#78879B"/><Setter Property="Opacity" Value="0.48"/></Trigger>
         </ControlTemplate.Triggers>
       </ControlTemplate></Setter.Value></Setter>
     </Style>
@@ -353,7 +356,7 @@
                       <TextBlock Text="Gameplay" Style="{StaticResource SettingsHeading}"/>
                       <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="18"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                         <StackPanel><TextBlock Text="FPS / speltempo" Style="{StaticResource OptionLabel}"/><TextBlock Text="60 FPS · Revival" FontSize="18" Margin="0,8,0,0"/><TextBlock Text="De race gebruikt zijn eigen speltempo." Style="{StaticResource OptionNote}"/></StackPanel>
-                        <StackPanel Grid.Column="2"><TextBlock Text="HUD" Style="{StaticResource OptionLabel}"/><ComboBox x:Name="IIHudChoice" AutomationProperties.Name="A2 Racer II HUD"/><TextBlock Text="HD HUD vereist 1080p of 4K. Radar en meldingen blijven een proef." Style="{StaticResource OptionNote}"/></StackPanel>
+                        <StackPanel Grid.Column="2"><TextBlock Text="HUD" Style="{StaticResource OptionLabel}"/><ComboBox x:Name="IIHudChoice" AutomationProperties.Name="A2 Racer II HUD"/><TextBlock x:Name="IIHudNote" Text="HD HUD vereist 1080p of 4K. Radar en meldingen blijven een proef." Style="{StaticResource OptionNote}"/></StackPanel>
                       </Grid>
                     </StackPanel></Border>
                     <Border Style="{StaticResource SettingsCard}"><StackPanel>
