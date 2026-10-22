@@ -201,8 +201,8 @@ class BackendTests(unittest.TestCase):
             self.assertEqual((self.base / 'game' / name).read_bytes(), b'preserve')
 
     def test_wpf_buttons_name_field_and_hidden_lifetime_without_game(self):
-        shell = shutil.which('pwsh')
-        if not shell:self.skipTest('WPF runtime unavailable')
+        shell = Path(r'C:\Users\Robin W\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.exe')
+        if not shell.is_file():self.skipTest('WPF runtime unavailable')
         self.cfg.update(python=sys.executable, files=[], synthetic_fixture=True,
                         profile_scope='trial', state_path=str(self.base / 'players.json'))
         assets = self.base / 'assets';assets.mkdir()

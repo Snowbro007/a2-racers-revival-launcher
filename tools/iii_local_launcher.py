@@ -17,6 +17,7 @@ from tools.local_game_data import launch_environment
 from tools.trial_manifest import validate_ancestors, validate_tree
 from tools.iii_source_catalog import CATALOG
 from tools import iii_start_safety
+from tools import iii_guarded_start
 
 PINS = {1: '506df78dffc4712f30a14975b9252827ba6a76c9403819816ad4bc87453eeda7',
         2: '2a9170a6efce4fcf27dc3683643183967023c8352a5e4922dd82dca8fd52f23c'}
@@ -113,14 +114,9 @@ def check_folder(root: Path, tour: int, target: Path) -> dict:
 
 
 def start(root: Path, tour: int) -> int:
-    iii_start_safety.assert_start_allowed()
+    iii_start_safety.assert_start_allowed(tour, 'original')
     target = prepare(root, tour)
-    environment = {**os.environ, **launch_environment(target)}
-    # The original parent owns menu/race transitions, including Menu.ini's
-    # ExitCode 40. We do not transplant II offsets or reinterpret race state.
-    child = subprocess.Popen([str(target / f'A2 Racer III Tour {tour}.exe')],
-                             cwd=target, env=environment)
-    return child.wait()
+    return iii_guarded_start.run(root, tour, 'original', target)
 
 
 def main() -> int:

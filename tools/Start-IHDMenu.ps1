@@ -7,7 +7,8 @@ param([Parameter(Mandatory)][string]$RunName,[Parameter(Mandatory)][string]$Pyth
       [string]$TextureProfile='original',[string]$HudProfile='original',
       [string]$ObjectDistanceProfile='original',[string]$NativeGraphics='accelerated-640',
       [int]$NativeDashboard=1,[int]$NativeHorizon=0,[switch]$RaceFocusRecovery,
-      [switch]$EnableGameDebug,[switch]$IsolatedState,[switch]$StopAtEnd,[int]$DurationSeconds=20)
+      [switch]$EnableGameDebug,[switch]$IsolatedState,[switch]$StopAtEnd,[int]$DurationSeconds=20,
+      [string]$CheatsJson)
 Set-StrictMode -Version Latest
 $ErrorActionPreference='Stop'
 $choices=@{race_fps_limit=$RaceFPSLimit;display_profile=$DisplayProfile;camera_profile=$CameraProfile;
@@ -19,6 +20,7 @@ try{
     $prepArgs=@((Join-Path $PSScriptRoot 'i_frontend_prepare.py'),'--run-name',$RunName,'--python-path',$PythonPath,'--choices',($choices|ConvertTo-Json -Compress))
     if($EnableGameDebug){$prepArgs+='--debug'}
     if($IsolatedState){$prepArgs+='--isolated-state'}
+    if($CheatsJson){$prepArgs+=@('--cheats',$CheatsJson)}
     $output=& $PythonPath @prepArgs
     if($LASTEXITCODE -ne 0){throw 'HD-menuvoorbereiding is mislukt.'};$prepared=$output|ConvertFrom-Json
     if($CheckOnly){& $prepared.script -CheckOnly;return}

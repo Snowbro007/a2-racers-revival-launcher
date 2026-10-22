@@ -148,6 +148,16 @@
       <Setter Property="BorderThickness" Value="1"/><Setter Property="CornerRadius" Value="8"/>
       <Setter Property="Padding" Value="18,15"/><Setter Property="Margin" Value="0,0,0,12"/>
     </Style>
+    <Style x:Key="CategoryHeading" TargetType="Label">
+      <Setter Property="Foreground" Value="#F4F7FD"/><Setter Property="FontSize" Value="17"/>
+      <Setter Property="FontWeight" Value="SemiBold"/><Setter Property="Padding" Value="11,0,0,1"/>
+      <Setter Property="Margin" Value="0,0,0,15"/>
+      <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Label">
+        <Border BorderBrush="#FFE057" BorderThickness="3,0,0,0" Padding="{TemplateBinding Padding}">
+          <ContentPresenter RecognizesAccessKey="True"/>
+        </Border>
+      </ControlTemplate></Setter.Value></Setter>
+    </Style>
     <Style x:Key="SettingsHeading" TargetType="TextBlock">
       <Setter Property="FontSize" Value="18"/><Setter Property="FontWeight" Value="SemiBold"/>
       <Setter Property="Foreground" Value="#F4F7FD"/><Setter Property="Margin" Value="0,0,0,12"/>
@@ -345,22 +355,19 @@
                   </DockPanel>
                   <StackPanel x:Name="IIOptionsNotice" Visibility="Collapsed">
                     <Border Style="{StaticResource SettingsCard}"><StackPanel>
-                      <TextBlock Text="Beeld" Style="{StaticResource SettingsHeading}"/>
+                      <Label Content="Beeld" Style="{StaticResource CategoryHeading}"/>
                       <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="18"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                         <StackPanel><TextBlock Text="Resolutie" Style="{StaticResource OptionLabel}"/><ComboBox x:Name="IIResolutionChoice" AutomationProperties.Name="A2 Racer II resolutie"/></StackPanel>
                         <StackPanel Grid.Column="2"><TextBlock Text="Beeldverhouding" Style="{StaticResource OptionLabel}"/><ComboBox x:Name="IIRaceDisplayChoice" AutomationProperties.Name="A2 Racer II raceweergave"/></StackPanel>
                       </Grid>
                       <TextBlock Text="Full HD (1920 × 1080) is aanbevolen voor breedbeeld. Klassiek speelt in 640 × 480 met de originele HUD en wereldinstellingen." Style="{StaticResource OptionNote}"/>
-                    </StackPanel></Border>
-                    <Border Style="{StaticResource SettingsCard}"><StackPanel>
-                      <TextBlock Text="Gameplay" Style="{StaticResource SettingsHeading}"/>
-                      <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="18"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                        <StackPanel><TextBlock Text="FPS / speltempo" Style="{StaticResource OptionLabel}"/><TextBlock Text="60 FPS · Revival" FontSize="18" Margin="0,8,0,0"/><TextBlock Text="De race gebruikt zijn eigen speltempo." Style="{StaticResource OptionNote}"/></StackPanel>
-                        <StackPanel Grid.Column="2"><TextBlock Text="HUD" Style="{StaticResource OptionLabel}"/><ComboBox x:Name="IIHudChoice" AutomationProperties.Name="A2 Racer II HUD"/><TextBlock x:Name="IIHudNote" Text="HD HUD vereist 1080p of 4K. Radar en meldingen: untested." Style="{StaticResource OptionNote}"/></StackPanel>
+                      <Grid Margin="0,16,0,0"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="18"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                        <StackPanel><TextBlock Text="HUD / meters" Style="{StaticResource OptionLabel}"/><ComboBox x:Name="IIHudChoice" AutomationProperties.Name="A2 Racer II HUD"/></StackPanel>
+                        <TextBlock x:Name="IIHudNote" Grid.Column="2" Text="Grotere kaart beschikbaar op 4K; uitgebreide meldingen blijven untested." Style="{StaticResource OptionNote}" VerticalAlignment="Center"/>
                       </Grid>
                     </StackPanel></Border>
                     <Border Style="{StaticResource SettingsCard}"><StackPanel>
-                      <TextBlock Text="Wereld &amp; textures" Style="{StaticResource SettingsHeading}"/>
+                      <Label Content="Wereld" Style="{StaticResource CategoryHeading}"/>
                       <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="18"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                         <StackPanel><TextBlock Text="Wegzicht / render distance" Style="{StaticResource OptionLabel}"/><ComboBox x:Name="IIDistanceChoice" AutomationProperties.Name="A2 Racer II wegzicht"/></StackPanel>
                         <StackPanel Grid.Column="2"><TextBlock Text="Horizon &amp; lucht" Style="{StaticResource OptionLabel}"/><ComboBox x:Name="IISkyChoice" AutomationProperties.Name="A2 Racer II horizon en lucht"/></StackPanel>
@@ -368,15 +375,41 @@
                       <TextBlock Text="Meer baanstukken houdt meer weg geladen; de echte zichtafstand neemt niet automatisch toe. Nieuwe combinaties moeten nog worden speelgetest." Style="{StaticResource OptionNote}"/>
                     </StackPanel></Border>
                     <Border Style="{StaticResource SettingsCard}"><StackPanel>
-                      <TextBlock Text="Spelmenu" Style="{StaticResource SettingsHeading}"/>
+                      <Label Content="Uiterlijk" Style="{StaticResource CategoryHeading}"/>
+                      <TextBlock Text="Spelmenu" Style="{StaticResource OptionLabel}"/>
                       <ComboBox x:Name="IIMenuChoice" AutomationProperties.Name="A2 Racer II spelmenu"/>
                       <TextBlock x:Name="IIMenuNote" Style="{StaticResource OptionNote}" Visibility="Collapsed"/>
                       <TextBlock Text="Speler, auto, baan, bediening en audio kies je in het spelmenu." Style="{StaticResource OptionNote}"/>
                     </StackPanel></Border>
+                    <Border Style="{StaticResource SettingsCard}"><StackPanel>
+                      <Label Content="Gameplay" Style="{StaticResource CategoryHeading}"/>
+                      <TextBlock Text="FPS / speltempo" Style="{StaticResource OptionLabel}"/>
+                      <TextBlock Text="60 FPS · Revival" FontSize="18"/>
+                      <TextBlock Text="De race gebruikt zijn eigen speltempo." Style="{StaticResource OptionNote}"/>
+                    </StackPanel></Border>
+                    <Border Style="{StaticResource SettingsCard}"><StackPanel>
+                      <Label Content="Bonusauto" Style="{StaticResource CategoryHeading}"/>
+                      <CheckBox x:Name="IIVectorChoice" Content="Vector beschikbaar maken · untested" AutomationProperties.Name="A2 Racer II optionele Vector" Margin="0,0,0,0"/>
+                      <TextBlock Text="Het basismodel is teruggevonden in de originele spelbestanden. Voor Revival opgefrist met eigen textures en wielen; de sportauto-afstelling (240 km/u) is door ons toegewezen." Style="{StaticResource OptionNote}" ToolTip="Basis: R_VECTOR.d3d uit A2 Racer II. Er zijn geen oorspronkelijke Vector-specificaties teruggevonden."/>
+                      <TextBlock Text="Kies de Vector daarna in de showroom van het Revival-menu. Je gewone auto en onderdelen blijven bewaard." Style="{StaticResource OptionNote}"/>
+                    </StackPanel></Border>
+                    <Border Style="{StaticResource SettingsCard}" BorderBrush="#5A5032"><StackPanel>
+                      <Label Content="Cheats · optioneel" Style="{StaticResource CategoryHeading}"/>
+                      <CheckBox x:Name="IICheatsEnabled" Content="Cheats gebruiken · untested" IsChecked="False" AutomationProperties.Name="A2 Racer II cheats gebruiken" Margin="0,0,0,0"/>
+                      <TextBlock x:Name="IICheatsNote" Text="Standaard uit. Kies hieronder welke extra's je wilt gebruiken." Style="{StaticResource OptionNote}"/>
+                      <StackPanel x:Name="IICheatsPanel" Margin="0,8,0,0"/>
+                    </StackPanel></Border>
+                    <Border Style="{StaticResource SettingsCard}"><StackPanel>
+                      <Label Content="Geavanceerd" Style="{StaticResource CategoryHeading}"/>
+                      <TextBlock Text="Ontwikkelaarsmodus" Style="{StaticResource OptionLabel}"/>
+                      <CheckBox x:Name="IIDeveloperChoice" Content="Verborgen ontwikkelaarsfuncties aanzetten · untested" AutomationProperties.Name="A2 Racer II ontwikkelaarsmodus" Margin="0,0,0,0"/>
+                      <TextBlock Text="Bij het Revival-menu: Tab opent het automenu, F12 toont FPS. Toetsen 5, 7, 8, 9 en 0 geven extra camera’s; M wisselt de gevolgde auto." Style="{StaticResource OptionNote}"/>
+                      <TextBlock Text="Opslaan in het automenu wijzigt autogegevens in je startkopie. Deze wijzigingen gaan niet terug naar je oorspronkelijke game." Style="{StaticResource OptionNote}"/>
+                    </StackPanel></Border>
                   </StackPanel>
                   <StackPanel x:Name="IOptionsPanel">
                     <Border Style="{StaticResource SettingsCard}"><StackPanel>
-                      <TextBlock Text="Beeld" Style="{StaticResource SettingsHeading}"/>
+                      <Label Content="Beeld" Style="{StaticResource CategoryHeading}"/>
                       <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="18"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                         <StackPanel><TextBlock Text="Resolutie" Style="{StaticResource OptionLabel}"/><ComboBox x:Name="ResolutionChoice"/><TextBlock x:Name="ResolutionNote" Style="{StaticResource OptionNote}"/></StackPanel>
                         <StackPanel Grid.Column="2"><TextBlock Text="Renderer" Style="{StaticResource OptionLabel}"/><ComboBox x:Name="GraphicsChoice"/><TextBlock x:Name="GraphicsNote" Style="{StaticResource OptionNote}"/></StackPanel>
@@ -384,30 +417,37 @@
                       <TextBlock x:Name="CameraNote" Style="{StaticResource OptionNote}" Foreground="#C6D8EF"/>
                     </StackPanel></Border>
                     <Border Style="{StaticResource SettingsCard}"><StackPanel>
-                      <TextBlock Text="Gameplay" Style="{StaticResource SettingsHeading}"/>
-                      <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="18"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                        <StackPanel><TextBlock Text="FPS / speltempo" Style="{StaticResource OptionLabel}"/><ComboBox x:Name="FpsChoice"/><TextBlock x:Name="FpsNote" Style="{StaticResource OptionNote}"/></StackPanel>
-                        <StackPanel Grid.Column="2"><TextBlock Text="Camera" Style="{StaticResource OptionLabel}"/><CheckBox x:Name="DashboardChoice" Content="Dashboard aan · aanbevolen" Margin="0,10,0,6"/><TextBlock Text="Toont het stuur en dashboard tijdens de race." Style="{StaticResource OptionNote}"/></StackPanel>
-                      </Grid>
-                    </StackPanel></Border>
-                    <Border Style="{StaticResource SettingsCard}"><StackPanel>
-                      <TextBlock Text="Wereld &amp; textures" Style="{StaticResource SettingsHeading}"/>
+                      <Label Content="Wereld" Style="{StaticResource CategoryHeading}"/>
                       <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="18"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                         <StackPanel><TextBlock Text="Wegzicht" Style="{StaticResource OptionLabel}"/><ComboBox x:Name="DistanceChoice"/><TextBlock x:Name="DistanceNote" Style="{StaticResource OptionNote}"/></StackPanel>
                         <StackPanel Grid.Column="2"><TextBlock Text="Objectafstand" Style="{StaticResource OptionLabel}"/><ComboBox x:Name="ObjectDistanceChoice"/><TextBlock x:Name="ObjectDistanceNote" Style="{StaticResource OptionNote}"/></StackPanel>
                       </Grid>
-                      <Grid Margin="0,18,0,0"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="18"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                        <StackPanel><TextBlock Text="Texture pack" Style="{StaticResource OptionLabel}"/><ComboBox x:Name="TextureChoice"/><TextBlock x:Name="TextureNote" Style="{StaticResource OptionNote}"/></StackPanel>
-                        <StackPanel Grid.Column="2"><TextBlock Text="Horizonachtergrond" Style="{StaticResource OptionLabel}"/><ComboBox x:Name="HorizonChoice"/><TextBlock Text="Uit geeft vrij uitzicht op de wereld." Style="{StaticResource OptionNote}"/></StackPanel>
-                      </Grid>
+                      <StackPanel Margin="0,16,0,0"><TextBlock Text="Horizonachtergrond" Style="{StaticResource OptionLabel}"/><ComboBox x:Name="HorizonChoice"/><TextBlock Text="Uit geeft vrij uitzicht op de wereld." Style="{StaticResource OptionNote}"/></StackPanel>
                     </StackPanel></Border>
                     <Border Style="{StaticResource SettingsCard}"><StackPanel>
-                      <TextBlock Text="Spelmenu" Style="{StaticResource SettingsHeading}"/>
-                      <TextBlock Text="Menuweergave" Style="{StaticResource OptionLabel}"/>
-                      <ComboBox x:Name="MenuChoice" AutomationProperties.Name="Optionele spelmenuweergave"/>
-                      <TextBlock x:Name="MenuNote" Style="{StaticResource OptionNote}"/>
+                      <Label Content="Uiterlijk" Style="{StaticResource CategoryHeading}"/>
+                      <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="18"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                        <StackPanel><TextBlock Text="Texture pack" Style="{StaticResource OptionLabel}"/><ComboBox x:Name="TextureChoice"/><TextBlock x:Name="TextureNote" Style="{StaticResource OptionNote}"/></StackPanel>
+                        <StackPanel Grid.Column="2"><TextBlock Text="Spelmenu" Style="{StaticResource OptionLabel}"/><ComboBox x:Name="MenuChoice" AutomationProperties.Name="Optionele spelmenuweergave"/><TextBlock x:Name="MenuNote" Style="{StaticResource OptionNote}"/></StackPanel>
+                      </Grid>
+                      <Border BorderBrush="#33465B" BorderThickness="0,1,0,0" Margin="0,16,0,0" Padding="0,12,0,0"><StackPanel>
+                        <CheckBox x:Name="DashboardChoice" Content="Dashboard aan · aanbevolen" Margin="0,0,0,0"/>
+                        <TextBlock Text="Toont het stuur en dashboard tijdens de race." Style="{StaticResource OptionNote}"/>
+                      </StackPanel></Border>
                     </StackPanel></Border>
-                    <Expander x:Name="AdvancedOptions" Header="Compatibiliteit" IsExpanded="False" Margin="0,0,0,12">
+                    <Border Style="{StaticResource SettingsCard}"><StackPanel>
+                      <Label Content="Gameplay" Style="{StaticResource CategoryHeading}"/>
+                      <TextBlock Text="FPS / speltempo" Style="{StaticResource OptionLabel}"/>
+                      <ComboBox x:Name="FpsChoice"/>
+                      <TextBlock x:Name="FpsNote" Style="{StaticResource OptionNote}"/>
+                    </StackPanel></Border>
+                    <Border Style="{StaticResource SettingsCard}" BorderBrush="#5A5032"><StackPanel>
+                      <Label Content="Cheats · optioneel" Style="{StaticResource CategoryHeading}"/>
+                      <CheckBox x:Name="ICheatsEnabled" Content="Cheats gebruiken · untested" IsChecked="False" AutomationProperties.Name="A2 Racer I cheats gebruiken" Margin="0,0,0,0"/>
+                      <TextBlock x:Name="ICheatsNote" Text="Standaard uit. Kies hieronder welke extra's je wilt gebruiken." Style="{StaticResource OptionNote}"/>
+                      <StackPanel x:Name="ICheatsPanel" Margin="0,8,0,0"/>
+                    </StackPanel></Border>
+                    <Expander x:Name="AdvancedOptions" Header="Geavanceerd · compatibiliteit" IsExpanded="False" Margin="0,0,0,12">
                       <StackPanel Margin="14,0,14,3">
                         <CheckBox x:Name="FocusRecoveryChoice" Content="Alt+Tab-herstel" Margin="0,0,0,0"/>
                         <TextBlock x:Name="FocusRecoveryNote" Style="{StaticResource OptionNote}" Margin="26,5,0,0"/>
@@ -434,7 +474,7 @@
                 <TextBox x:Name="LogText" Height="190" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" Background="#0C1521" Foreground="#C2D0E5" BorderBrush="#33465B" BorderThickness="1" Padding="12" FontFamily="Consolas" FontSize="12" Text="Nog geen launchersessie gestart."/>
               </StackPanel></ScrollViewer></TabItem>
               <TabItem Header="Spelen" Visibility="Collapsed"><ScrollViewer x:Name="IIIStartScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><StackPanel Margin="0,1,8,0">
-                <TextBlock Text="Je kunt je tour voorbereiden en een gamemap kiezen. unstable · Starten is geblokkeerd na een vastloper die de muis vasthield." TextWrapping="Wrap" Foreground="#A6B8CE" FontSize="12" LineHeight="18" Margin="0,0,0,8"/>
+                <TextBlock Text="Tour 1: untested · Bewaakte start met vrije muis; noodstop Ctrl+Shift+F8. Tour 2: unstable · Start geblokkeerd." TextWrapping="Wrap" Foreground="#A6B8CE" FontSize="12" LineHeight="18" Margin="0,0,0,8"/>
                 <Grid x:Name="IIIOverviewPanel"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="12"/><ColumnDefinition Width="*"/><ColumnDefinition Width="12"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                   <Border Style="{StaticResource OverviewCard}"><StackPanel><TextBlock Text="RESOLUTIE" Style="{StaticResource OverviewLabel}"/><TextBlock x:Name="IIIResolutionOverview" Text="Origineel" Style="{StaticResource OverviewValue}"/></StackPanel></Border>
                   <Border Grid.Column="2" Style="{StaticResource OverviewCard}"><StackPanel><TextBlock Text="TOUR" Style="{StaticResource OverviewLabel}"/><TextBlock x:Name="IIITourOverview" Text="Tour 1" Style="{StaticResource OverviewValue}"/></StackPanel></Border>

@@ -1,18 +1,19 @@
-# A2 Racers Revival — 0.1.0-beta.10
+# A2 Racers Revival — 0.1.0-beta.11
 
-Beta 10 maakt het toevoegen en voorbereiden van je eigen **A2 Racer II** duidelijker en voorkomt een grote onnodige download.
+Beta 11 brengt de extra launcheropties terug in de downloadversie, met behoud van het eenvoudige toevoegen van je eigen game en de kortere voorbereiding uit beta 10.
 
-- **Kies je eigen gamebestanden:** de volledige Nederlandse gamemap met `DATA`, of je eigen volledige `A2-Racer-II_Win_NL.zip`. De ondersteunde v1.01-cd wordt aan zijn inhoud herkend, ook als de ZIP anders verpakt is. BIN/CUE hoef je niet zelf uit te pakken, te mounten of te installeren. NRG en andere versies zijn niet ondersteund.
-- **Minder downloaden:** toevoegen en voorbereiden van games en starten van deel II halen de introspeler van 109,5 MiB niet meer op. Die is alleen nodig als je deel I met intro start. De menumuziek van deel II komt uit je eigen gamebestanden.
-- **Verder na een onderbreking:** gedeeltelijke downloads kunnen bij een nieuwe poging hervatten wanneer de server dit ondersteunt. De volledige download wordt vóór gebruik gecontroleerd. Reeds opgehaalde onderdelen blijven bewaard.
-- **Duidelijke foutdetails:** download- en voorbereidingsfouten tonen hun oorzaak en zijn terug te vinden via **Support**, ook wanneer de eerdere melding alleen “Kon niet doorgaan” was.
+- **Meer instellingen:** aparte categorieën voor beeld, wereld, uiterlijk, gameplay en extra functies. Kies resolutie, HUD, kaart, horizon/lucht, wegzicht en menu. MAX voor deel II combineert 4K met HD HUD, een grotere kaart, egale lucht en 60 baanstukken.
+- **HD HUD en kaart:** worden lokaal opgebouwd uit je eigen ondersteunde Nederlandse deel-II-bestanden. Er zijn geen oude lokale testmappen nodig.
+- **Extra functies:** optionele cheats voor deel I en II, ontwikkelaarsmodus voor deel II en de bonusauto Vector met eigen artwork en wielen. Ze staan standaard uit. Cheats gebruiken aparte sessies en schrijven hun voortgang niet terug naar je normale profiel. Vector en ontwikkelaarsmodus gebruiken het Revival-menu.
+- **Bestaande voortgang behouden:** verouderde Revival-menubestanden worden bij Game voorbereiden vernieuwd in een aparte kopie, met behoud van je profiel. Je originele gamebestanden blijven behouden.
+- **Deel III:** Tour 1 heeft een bewaakte start via het originele menu, met noodstop Ctrl+Shift+F8. Dit is **untested**; Tour 2 blijft **unstable** en geblokkeerd.
 
-Pak de launcher-ZIP helemaal uit en open **Launcher.cmd**. Kies deel I of II, voeg je eigen ondersteunde game toe en kies **Aanbevolen → Spelen**. De launcher bevat en downloadt geen games. Python hoef je niet zelf te installeren; benodigde hulponderdelen worden bij hun leveranciers opgehaald.
+**untested** betekent nog niet tijdens spelen bevestigd; **unstable** betekent een bekend crash- of hangprobleem. Een aanwezige maar gewijzigde bron wordt geweigerd. Nieuwe combinaties zijn niet automatisch speelgetest.
 
-Bewaar bij een portable update je map `local/` met instellingen en voortgang en je eigen gamebronnen. Je oorspronkelijke map of ZIP blijft behouden.
+Pak de launcher-ZIP helemaal uit en open **Launcher.cmd**. Kies deel I of II, voeg je eigen volledige ondersteunde Nederlandse gamemap of ZIP toe en kies **Aanbevolen → Spelen**. Deel-II-ZIP’s worden aan het ondersteunde cd-image herkend; zelf mounten of installeren is niet nodig. De grote introspeler wordt bij deel II overgeslagen. De launcher bevat en downloadt geen games.
 
-**untested** betekent nog niet tijdens spelen bevestigd; **unstable** betekent een bekend crash- of hangprobleem. Niet-beschikbare beeldopties blijven uitgeschakeld. Deel III blijft geblokkeerd. Deze beta voegt geen nieuwe deel-II-HD-texturetestset toe; de bestaande speelopties blijven beschikbaar.
+Bewaar bij een portable update je map **local/** met instellingen en voortgang en je eigen gamebronnen. Gebruik daarna **Game voorbereiden** om de menubestanden te vernieuwen.
 
-Dit is een niet-ondertekende, draagbare testbeta. Er is geen nieuwe MSI-installer, antivirusbeoordeling of automatische update vrijgegeven. Eerdere antivirusmeldingen blijven open; zet je beveiliging niet uit bij een blokkade. De installer- en updater-vrijgavevoorwaarden blijven gelden.
+Dit is een niet-ondertekende portable beta. Er is geen nieuwe MSI-installer, antivirusbeoordeling of automatische update vrijgegeven. Zet je beveiliging niet uit bij een blokkade.
 
 Onofficieel fanproject, zonder steun van de rechthebbenden. Games en merken blijven van hen; MIT geldt voor eigen code. Beta zonder garantie, gemaakt met hulp van LLM’s. Hulp via [GitHub Issues](https://github.com/Snowbro007/a2-racers-revival-launcher/issues).

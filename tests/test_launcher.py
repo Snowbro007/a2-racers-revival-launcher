@@ -239,7 +239,7 @@ class LauncherTests(unittest.TestCase):
                 self.assertEqual(path.read_bytes(), before)
                 self.assertEqual(result["schema"], 4)
                 self.assertEqual(result["selected_game"], "a2racer2")
-                self.assertEqual(result["games"]["a2racer2"], dict(original["games"]["a2racer2"],menu_profile='original',race_display='classic',**lm.ii_launcher_graphics.DEFAULTS))
+                self.assertEqual(result["games"]["a2racer2"], dict(original["games"]["a2racer2"],menu_profile='original',race_display='classic',developer_mode=False,vector_car=False,cheats=lm.launcher_cheats.DEFAULTS['a2racer2'],**lm.ii_launcher_graphics.DEFAULTS))
                 prefs = result["games"]["a2racer1"]
                 self.assertEqual(prefs["graphics"], graphic["native"])
                 self.assertEqual(prefs["display_profile"], graphic["display"])
@@ -310,7 +310,7 @@ class LauncherTests(unittest.TestCase):
         lm.save_preferences(self.root, "a2racer1", first)
         saved = lm.load_settings(self.root)
         self.assertEqual(json.loads(path.read_text())["schema"], 4)
-        self.assertEqual(saved["games"]["a2racer2"], dict(original["games"]["a2racer2"],menu_profile='original',race_display='classic',**lm.ii_launcher_graphics.DEFAULTS))
+        self.assertEqual(saved["games"]["a2racer2"], dict(original["games"]["a2racer2"],menu_profile='original',race_display='classic',developer_mode=False,vector_car=False,cheats=lm.launcher_cheats.DEFAULTS['a2racer2'],**lm.ii_launcher_graphics.DEFAULTS))
         self.assertEqual(saved["games"]["a2racer1"], first)
 
     def test_cli_new_options_and_legacy_callers_save_validated_choices(self):

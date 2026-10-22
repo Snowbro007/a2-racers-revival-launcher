@@ -53,6 +53,20 @@ def fixture_temp():
 
 
 class FrontendModelTests(unittest.TestCase):
+    def test_tweak_mode_survives_repeated_race_starts_and_profile_reset(self):
+        for enabled in (0,1):
+            original=RASER.replace(b'DEBUGON=1',f'TWEAK_MODE={enabled} ; keep\nDEBUGON=1'.encode())
+            state=model.initial_state()
+            for attempt in range(3):
+                game,raser,pending=model.race_inputs(state,GAME,original)
+                self.assertEqual(model.read_ini(raser)['HELPDESK']['TWEAK_MODE'],str(enabled))
+                self.assertIn(f'TWEAK_MODE={enabled} ; keep'.encode(),raser)
+                self.assertEqual(model.read_ini(raser)['HELPDESK']['DEBUGON'],'0')
+                running=copy.deepcopy(state);running['pending']=pending
+                state=model.finish_race(running,game,token=pending['token'],exit_code=1)
+                original=raser
+            state=model.initial_state()
+            self.assertEqual(model.read_ini(model.race_inputs(state,GAME,original)[1])['HELPDESK']['TWEAK_MODE'],str(enabled))
 
     def test_distance_trial_survives_race_start_without_touching_other_choices(self):
         for count in (30, 50):

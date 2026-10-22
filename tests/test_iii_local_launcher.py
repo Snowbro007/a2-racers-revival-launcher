@@ -74,18 +74,12 @@ class LocalIIITests(unittest.TestCase):
         launcher.prepare(self.root, 1)
         self.assertEqual((folder/'menu.ini').read_bytes(), saved)
 
-    def test_start_uses_owned_local_parent_and_child_only_environment(self):
-        child = Mock()
-        child.wait.return_value = 0
-        # Exercise the dormant parent contract with synthetic data only. The
-        # production safety stop is tested separately and has no user bypass.
-        with patch.object(launcher.iii_start_safety,'assert_start_allowed'), patch.dict(os.environ, {'NOCD': 'parent-value'}), patch.object(launcher.subprocess, 'Popen', return_value=child) as spawn:
+    def test_start_hands_verified_tour1_to_mandatory_guard(self):
+        with patch.dict(os.environ, {'NOCD': 'parent-value'}), patch.object(launcher.iii_guarded_start, 'run', return_value=0) as guarded, patch.object(launcher.subprocess, 'Popen') as spawn:
             self.assertEqual(launcher.start(self.root, 1), 0)
-            args, kwargs = spawn.call_args
             folder = launcher.game_folder(self.root, 1)
-            self.assertEqual(args[0], [str(folder/'A2 Racer III Tour 1.exe')])
-            self.assertEqual(kwargs['cwd'], folder)
-            self.assertEqual(kwargs['env']['NOCD'], folder.drive[0].upper())
+            guarded.assert_called_once_with(self.root, 1, 'original', folder)
+            spawn.assert_not_called()
             self.assertEqual(os.environ['NOCD'], 'parent-value')
 
     def test_unknown_tour_rejected(self):

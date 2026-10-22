@@ -30,6 +30,8 @@ PUBLIC_FILES = ('LICENSE', 'VERSION.txt', 'tools/prepare_public_release.py', 'do
                 'tools/windows/msi/README.md', 'tools/windows/msi/.gitignore',
                 'tools/windows/msi/audit_msi.ps1')
 EXTRA_FILES = (
+    'tools/ii_frontend_art/hud-pixels.json',
+    'tools/ii_frontend_art/vector-paint.json', 'tools/ii_frontend_art/vector-preview.png',
     'Controleren.cmd',
     'tools/launcher_art/a2-revival.ico',
     'tools/portable_launcher.py', 'tools/launcher_assets.py', 'tools/launcher_updates.py',

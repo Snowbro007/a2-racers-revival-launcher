@@ -21,6 +21,8 @@ sys.path.insert(0, str(ROOT))
 from tools.trial_manifest import EXPECTED_BINARIES, HD_DISPLAY_PROFILES, validate_ancestors, validate_slug
 from tools import ii_frontend_launcher, ii_original_launcher
 from tools import ii_launcher_graphics
+from tools import ii_vector_car
+from tools import launcher_cheats
 from tools import game_library
 
 # Version-1 presets are migration data only; new choices are independent.
@@ -90,10 +92,13 @@ DEFAULT_SETTINGS = {
                      "camera_profile": "camera-16-9", "render_distance_profile": "extended-20",
                      "object_distance_profile": "original", "texture_profile": "original", "native_horizon": 0, "race_focus_recovery": True,
                      "menu_profile": "original", "dashboard": True, "fps": 20, "intro": True, "debug": False},
-        "a2racer2": {"graphics": "native", "dashboard": None, "fps": 0, "intro": False, "debug": False, "menu_profile": "revival", "race_display": "widescreen", **ii_launcher_graphics.DEFAULTS, "race_resolution": "1080p"},
+        "a2racer2": {"graphics": "native", "dashboard": None, "fps": 0, "intro": False, "debug": False, "menu_profile": "revival", "race_display": "widescreen", **ii_launcher_graphics.DEFAULTS, "race_resolution": "1080p", "developer_mode": False, "vector_car": False},
     },
 }
-SCHEMA_THREE_PREFERENCE_KEYS = set(DEFAULT_SETTINGS["games"]["a2racer1"]) - {"menu_profile"}
+BASE_DEFAULT_SETTINGS = deepcopy(DEFAULT_SETTINGS)
+for _game, _preferences in DEFAULT_SETTINGS['games'].items():
+    _preferences['cheats'] = deepcopy(launcher_cheats.DEFAULTS[_game])
+SCHEMA_THREE_PREFERENCE_KEYS = set(BASE_DEFAULT_SETTINGS["games"]["a2racer1"]) - {"menu_profile"}
 SCHEMA_TWO_PREFERENCE_KEYS = SCHEMA_THREE_PREFERENCE_KEYS - {"texture_profile"}
 
 # Presets are explicit choices, not migrations or new saved defaults.
@@ -115,11 +120,11 @@ II_PROFILES = {
         'sky_mode': 'original', 'race_distance': 'auto'}},
     'recommended': {'label': 'Aanbevolen', 'preferences': deepcopy(DEFAULT_SETTINGS['games']['a2racer2'])},
     'max': {'label': 'MAX', 'preferences': {
-        **DEFAULT_SETTINGS['games']['a2racer2'], 'race_resolution': '4k', 'race_hud': 'hd'}},
+        **DEFAULT_SETTINGS['games']['a2racer2'], 'race_resolution': '4k', 'race_hud': 'hd-map'}},
 }
 
 
-def validate_preferences(game: str, value: dict, *, legacy: bool = False, schema: int | None = None) -> dict:
+def _validate_base_preferences(game: str, value: dict, *, legacy: bool = False, schema: int | None = None) -> dict:
     if not isinstance(game, str) or game not in DEFAULT_SETTINGS["games"] or not isinstance(value, dict):
         raise ValueError("Onbekende game of instellingen.")
     if schema is not None and (type(schema) is not int or schema not in (1, 2, 3, 4)):
@@ -130,10 +135,14 @@ def validate_preferences(game: str, value: dict, *, legacy: bool = False, schema
     old_ii = game == 'a2racer2' and set(value) == LEGACY_PREFERENCE_KEYS
     previous_ii = game == 'a2racer2' and set(value) == LEGACY_PREFERENCE_KEYS | {'menu_profile'}
     display_ii = game == 'a2racer2' and set(value) == LEGACY_PREFERENCE_KEYS | {'menu_profile','race_display'}
+    graphics_ii = game == 'a2racer2' and set(value) == set(BASE_DEFAULT_SETTINGS['games']['a2racer2']) - {'developer_mode','vector_car'}
+    before_vector_ii = game == 'a2racer2' and set(value) == set(BASE_DEFAULT_SETTINGS['games']['a2racer2']) - {'vector_car'}
     expected = (LEGACY_PREFERENCE_KEYS if old_ii or legacy and game != 'a2racer2' else
                 LEGACY_PREFERENCE_KEYS | {'menu_profile'} if previous_ii else
                 LEGACY_PREFERENCE_KEYS | {'menu_profile','race_display'} if display_ii else
-                SCHEMA_TWO_PREFERENCE_KEYS if schema_two else SCHEMA_THREE_PREFERENCE_KEYS if schema_three else set(DEFAULT_SETTINGS["games"][game]))
+                set(BASE_DEFAULT_SETTINGS['games']['a2racer2']) - {'developer_mode','vector_car'} if graphics_ii else
+                set(BASE_DEFAULT_SETTINGS['games']['a2racer2']) - {'vector_car'} if before_vector_ii else
+                SCHEMA_TWO_PREFERENCE_KEYS if schema_two else SCHEMA_THREE_PREFERENCE_KEYS if schema_three else set(BASE_DEFAULT_SETTINGS["games"][game]))
     if set(value) != expected:
         raise ValueError("Onbekende of ontbrekende launcheropties.")
     if (type(value["intro"]) is not bool or type(value["debug"]) is not bool
@@ -154,6 +163,16 @@ def validate_preferences(game: str, value: dict, *, legacy: bool = False, schema
             raise ValueError('Onbekende deel-II-raceweergave.')
         if old_ii or previous_ii or display_ii:
             result.update(ii_launcher_graphics.DEFAULTS)
+        result.setdefault('developer_mode', False)
+        result.setdefault('vector_car', False)
+        if type(result['vector_car']) is not bool:
+            raise ValueError('Ongeldige Vector-keuze.')
+        if result['vector_car'] and result['menu_profile'] != 'revival':
+            raise ValueError('Vector vereist het Revival-menu met een eigen startkopie.')
+        if type(result['developer_mode']) is not bool:
+            raise ValueError('Ongeldige ontwikkelaarsmodus.')
+        if result['developer_mode'] and result['menu_profile'] != 'revival':
+            raise ValueError('Ontwikkelaarsmodus vereist het Revival-menu met een eigen startkopie.')
         ii_launcher_graphics.validate_options({key:result[key] for key in ii_launcher_graphics.CHOICES})
         return result
     if type(value["dashboard"]) is not bool or value["fps"] not in (20, 30):
@@ -166,7 +185,7 @@ def validate_preferences(game: str, value: dict, *, legacy: bool = False, schema
         result.update(graphics=old["native"], display_profile=old["display"], camera_profile="original",
                       render_distance_profile=old.get("render_distance_profile", "original"),
                       object_distance_profile="original", texture_profile="original", menu_profile="original", native_horizon=-1, race_focus_recovery=False)
-        return validate_preferences(game, result)
+        return _validate_base_preferences(game, result)
     if schema_two:
         value = deepcopy(value)
         value["texture_profile"] = "original"
@@ -190,6 +209,19 @@ def validate_preferences(game: str, value: dict, *, legacy: bool = False, schema
             or value["object_distance_profile"] != "original" or value["texture_profile"] != "original" or value["race_focus_recovery"]):
         raise ValueError("Extra zicht, objectselectie, HD-textures en focusherstel vereisen native 3D.")
     return deepcopy(value)
+
+
+def validate_preferences(game: str, value: dict, *, legacy: bool = False, schema: int | None = None) -> dict:
+    # Optional extension: old settings and frozen sessions remain cheat-free.
+    if not isinstance(game, str) or game not in DEFAULT_SETTINGS['games'] or not isinstance(value, dict):
+        return _validate_base_preferences(game, value, legacy=legacy, schema=schema)
+    base = deepcopy(value)
+    cheats = launcher_cheats.validate(game, base.pop('cheats', deepcopy(launcher_cheats.DEFAULTS[game])))
+    result = _validate_base_preferences(game, base, legacy=legacy, schema=schema)
+    if launcher_cheats.active(game, cheats) and result['menu_profile'] != launcher_cheats.catalog(game)['requires_menu']:
+        raise ValueError('Cheats vereisen het HD-menu voor deel I of het Revival-menu voor deel II, met een eigen speelkopie.')
+    result['cheats'] = cheats
+    return result
 
 
 def validate_settings(value: dict) -> dict:
@@ -418,15 +450,19 @@ def iii_preparation(root: Path) -> dict:
                     for name,entry in PROFILES.items()}
         profiles['original'] = {'available': launch_ready, 'label': 'Origineel · unstable',
                                 'reason': 'unstable · Originele schermmodus; de racecrash is gemeld bij Tour 1.'}
-        from tools.iii_start_safety import BLOCK_REASON
-        for profile in profiles.values():
-            profile.update(available=False, reason=BLOCK_REASON)
+        from tools.iii_start_safety import status as iii_safety_status
+        for name, profile in profiles.items():
+            safety = iii_safety_status(number, name)
+            profile.update(available=profile['available'] and safety['start_allowed'],
+                           reason=safety['reason'])
+        safety = iii_safety_status(number, 'original')
         tours[str(number)] = {'label': f'Tour {number}', 'source_present': present,
                              'launch_ready': launch_ready,
-                             'start_blocked': True,
+                             'start_blocked': safety['start_blocked'],
+                             'guard_required': True,
                              'profiles': profiles,
                              'ready': False, 'runtime_verified': False,
-                             'reason': (BLOCK_REASON if launch_ready else
+                             'reason': (safety['reason'] if launch_ready else
                                         'Bron beschikbaar · voorbereid, nog niet speelgetest.' if present
                                         else 'Lokale proefbron ontbreekt of wijkt af.')}
     return {'tours': tours, 'ready': False}
@@ -459,6 +495,8 @@ def snapshot(root: Path) -> dict:
             "ii_menus": {profile: {**entry, **(ii_frontend_launcher.availability(root) if profile == 'revival'
                          else {'available': game_availability(root,'a2racer2')['ready'], 'reason': ''})}
                          for profile, entry in ii_frontend_launcher.MENU_PROFILES.items()},
+            "ii_vector_car": ii_vector_car.availability(root),
+            "cheats": {game: launcher_cheats.catalog(game) for game in launcher_cheats.DEFAULTS},
             "games": {game: game_availability(root, game) for game in DEFAULT_SETTINGS["games"]},
             "i_profiles": deepcopy(I_PROFILES), "ii_profiles": deepcopy(II_PROFILES), "ii_graphics": deepcopy(ii_launcher_graphics.CHOICES), "ii_graphics_support": ii_graphics_support(root), "iii_preparation": iii_preparation(root), "latest_session": latest_session(root)}
 
@@ -535,6 +573,13 @@ def launch_plan(root: Path, name: str) -> dict:
             arguments += ['-RunName',name]
             for key,flag in (('race_resolution','-RaceResolution'),('race_hud','-RaceHud'),('sky_mode','-SkyMode'),('race_distance','-RenderDistance')):
                 arguments += [flag,preferences[key]]
+            if preferences['developer_mode']:
+                arguments += ['-DeveloperMode']
+            if preferences['vector_car']:
+                ii_vector_car.checked_art(root)
+                arguments += ['-VectorCar']
+            if launcher_cheats.active(game, preferences['cheats']):
+                arguments += ['-CheatsJson', json.dumps(preferences['cheats'], separators=(',', ':'))]
             trial = ii_launcher_graphics.target_folder(root,name)/'game'
             report = str(root/'reports/a2racer2-next'/trial.parent.name)
         return {'run_name': name, 'game': game, 'script': 'Invoke-IIFrontend.ps1', 'arguments': arguments,
@@ -563,6 +608,8 @@ def launch_plan(root: Path, name: str) -> dict:
                       "-ObjectDistanceProfile", preferences["object_distance_profile"],
                       "-TextureProfile", texture.get("native_texture_profile", preferences["texture_profile"]),
                       "-HudProfile", texture.get("hud_profile", "original")]
+        if launcher_cheats.active(game, preferences['cheats']):
+            arguments += ['-CheatsJson', json.dumps(preferences['cheats'], separators=(',', ':'))]
         if preferences["intro"]:
             arguments += ["-Intro"]
         if preferences["race_focus_recovery"]:
@@ -619,12 +666,12 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="action", required=True)
     sub.add_parser("snapshot")
-    item = sub.add_parser('game-library-folder')
-    item.add_argument('--game', choices=('a2racer1', 'a2racer2'), required=True)
+    item = sub.add_parser("game-library-folder")
+    item.add_argument("--game", choices=("a2racer1","a2racer2"), required=True)
     sub.add_parser('ii-menu-plan')
     sub.add_parser('ii-original-menu-plan')
     item = sub.add_parser('ii-original-stage')
-    item.add_argument('--stage', choices=('menu', 'race'), required=True)
+    item.add_argument('--stage', choices=('menu','race'), required=True)
     for action in ("save", "create-session"):
         item = sub.add_parser(action)
         item.add_argument("--game", choices=tuple(DEFAULT_SETTINGS["games"]), required=True)
@@ -636,6 +683,9 @@ def main() -> int:
         item.add_argument("--texture-profile", choices=tuple(TEXTURE_PROFILES))
         item.add_argument("--menu-profile", choices=tuple(dict.fromkeys((*MENU_PROFILES,*ii_frontend_launcher.MENU_PROFILES))))
         item.add_argument('--race-display', choices=('classic','widescreen'))
+        item.add_argument('--developer-mode', type=int, choices=(0, 1))
+        item.add_argument('--vector-car', type=int, choices=(0, 1))
+        item.add_argument('--cheats', help='Vaste optionele cheatkeuzes als JSON; standaard uit.')
         for key,choices in ii_launcher_graphics.CHOICES.items():
             item.add_argument('--'+key.replace('_','-'),choices=tuple(choices))
         item.add_argument("--native-horizon", type=int, choices=(-1, 0, 1))
@@ -663,10 +713,10 @@ def main() -> int:
             result = snapshot(ROOT)
         elif args.action == 'game-library-folder':
             result = game_library.ensure_game_folder(ROOT, args.game)
-        elif args.action == 'ii-original-menu-plan':
-            result = ii_original_launcher.registered_menu(ROOT)
         elif args.action == 'ii-original-stage':
             result = ii_original_launcher.select_stage(ROOT, args.stage)
+        elif args.action == 'ii-original-menu-plan':
+            result = ii_original_launcher.registered_menu(ROOT)
         elif args.action == 'ii-menu-plan':
             result = ii_frontend_launcher.registered_menu(ROOT)
         elif args.action == "plan":
@@ -702,6 +752,10 @@ def main() -> int:
             preferences = {"graphics": args.graphics, "fps": args.fps,
                            "dashboard": None if args.dashboard == -1 else bool(args.dashboard),
                            "intro": bool(args.intro), "debug": bool(args.debug)}
+            if args.developer_mode is not None and args.game != 'a2racer2':
+                raise ValueError('Ontwikkelaarsmodus hoort uitsluitend bij deel II.')
+            if args.vector_car is not None and args.game != 'a2racer2':
+                raise ValueError('Vector hoort uitsluitend bij deel II.')
             if args.race_display is not None and args.game != 'a2racer2':
                 raise ValueError('Deze raceweergavekeuze hoort bij deel II.')
             extra = {"display_profile": args.display_profile, "camera_profile": args.camera_profile,
@@ -726,12 +780,16 @@ def main() -> int:
             elif args.texture_profile is not None:
                 raise ValueError("HD-texturekeuzes zijn uitsluitend beschikbaar voor deel I.")
             elif args.game == 'a2racer2':
+                preferences['developer_mode'] = bool(args.developer_mode)
+                preferences['vector_car'] = bool(args.vector_car)
                 preferences['menu_profile'] = args.menu_profile or 'original'
                 preferences['race_display'] = args.race_display or ('widescreen' if preferences['menu_profile']=='revival' else 'classic')
                 for key in ii_launcher_graphics.CHOICES:
                     preferences[key] = getattr(args,key) or DEFAULT_SETTINGS['games']['a2racer2'][key]
             if args.game != 'a2racer2' and any(getattr(args,key) is not None for key in ii_launcher_graphics.CHOICES):
                 raise ValueError('Deze beeldopties horen uitsluitend bij deel II.')
+            if args.cheats is not None:
+                preferences['cheats'] = json.loads(args.cheats)
             result = (save_preferences if args.action == "save" else create_session)(ROOT, args.game, preferences)
         print(json.dumps(result, ensure_ascii=True))
         return 0

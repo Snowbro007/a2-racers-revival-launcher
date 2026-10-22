@@ -32,7 +32,7 @@ foreach($node in $xml.SelectNodes('//*')){
 $workspacePath=Split-Path -Parent $Catalog
 $script:catalog=[IO.File]::ReadAllText($Catalog)|ConvertFrom-Json
 $script:settings=$script:catalog.settings;$script:game='a2racer2';$script:binding=$false
-$script:operation=$null;$script:worker=$null;$script:initialized=$false
+$script:operation=$null;$script:worker=$null;$script:initialized=$false;$script:cheatControls=@{}
 Select-Game 'a2racer2'
 $script:initialized=$true
 $ui.Pages.SelectedIndex=1

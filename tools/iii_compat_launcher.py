@@ -23,6 +23,7 @@ from tools.ii_frontend_state import read_regular
 from tools.ii_next_wrapper_probe import replace_setting
 from tools.local_game_data import launch_environment
 from tools import iii_start_safety
+from tools import iii_guarded_start
 
 PROFILES={
     'compat':{'label':'Compatibiliteit · originele resolutie · untested',
@@ -193,7 +194,7 @@ def available(root,tour,profile):
 
 
 def start(root,tour,profile):
-    iii_start_safety.assert_start_allowed()
+    iii_start_safety.assert_start_allowed(tour, profile)
     target=prepare(root,tour,profile)
     if profile=='fullhd-skyoff':
         for path,changes in ((target/'raser.ini',{('PROGRAM','RESOLUTION'):3}),
@@ -201,20 +202,7 @@ def start(root,tour,profile):
             raw=read_regular(path,128*1024)
             value=override_ini(raw,changes)
             if value!=raw:path.write_bytes(value)
-    debug=target/'debug.txt'
-    previous_debug=sha(read_regular(debug,1024**2)) if debug.exists() else None
-    child=subprocess.Popen([str(target/f'A2 Racer III Tour {tour}.exe')],cwd=target,
-        env={**os.environ,**launch_environment(target)})
-    code=child.wait()
-    report=root/'reports/a2racer3/compatibility-runs';report.mkdir(parents=True,exist_ok=True)
-    data={'tour':tour,'profile':profile,'parent_exit_code':code,'runtime_verified':False,
-          'game_path':str(target),'disc_image_used':False}
-    if debug.exists():
-        raw=read_regular(debug,1024**2)
-        data['debug_changed']=sha(raw)!=previous_debug
-        data['debug_tail']=raw[-16384:].decode('latin1')
-    (report/f'tour{tour}-{profile}-last.json').write_text(json.dumps(data,indent=2),encoding='utf-8')
-    return code
+    return iii_guarded_start.run(root, tour, profile, target)
 
 
 def main():

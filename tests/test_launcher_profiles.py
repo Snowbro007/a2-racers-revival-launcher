@@ -29,7 +29,7 @@ class LauncherProfileTests(unittest.TestCase):
         original = model.II_PROFILES['original']['preferences']
         self.assertEqual((original['race_display'], original['sky_mode'], original['race_distance']), ('classic', 'original', 'auto'))
         maximum = model.II_PROFILES['max']['preferences']
-        self.assertEqual((maximum['race_resolution'], maximum['race_hud'], maximum['race_distance']), ('4k', 'hd', '60'))
+        self.assertEqual((maximum['race_resolution'], maximum['race_hud'], maximum['race_distance']), ('4k', 'hd-map', '60'))
         self.assertEqual(defaults, model.DEFAULT_SETTINGS)
 
     def test_profiles_are_valid_and_do_not_change_defaults(self):

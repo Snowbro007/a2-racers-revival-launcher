@@ -265,10 +265,94 @@ def _assets(data,assets,own_art):
     return music
 
 
+def refresh_menu_sources(root, run_name):
+    """Publish an updated own-menu copy; retain the complete old copy and saves."""
+    root = root.absolute()
+    trial_manifest.validate_slug(run_name)
+    if not run_name.startswith('ii-frontend'):
+        raise ValueError('Ongeldige bijwerknaam.')
+    registration = root/'local/ii-parallel/frontend-current.json'
+    lock = registration.with_name('.frontend-refresh.lock')
+    state.validate_ancestors(lock)
+    # Serialise our preparation requests without touching a running/old copy.
+    with lock.open('xb') as stream:
+        lock_identity = os.fstat(stream.fileno())
+        try:
+            before_registration = state.read_regular(registration,4096)
+            previous = frontend.registered_menu(root,allow_stale_sources=True)
+            old_base = Path(previous['base'])
+            config = json.loads(state.read_regular(old_base/'Frontend.json',65536))
+            target = old_base.parent/run_name
+            report = root/'reports/a2racer2-next'/run_name
+            state.validate_ancestors(target);state.validate_ancestors(report)
+            if target.exists() or report.exists():
+                raise ValueError('Bijwerkmap bestaat al; overschrijven geweigerd.')
+            paths = sorted(old_base.rglob('*'))
+            if len(paths)>10000: raise ValueError('Onverwacht grote menukopie.')
+            for path in paths:
+                state.validate_ancestors(path)
+                if not path.is_file() and not path.is_dir():
+                    raise ValueError('Onbekend bestand in menukopie.')
+            player_path = old_base/'menu-state.json'
+            if player_path.exists():
+                state.validate_state(json.loads(state.read_regular(player_path,state.MAX_STATE_BYTES)))
+            target.mkdir();report.mkdir(parents=True)
+            fingerprints = {}
+            for path in paths:
+                relative = path.relative_to(old_base)
+                destination = filesystem_path(target/relative)
+                if path.is_dir(): destination.mkdir(parents=True,exist_ok=True)
+                else:
+                    raw = state.read_regular(path,64*1024**2)
+                    fingerprints[relative] = sha(raw)
+                    destination.parent.mkdir(parents=True,exist_ok=True)
+                    with destination.open('xb') as output: output.write(raw)
+            # Only our menu code changes. All game files and player bytes stay copied.
+            for name, source_name in frontend.SOURCE_FILES.items():
+                raw = state.read_regular(root/'tools'/source_name,1024**2)
+                (target/name).write_bytes(raw)
+                next(row for row in config['files'] if row['path']==name)['sha256'] = sha(raw)
+            config.update(game_path=str(target/'game'),report_path=str(report))
+            config_raw = encoded(config)
+            (target/'Frontend.json').write_bytes(config_raw)
+            for path,pin in fingerprints.items():
+                if path.as_posix() not in set(frontend.SOURCE_FILES)|{'Frontend.json'}:
+                    if sha(state.read_regular(target/path,64*1024**2))!=pin:
+                        raise ValueError('De nieuwe menukopie verschilt van de bron: '+path.as_posix())
+            # A save or registration changed while copying: retain both copies,
+            # but do not publish the stale snapshot as the new play source.
+            current_paths = sorted(p.relative_to(old_base) for p in old_base.rglob('*') if p.is_file())
+            if current_paths != sorted(fingerprints) or any(
+                    sha(state.read_regular(old_base/path,64*1024**2))!=pin
+                    for path,pin in fingerprints.items()):
+                raise ValueError('De menukopie veranderde tijdens bijwerken; probeer na afsluiten opnieuw.')
+            if state.read_regular(registration,4096)!=before_registration:
+                raise ValueError('De menuregistratie veranderde tijdens bijwerken.')
+            after_registration = encoded({'schema':1,'run_name':run_name,'frontend_sha256':sha(config_raw)})
+            state.atomic_write(registration,after_registration)
+            try:
+                result = frontend.registered_menu(root)
+            except Exception:
+                if state.read_regular(registration,4096)==after_registration:
+                    state.atomic_write(registration,before_registration)
+                raise
+            return {**result,'prepared':True,'refreshed':True,'previous_base':str(old_base),
+                    'players_preserved':True,'native_game_executed':False}
+        finally:
+            current = lock.stat()
+            if (current.st_dev,current.st_ino)==(lock_identity.st_dev,lock_identity.st_ino):
+                # Close before unlinking: Windows may still hold the open handle.
+                stream.close()
+                lock.unlink()
+
+
 def prepare(root,python_path,run_name=None,*,source=None):
-    """First-use native build. An existing registration is never replaced."""
+    """Build first-use sources, or refresh only stale own-menu code in a new copy."""
     from tools import ii_launcher_graphics as graphics
     root=root.absolute()
+    if (root/'tools/ii_frontend_art/vector-paint.json').exists():
+        from tools.ii_vector_public import prepare as prepare_vector
+        prepare_vector(root)
     run_name=run_name or ('ii-frontend-portable-'+uuid.uuid4().hex[:12])
     trial_manifest.validate_slug(run_name)
     if not run_name.startswith('ii-frontend'):
@@ -276,7 +360,10 @@ def prepare(root,python_path,run_name=None,*,source=None):
     registration=root/'local/ii-parallel/frontend-current.json'
     state.validate_ancestors(registration)
     if registration.exists():
-        existing=frontend.registered_menu(root)
+        try:
+            existing=frontend.registered_menu(root)
+        except frontend.StaleMenuSources:
+            return refresh_menu_sources(root,run_name)
         return {**existing,'prepared':False,'already_ready':True,'native_game_executed':False}
     source,own_art,dependencies,profile=checked_inputs(root,source)
     runtime=Path(python_path)

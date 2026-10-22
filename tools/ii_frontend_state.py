@@ -25,6 +25,7 @@ UPGRADES = {'motor': ('MOTOR', 1), 'tires': ('BANDEN', 2),
             'turbo': ('TURBO', 4), 'brakes': ('ABS', 5),
             'gears': ('VERSNELLINGSBAK', 6)}
 STAT_KEYS = ('speed', 'acceleration', 'braking', 'handling')
+VEHICLE_FIELDS = ('car', 'damage', 'upgrades', 'damage_mesh', 'damage_value')
 MAX_STATE_BYTES = 256 * 1024
 RACE_DISPLAYS = {
     'classic': {'binary': 'SPEL.DAT', 'profile': 'profiles/classic.conf',
@@ -146,6 +147,34 @@ def damage_array(value: str, *, mesh: bool) -> str:
     return value
 
 
+def validate_vehicle(vehicle, *, bonus=False):
+    if type(vehicle) is not dict or set(vehicle) != set(VEHICLE_FIELDS):
+        raise ValueError('Ongeldige bewaarde auto.')
+    bounded(vehicle['car'], 7 if bonus else 0, 7 if bonus else 6, 'bewaarde auto')
+    bounded(vehicle['damage'], 0, 100, 'bewaarde schade')
+    if (type(vehicle['upgrades']) is not dict or set(vehicle['upgrades']) != set(UPGRADES)
+            or any(type(v) is not bool for v in vehicle['upgrades'].values())):
+        raise ValueError('Ongeldige bewaarde onderdelen.')
+    damage_array(vehicle['damage_mesh'], mesh=True)
+    damage_array(vehicle['damage_value'], mesh=False)
+
+
+def vehicle_snapshot(p):
+    return {key: copy.deepcopy(p[key]) for key in VEHICLE_FIELDS}
+
+
+def select_vector(p, selected):
+    """Swap vehicle state only; keep player identity, budget and campaign progress."""
+    if selected and p['car'] != 7:
+        p['normal_vehicle'] = vehicle_snapshot(p)
+        fresh = {'car':7, 'damage':0, 'upgrades':{key:False for key in UPGRADES},
+                 'damage_mesh':'-1,-1,-1,-1,-1,-1,-1,-1', 'damage_value':'-1,-1,-1,-1,-1,-1,-1,-1'}
+        p.update(p.pop('vector_vehicle', fresh))
+    elif not selected and p['car'] == 7:
+        p['vector_vehicle'] = vehicle_snapshot(p)
+        p.update(p.pop('normal_vehicle'))
+
+
 def validate_state(state: dict) -> dict:
     if type(state) is not dict or state.get('schema') != 1:
         raise ValueError('Onbekende menustatus.')
@@ -158,12 +187,18 @@ def validate_state(state: dict) -> dict:
             raise ValueError('Ongeldige speler-ID.')
         ids.add(p['id'])
         new_profile(p.get('name'))  # same name validation, no native save conversion
-        for key, high in [('car', 6), ('money', 1000000000), ('damage', 100)]:
+        for key, high in [('car', 7), ('money', 1000000000), ('damage', 100)]:
             bounded(p.get(key), 0, high, key)
         if set(p.get('upgrades', {})) != set(UPGRADES) or any(type(v) is not bool for v in p['upgrades'].values()):
             raise ValueError('Ongeldige onderdelen.')
         damage_array(p.get('damage_mesh'), mesh=True)
         damage_array(p.get('damage_value'), mesh=False)
+        if p['car'] == 7:
+            validate_vehicle(p.get('normal_vehicle'))
+        elif 'normal_vehicle' in p:
+            raise ValueError('Ongeldige actieve auto bij bewaarde gewone auto.')
+        if 'vector_vehicle' in p:
+            validate_vehicle(p['vector_vehicle'], bonus=True)
         if type(p.get('records')) is not dict or len(p['records']) > 7:
             raise ValueError('Ongeldige records.')
         for key, value in p['records'].items():
@@ -205,7 +240,13 @@ def validate_state(state: dict) -> dict:
                 or pending.get('profile') not in ids):
             raise ValueError('Ongeldige lopende race.')
         bounded(pending.get('track'), 0, 6, 'pending track')
-        bounded(pending.get('car'), 0, 6, 'pending car')
+        bounded(pending.get('car'), 0, 7, 'pending car')
+        if pending.get('native_car', pending['car']) != (6 if pending['car'] == 7 else pending['car']):
+            raise ValueError('Onjuiste native bonusautokoppeling.')
+        if 'binary' in pending:
+            expected = 'SPEL-VECTOR'+('-WIDE' if pending.get('race_display') == 'widescreen' else '')+'.DAT'
+            if pending['car'] != 7 or pending['binary'] != expected:
+                raise ValueError('Onbekende bonusracebinary.')
         if (type(pending.get('race_display', 'classic')) is not str or
                 pending.get('race_display', 'classic') not in RACE_DISPLAYS):
             raise ValueError('Onbekende lopende raceweergave.')
@@ -264,7 +305,17 @@ def catalog(base: Path) -> dict:
     effects = {key: {stat_key: integer(ini, 'percents', f'item{item}_perc{j}', 0, 100)
                      for j, stat_key in enumerate(STAT_KEYS, 1)}
                for key, (_, item) in UPGRADES.items()}
-    return {'cars': cars, 'upgrade_effects': effects, 'tracks': [{'id': i, 'name': name, 'city': i in (0, 2, 4, 6)}
+    config_path = base/'Frontend.json'
+    enabled = False
+    if config_path.exists():
+        cfg = json.loads(read_regular(config_path, 65536))
+        enabled = cfg.get('vector_vehicle', {}).get('enabled') is True
+    if enabled:
+        bonus = copy.deepcopy(cars[6])
+        bonus.update(id=7, name='Vector', price=0, bonus=True,
+                     description='Basismodel teruggevonden in de originele spelbestanden. Textures en wielen zijn voor Revival gemaakt; de sportauto-afstelling is door ons toegewezen.')
+        cars.append(bonus)
+    return {'cars': cars, 'vector_enabled': enabled, 'upgrade_effects': effects, 'tracks': [{'id': i, 'name': name, 'city': i in (0, 2, 4, 6)}
                                     for i, name in enumerate(TRACK_NAMES)]}
 
 
@@ -329,9 +380,21 @@ def mutate(state: dict, command: str, payload: dict, catalog_data: dict) -> dict
             raise ValueError('Onbekende instelling.')
         state['settings'].update(payload)
     elif command == 'buy':
-        car = bounded(payload['car'], 0, 6, 'car')
+        car = bounded(payload['car'], 0, len(catalog_data['cars'])-1, 'car')
         if car == p['car']:
             raise ValueError('Deze auto heb je al.')
+        if car == 7:
+            if catalog_data.get('vector_enabled') is not True:
+                raise ValueError('Schakel de Vector eerst in via de launcher.')
+            select_vector(p, True)
+            state['last_message'] = 'Vector geselecteerd. Je gewone auto en zijn onderdelen blijven bewaard.'
+            return validate_state(state)
+        returning = p['car'] == 7 and p['normal_vehicle']['car'] == car
+        if p['car'] == 7:
+            select_vector(p, False)
+        if returning:
+            state['last_message'] = 'Je gewone auto is weer geselecteerd.'
+            return validate_state(state)
         cost = catalog_data['cars'][car]['price']
         if cost > p['money']:
             raise ValueError('Niet genoeg geld voor deze auto.')
@@ -373,7 +436,8 @@ def race_inputs(state: dict, game_ini: bytes, raser_ini: bytes) -> tuple[bytes, 
     p, s = profile(state), state['settings']
     if state['track'] > p['next_track']:
         raise ValueError('Deze etappe is nog vergrendeld. Voltooi eerst de vorige race.')
-    changes = {('ETAPPE', 'etappe'): state['track'], ('PLAYER', 'car'): p['car'],
+    native_car = 6 if p['car'] == 7 else p['car']
+    changes = {('ETAPPE', 'etappe'): state['track'], ('PLAYER', 'car'): native_car,
                ('PLAYER', 'money'): p['money'], ('PLAYER', 'damage'): p['damage'],
                ('PLAYER', 'finished'): 0, ('PLAYER', 'tracktime'): 0, ('PLAYER', 'position'): 0,
                ('PLAYER', 'copland'): 0, ('PLAYER', 'DAMAGE_MESH'): p['damage_mesh'],
@@ -386,7 +450,40 @@ def race_inputs(state: dict, game_ini: bytes, raser_ini: bytes) -> tuple[bytes, 
                     ('MOVIES', 'ON'): 0, ('HELPDESK', 'DEBUGON'): 0,
                     ('SOUND', 'MUSICVOLUME'): s['music'], ('SOUND', 'SFXVOLUME'): s['effects']})
     pending = {'token': uuid.uuid4().hex, 'profile': p['id'], 'track': state['track'], 'car': p['car']}
+    if p['car'] == 7:
+        pending['native_car'] = native_car
     return result_game, result_raser, pending
+
+
+def vector_race_files(base, state, config, mode):
+    """Read sealed overlays before any writes; switch resources for this race only."""
+    vector = config.get('vector_vehicle')
+    chosen = profile(state)['car'] == 7
+    if not vector or vector.get('enabled') is not True:
+        if chosen:raise ValueError('Vector is niet ingeschakeld voor deze startkopie.')
+        return [], None
+    if vector.get('schema') != 1 or vector.get('native_car') != 6 or vector.get('menu_car') != 7:
+        raise ValueError('Andere Vector-configuratie.')
+    key = 'vector' if chosen else 'normal'
+    rows = vector.get('resources', {}).get(key)
+    if type(rows) is not list or len(rows) != 2:
+        raise ValueError('Vector-resources ontbreken.')
+    result = []
+    for row, name in zip(rows, ('RCS.IND', 'RCS.IMG')):
+        if (row.get('path') != f'vector-vehicle/{key}/{name}' or row.get('target') != name):
+            raise ValueError('Andere Vector-resourcepaden.')
+        raw = read_regular(base/row['path'], 64*1024**2)
+        if hashlib.sha256(raw).hexdigest() != row.get('sha256'):
+            raise ValueError('Vector-resources veranderden; race niet gestart.')
+        result.append((name, raw))
+    binary = None
+    if chosen:
+        binary = 'SPEL-VECTOR'+('-WIDE' if mode == 'widescreen' else '')+'.DAT'
+        spec = vector.get('binaries', {}).get(mode, {})
+        raw = read_regular(base/'game/DATA'/binary, 2*1024**2)
+        if spec.get('binary') != binary or hashlib.sha256(raw).hexdigest() != spec.get('sha256'):
+            raise ValueError('Vector-racebinary veranderde; race niet gestart.')
+    return result, binary
 
 
 def race_display_files(base: Path, state: dict) -> tuple[str, bytes | None]:
@@ -412,6 +509,13 @@ def start_race(base: Path, state: dict) -> dict:
     game, raser, pending = race_inputs(state, original['GAME.INI'], original['RASER.INI'])
     mode, display_profile = race_display_files(base, state)
     pending['race_display'] = mode
+    config_path = base/'Frontend.json'
+    config = json.loads(read_regular(config_path, 65536)) if config_path.exists() else {}
+    vehicle_files, vehicle_binary = vector_race_files(base, state, config, mode)
+    if vehicle_binary:
+        pending['binary'] = vehicle_binary
+    for name, _ in vehicle_files:
+        original[name] = read_regular(data/name, 64*1024**2)
     if display_profile is not None:
         original['dgVoodoo.conf'] = read_regular(data/'dgVoodoo.conf', 65536)
     # Validate map components before committing any chosen values or pending state.
@@ -422,6 +526,7 @@ def start_race(base: Path, state: dict) -> dict:
     planned['last_message'] = 'Race wordt gestart: ' + ('16:9 fullscreen.' if mode == 'widescreen' else 'klassiek 4:3.')
     try:
         changes = [('GAME.INI', game), ('RASER.INI', raser)]
+        changes.extend(vehicle_files)
         if display_profile is not None:
             changes.append(('dgVoodoo.conf', display_profile))
         for n, content in changes:
@@ -445,7 +550,7 @@ def finish_race(state: dict, data: bytes, *, token: str, exit_code: int) -> dict
         return state
     ini = read_ini(data)
     if (integer(ini, 'ETAPPE', 'etappe', 0, 6) != pending['track'] or
-            integer(ini, 'PLAYER', 'car', 0, 6) != pending['car']):
+            integer(ini, 'PLAYER', 'car', 0, 6) != pending.get('native_car', pending['car'])):
         raise ValueError('Racegegevens komen niet overeen met baan en auto.')
     p = next(p for p in state['profiles'] if p['id'] == pending['profile'])
     if pending['track'] > p['next_track']:
@@ -474,6 +579,10 @@ def finish_race(state: dict, data: bytes, *, token: str, exit_code: int) -> dict
 def dispatch(base: Path, command: str, payload: dict) -> dict:
     state = load_state(base)
     cat = catalog(base)
+    if not cat['vector_enabled']:
+        for p in state['profiles']:
+            if p['car'] == 7:
+                select_vector(p, False)
     if command == 'check':
         cat['garage_stats'] = garage_stats(state, cat)
         return {'state': state, 'catalog': cat}
