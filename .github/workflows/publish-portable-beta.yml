@@ -1,0 +1,88 @@
+name: Publish game-free portable beta
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version from VERSION.txt (without v)
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-game-free-portable-beta
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.repository == 'Snowbro007/a2-racers-revival-launcher' && github.ref == 'refs/heads/main'
+    runs-on: windows-latest
+    timeout-minutes: 20
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_VERSION: ${{ inputs.version }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Validate version and refuse replacing a release
+        shell: pwsh
+        run: |
+          if ($env:RELEASE_VERSION -notmatch '^\d+\.\d+\.\d+-beta\.\d+$' -or
+              (Get-Content VERSION.txt -Raw).Trim() -cne $env:RELEASE_VERSION) {
+            throw 'Version does not match the checked-in beta.'
+          }
+          $tag = 'v'+$env:RELEASE_VERSION
+          $PSNativeCommandUseErrorActionPreference = $false
+          gh release view $tag --repo $env:GITHUB_REPOSITORY --json tagName *> $null
+          if ($LASTEXITCODE -eq 0) { throw 'Release already exists.' }
+          git ls-remote --exit-code --tags origin "refs/tags/$tag" | Out-Null
+          if ($LASTEXITCODE -eq 0) { throw 'Tag already exists.' }
+          if ($LASTEXITCODE -ne 2) { throw 'Unable to check remote tag.' }
+      - name: Validate source and run synthetic tests
+        shell: pwsh
+        run: |
+          python tools/check_public_docs.py
+          if ($LASTEXITCODE -ne 0) { throw 'Public documentation check failed.' }
+          python -m unittest discover -s tests -v
+          if ($LASTEXITCODE -ne 0) { throw 'Synthetic tests failed.' }
+      - name: Build and audit code-only portable ZIP
+        shell: pwsh
+        run: |
+          $zip = 'dist/A2-Racers-Revival-'+$env:RELEASE_VERSION+'-Windows-x64.zip'
+          python -B tools/portable_launcher.py build --public --output $zip
+          if ($LASTEXITCODE -ne 0) { throw 'Public ZIP build failed.' }
+          python -B tools/portable_launcher.py audit --archive $zip
+          if ($LASTEXITCODE -ne 0) { throw 'Public ZIP audit failed.' }
+          python -B tools/check_public_release.py --archive $zip --version $env:RELEASE_VERSION
+          if ($LASTEXITCODE -ne 0) { throw 'Game-free ZIP check failed.' }
+          $notes = @"
+          # A2 Racers Revival $env:RELEASE_VERSION
+
+          Draagbare testbeta voor Windows 11. Pak de ZIP volledig uit en open **Launcher.cmd**.
+
+          - Duidelijkere knoppen en uitleg bij ontbrekende HUD/MAX-bronnen.
+          - **Gamebestandenmap openen** maakt een optionele plek voor je eigen games. De eerste start haalt alleen de kleine launcherbasis op; gamehulponderdelen volgen bij voorbereiden.
+          - Deel II: **Origineel menu · gerestaureerd** behoudt het artwork en de handcursor. Kies **Game voorbereiden** om dit met je eigen bestanden op te bouwen. Het menu is visueel getest; raceovergang en Alt+Tab zijn nog te testen. Het Revival-menu blijft aanbevolen.
+          - De losse helper **Maak-snelkoppeling.ps1** is verwijderd. Deel III blijft geblokkeerd wegens de gemelde muis- en stabiliteitsproblemen.
+
+          Games, lokale textureproeven en eigen voortgang zitten niet in deze download. Bewaar bij een portable update je map **local/** en je eigen **Gamebestanden/**. Python hoef je niet zelf te installeren. Voor de eerste voorbereiding is internet nodig.
+
+          Dit is een niet-ondertekende ZIP, geen goedgekeurde MSI-installer of automatische update. Geen nieuw antivirusrapport beschikbaar; er zijn eerdere antivirusmeldingen bekend. Zet je beveiliging niet uit bij een blokkade. De installer- en updater-vrijgavevoorwaarden blijven gelden.
+
+          Onofficieel fanproject, gemaakt met hulp van LLM's. Games en merken blijven van hun rechthebbenden; MIT geldt voor eigen code. Beta zonder garantie.
+          "@
+          $digest = (Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash.ToLowerInvariant()
+          $notes += "`n`nSHA-256 ZIP: ``$digest```n"
+          Set-Content -LiteralPath dist/portable-release-notes.md -Value $notes -Encoding utf8
+      - name: Publish only the audited portable ZIP and checksum
+        shell: pwsh
+        run: |
+          $zip = 'dist/A2-Racers-Revival-'+$env:RELEASE_VERSION+'-Windows-x64.zip'
+          gh release create ('v'+$env:RELEASE_VERSION) $zip ($zip+'.sha256') --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --title ('A2 Racers Revival '+$env:RELEASE_VERSION) --notes-file dist/portable-release-notes.md --prerelease
+          if ($LASTEXITCODE -ne 0) { throw 'Portable release upload failed.' }

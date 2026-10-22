@@ -10,8 +10,8 @@ from tools.trial_manifest import EXPECTED_BINARIES, validate_slug
 MENU_PROFILES = {
     'revival': {'label': 'Revival-menu (aanbevolen)',
                 'description': 'Schermvullend menu met één Windows-cursor, eigen spelers, garage en records. Aanbevolen 16:9-race zonder cd-image: 60 baanstukken, egale lucht, horizon en wolken uit. Klassieke 4:3-keuze bij Opties.'},
-    'original': {'label': 'Origineel menu (instabiel)',
-                 'description': 'Oorspronkelijk MENU.DAT. Bekende problemen met cursor, knipperen en Alt+Tab. Start zonder cd-image via de eigen menu/race-host.'},
+    'original': {'label': 'Origineel menu · gerestaureerd',
+                 'description': 'Het oorspronkelijke artwork en de handcursor, met cursorherstel in een klassiek venster. Eigen voortgang blijft in deze menukopie. Raceovergang en Alt+Tab zijn nog te testen; beeldopties kies je in dit menu.'},
 }
 SOURCE_FILES = {'Menu.ps1': 'ii_frontend.ps1', 'Menu.xaml': 'ii_frontend.xaml',
                 'Backend.py': 'ii_frontend_state.py', 'OwnedSession.ps1': 'ii_owned_session.ps1'}

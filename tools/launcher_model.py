@@ -623,6 +623,8 @@ def main() -> int:
     item.add_argument('--game', choices=('a2racer1', 'a2racer2'), required=True)
     sub.add_parser('ii-menu-plan')
     sub.add_parser('ii-original-menu-plan')
+    item = sub.add_parser('ii-original-stage')
+    item.add_argument('--stage', choices=('menu', 'race'), required=True)
     for action in ("save", "create-session"):
         item = sub.add_parser(action)
         item.add_argument("--game", choices=tuple(DEFAULT_SETTINGS["games"]), required=True)
@@ -663,6 +665,8 @@ def main() -> int:
             result = game_library.ensure_game_folder(ROOT, args.game)
         elif args.action == 'ii-original-menu-plan':
             result = ii_original_launcher.registered_menu(ROOT)
+        elif args.action == 'ii-original-stage':
+            result = ii_original_launcher.select_stage(ROOT, args.stage)
         elif args.action == 'ii-menu-plan':
             result = ii_frontend_launcher.registered_menu(ROOT)
         elif args.action == "plan":
@@ -673,6 +677,8 @@ def main() -> int:
             if args.game == 'a2racer2':
                 from tools.ii_portable_prepare import prepare
                 result.update(prepare(ROOT, sys.executable))
+                from tools.ii_original_prepare import prepare as prepare_original
+                result['original_menu'] = prepare_original(ROOT)
         elif args.action == 'detect-installations':
             from tools.game_installation import discover
             result = discover(ROOT)
@@ -682,9 +688,13 @@ def main() -> int:
             if args.game == 'a2racer2':
                 from tools.ii_portable_prepare import prepare
                 result.update(prepare(ROOT, sys.executable))
+                from tools.ii_original_prepare import prepare as prepare_original
+                result['original_menu'] = prepare_original(ROOT)
         elif args.action == 'prepare-ii':
             from tools.ii_portable_prepare import prepare
             result = prepare(ROOT, sys.executable)
+            from tools.ii_original_prepare import prepare as prepare_original
+            result['original_menu'] = prepare_original(ROOT)
         elif args.action == 'import-iii-installation':
             from tools.iii_installation import import_folder
             result = import_folder(ROOT, args.folder, args.tour)

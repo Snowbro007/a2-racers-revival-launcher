@@ -102,7 +102,12 @@ function Update-Buttons {
         $ui[$name].IsEnabled = $ui.RecommendedOptions.IsEnabled
         $ui[$name].Visibility = 'Visible'
     }
-    if ($script:game -eq 'a2racer2') { $ui.MaxProfile.IsEnabled=$ui.MaxProfile.IsEnabled -and (Get-IIChoiceSupport '4k' 'hd').available }
+    if ($script:game -eq 'a2racer2') {
+        $maxSupport = Get-IIChoiceSupport '4k' 'hd'
+        $ui.MaxProfile.IsEnabled = $ui.MaxProfile.IsEnabled -and $maxSupport.available
+        $ui.MaxProfile.ToolTip = '4K, 60 FPS, 60 baanstukken, egale lucht en HD HUD. Deze combinatie moet nog worden speelgetest.'
+        if (-not $maxSupport.available) { $ui.MaxProfile.ToolTip += "`nNiet beschikbaar: " + $maxSupport.reason }
+    }
     $ui.IIMenuChoice.IsEnabled=[bool]($idle -and $script:initialized -and $script:game -eq 'a2racer2')
     $ui.IIRaceDisplayChoice.IsEnabled=[bool]($idle -and $script:initialized -and $script:game -eq 'a2racer2' -and $ui.IIMenuChoice.SelectedItem.Tag -eq 'revival')
     foreach($name in @('IIResolutionChoice','IIHudChoice','IISkyChoice','IIDistanceChoice')){
@@ -111,7 +116,24 @@ function Update-Buttons {
     foreach($item in $ui.IIHudChoice.Items){
         $support=Get-IIChoiceSupport ([string]$ui.IIResolutionChoice.SelectedItem.Tag) ([string]$item.Tag)
         $item.IsEnabled=($item.Tag -eq 'native' -or $ui.IIResolutionChoice.SelectedItem.Tag -ne '720p') -and $support.available
-        if (-not $support.available) { $item.ToolTip='Deze HUD-variant is op deze pc nog niet voorbereid.' }
+        $item.ToolTip = if (-not $support.available) { 'Niet beschikbaar: ' + $support.reason } else { $null }
+        if ($item.Tag -ne 'native' -and $ui.IIResolutionChoice.SelectedItem.Tag -eq '720p') {
+            $item.ToolTip = 'Kies 1080p of 4K om deze HD HUD te gebruiken.'
+        }
+    }
+    if ($script:initialized -and $script:game -eq 'a2racer2') {
+        $ui.IIHudNote.Text = 'HD HUD vereist 1080p of 4K. Radar en meldingen blijven een proef.'
+        if ($ui.IIResolutionChoice.SelectedItem.Tag -eq '720p') {
+            $ui.IIHudNote.Text = 'Kies 1080p of 4K om HD HUD te gebruiken.'
+        } else {
+            $missingHud = @($ui.IIHudChoice.Items | Where-Object {
+                -not (Get-IIChoiceSupport ([string]$ui.IIResolutionChoice.SelectedItem.Tag) ([string]$_.Tag)).available
+            })
+            if ($missingHud.Count) {
+                $support = Get-IIChoiceSupport ([string]$ui.IIResolutionChoice.SelectedItem.Tag) ([string]$missingHud[0].Tag)
+                $ui.IIHudNote.Text = 'Grijze HUD-keuzes zijn niet beschikbaar: ' + $support.reason
+            }
+        }
     }
     if($script:initialized -and $script:game -eq 'a2racer2' -and $ui.IIMenuChoice.SelectedItem.Tag -eq 'revival'){
         $ui.IntroChoice.IsEnabled=$false;$ui.DebugChoice.IsEnabled=$false
@@ -460,7 +482,7 @@ function Select-Game([string]$GameName) {
     $sourceReady = $script:catalog.games.($GameName).ready
     if (-not $one -and $script:catalog.games.a2racer2.PSObject.Properties.Name -contains 'source_ready') { $sourceReady = $script:catalog.games.a2racer2.source_ready }
     $ui.ImportGame.Visibility = if (-not $sourceReady) { 'Visible' } else { 'Collapsed' }
-    $needsII = -not $one -and -not $script:catalog.ii_menus.revival.available
+    $needsII = -not $one -and (-not $script:catalog.ii_menus.revival.available -or -not $script:catalog.ii_menus.original.available)
     $ui.InstallationPanel.Visibility = if ($ui.ImportGame.Visibility -eq 'Visible' -or $needsII) { 'Visible' } else { 'Collapsed' }
     if (-not $sourceReady) {
         $ui.WelcomeTitle.Text = 'Nog geen game toegevoegd'
@@ -893,7 +915,7 @@ try {
     try { $window = [Windows.Markup.XamlReader]::Load($reader) } finally { $reader.Close() }
     $ui = @{}
     foreach ($name in @('CoverBackdrop','CoverPreview','LauncherBadge','WelcomeTitle','WelcomeHint','GameOne','GameTwo','GameThree','GameOneAvailability','GameTwoAvailability','IIITourChoice','IIIStatus','IIIStartScroll','IIIOverviewPanel','IIITourOverview','IIIReadyOverview','IIIResolutionOverview','IIIProfileChoice','IIIProfileNote','IIIChooseInstallation','GameOneSelected','GameTwoSelected','GameTitle','GameSubtitle','OptionsGameTitle',
-            'IOptionsPanel','IIOptionsNotice','IOverviewPanel','IIOverviewPanel','IIMenuChoice','IIRaceDisplayChoice','IIResolutionChoice','IIHudChoice','IISkyChoice','IIDistanceChoice','IIMenuNote','Pages','PlaySummary','PlayNote','ImportGame','GraphicsChoice',
+            'IOptionsPanel','IIOptionsNotice','IOverviewPanel','IIOverviewPanel','IIMenuChoice','IIRaceDisplayChoice','IIResolutionChoice','IIHudChoice','IIHudNote','IISkyChoice','IIDistanceChoice','IIMenuNote','Pages','PlaySummary','PlayNote','ImportGame','GraphicsChoice',
             'GraphicsNote','ResolutionChoice','ResolutionNote','CameraNote','DistanceChoice','DistanceNote','ObjectDistanceChoice','ObjectDistanceNote','TextureChoice','TextureNote','MenuChoice','MenuNote',
             'HorizonChoice','FocusRecoveryChoice','FocusRecoveryNote','ChooseOptions','RecommendedOptions','OverviewResolution','OverviewFps','OverviewDistance','OverviewObjects','OverviewDetailLabel','SelectionNote','AdvancedOptions','StartScroll','SupportScroll','OptionsScroll','DashboardChoice','FpsChoice','FpsNote','IntroChoice','DebugChoice',
             'OriginalProfile','MaxProfile','SaveOptions','ResetOptions','OpenLogs','OpenDevtools','RefreshState','LogText','StatusTitle','StatusMessage','PlayButton','LauncherVersion','CheckUpdates',
@@ -990,7 +1012,6 @@ try {
         $ui[$name].Add_SelectionChanged({
             if(-not $script:binding -and $script:initialized -and $script:game -eq 'a2racer2'){
                 if($ui.IIResolutionChoice.SelectedItem.Tag -eq '720p' -and $ui.IIHudChoice.SelectedItem.Tag -ne 'native'){Select-Choice $ui.IIHudChoice 'native'}
-                foreach($item in $ui.IIHudChoice.Items){$item.IsEnabled=($item.Tag -eq 'native' -or $ui.IIResolutionChoice.SelectedItem.Tag -ne '720p')}
                 Update-Summary;Update-Buttons
             }
         })
