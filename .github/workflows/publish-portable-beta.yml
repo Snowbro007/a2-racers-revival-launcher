@@ -44,6 +44,9 @@ jobs:
           git ls-remote --exit-code --tags origin "refs/tags/$tag" | Out-Null
           if ($LASTEXITCODE -eq 0) { throw 'Tag already exists.' }
           if ($LASTEXITCODE -ne 2) { throw 'Unable to check remote tag.' }
+          # A missing tag is the expected git exit code 2. GitHub's PowerShell
+          # wrapper otherwise carries that status into a failed job step.
+          exit 0
       - name: Validate source and run synthetic tests
         shell: pwsh
         run: |
