@@ -2,7 +2,7 @@
 
 Een fanlauncher om A2 Racer I en II weer te spelen op Windows 11, met wat extra beeld- en spelinstellingen. Gemaakt met hulp van LLM’s.
 
-**[Download beta 9 voor Windows 11 (.zip)](https://github.com/Snowbro007/a2-racers-revival-launcher/releases/download/v0.1.0-beta.9/A2-Racers-Revival-0.1.0-beta.9-Windows-x64.zip)**
+**[Download beta 10 voor Windows 11 (.zip)](https://github.com/Snowbro007/a2-racers-revival-launcher/releases/download/v0.1.0-beta.10/A2-Racers-Revival-0.1.0-beta.10-Windows-x64.zip)**
 
 Games zitten er niet bij: je hebt je eigen volledige ondersteunde Nederlandse gamebestanden nodig. Deel III is nog in ontwikkeling en blijft geblokkeerd wegens muis- en stabiliteitsproblemen.
 
@@ -13,7 +13,7 @@ Games zitten er niet bij: je hebt je eigen volledige ondersteunde Nederlandse ga
 3. Kies deel I of II en voeg je eigen gamemap of ondersteunde ZIP toe.
 4. Kies **Aanbevolen → Spelen** zodra je game klaarstaat.
 
-Gebruik de download hierboven; **Code → Download ZIP** is de broncode. Python hoef je niet zelf te installeren. De eerste start haalt circa **11,4 MB** aan launcherbasis op. Overige hulponderdelen volgen wanneer je een game toevoegt of voorbereidt. Daarna kun je offline spelen.
+Gebruik de download hierboven; **Code → Download ZIP** is de broncode. Python hoef je niet zelf te installeren. De eerste start haalt circa **11,4 MB** aan launcherbasis op. Overige hulponderdelen volgen wanneer je een game toevoegt of voorbereidt. De grote introspeler van **109,5 MiB** wordt bij deel II overgeslagen en alleen voor deel I met intro opgehaald. Onderbroken downloads kunnen bij een nieuwe poging verdergaan als de server hervatten ondersteunt. Daarna kun je offline spelen.
 
 ### Je gamebestanden
 
@@ -23,6 +23,8 @@ De launcher maakt een eigen kopie en behoudt je bron. Zet geen games in `tools` 
 
 Voor deel II kun je de volledige `A2-Racer-II_Win_NL.zip` kiezen, zonder zelf BIN/CUE uit te pakken of te mounten. Ook anders verpakte ZIP’s worden herkend wanneer het cd-image exact overeenkomt met de ondersteunde Nederlandse v1.01-versie. NRG-images en andere versies worden niet ondersteund.
 
+Bij **A2 Racer II → Ik heb een gamemap** kies je de volledige map met `DATA`. Met **Ik heb een ZIP-bestand** kies je de volledige ZIP. De launcher toont bij een fout de oorzaak; via **Support** kun je de details terugvinden. De menumuziek komt uit je eigen gamebestanden, zonder aparte muziekdownload.
+
 Deel II gebruikt standaard het Revival-menu. Via **Instellingen → Menu** kun je ook **Origineel menu · gerestaureerd** kiezen; gebruik eerst **Game voorbereiden**. Het oorspronkelijke artwork en de handcursor blijven behouden. De raceovergang en Alt+Tab zijn nog te testen. Beide menu’s bewaren hun voortgang apart. Grijze HUD/MAX-keuzes tonen welke lokale bronnen ontbreken.
 
 Heb je de game nog niet, gebruik dan een rechtmatig verkregen eigen cd, installatie of back-up. De launcher downloadt geen games.
@@ -31,4 +33,4 @@ Heb je de game nog niet, gebruik dan een rechtmatig verkregen eigen cd, installa
 
 Dit is een niet-ondertekende, draagbare testbeta; er is geen nieuwe MSI-installer of antivirusbeoordeling vrijgegeven. Windows of antivirus kan waarschuwen of blokkeren en er zijn eerdere antivirusmeldingen bekend. Zet je beveiliging niet uit bij een blokkade. Meld versie, foutmelding en eventuele detectienaam via [GitHub Issues](https://github.com/Snowbro007/a2-racers-revival-launcher/issues) of [HeySnowdude@pm.me](mailto:HeySnowdude@pm.me).
 
-[Release en SHA-256](https://github.com/Snowbro007/a2-racers-revival-launcher/releases/tag/v0.1.0-beta.9). Onofficieel fanproject, zonder steun van de rechthebbenden. Games en merken blijven van hen. [MIT](https://github.com/Snowbro007/a2-racers-revival-launcher/blob/main/LICENSE) geldt voor eigen code; zie [overige licenties](https://github.com/Snowbro007/a2-racers-revival-launcher/blob/main/THIRD-PARTY-NOTICES.md). Beta zonder garantie.
+[Release en SHA-256](https://github.com/Snowbro007/a2-racers-revival-launcher/releases/tag/v0.1.0-beta.10). Onofficieel fanproject, zonder steun van de rechthebbenden. Games en merken blijven van hen. [MIT](https://github.com/Snowbro007/a2-racers-revival-launcher/blob/main/LICENSE) geldt voor eigen code; zie [overige licenties](https://github.com/Snowbro007/a2-racers-revival-launcher/blob/main/THIRD-PARTY-NOTICES.md). Beta zonder garantie.
