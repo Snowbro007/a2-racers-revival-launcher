@@ -1,10 +1,10 @@
 # Hulp bij starten
 
-Download de releasebijlage via [README](../README.md), pak de ZIP helemaal uit en open `Launcher.cmd`. **Code → Download ZIP** bevat de broncode. De draagbare beta 8 is niet digitaal ondertekend.
+Download de releasebijlage via [README](../README.md), pak de ZIP helemaal uit en open `Launcher.cmd`. **Code → Download ZIP** bevat de broncode. De draagbare beta 9 is niet digitaal ondertekend.
 
 ## De eerste voorbereiding duurt lang
 
-Beta 8 haalt bij de eerste start circa 11,4 MB aan launcherbasis op. Overige hulponderdelen volgen pas wanneer je een game toevoegt of voorbereidt. De melding over controleren kan daarbij zichtbaar blijven. Er worden geen games gedownload. Na volledige voorbereiding kun je offline spelen.
+Beta 9 haalt bij de eerste start circa 11,4 MB aan launcherbasis op. Overige hulponderdelen volgen pas wanneer je een game toevoegt of voorbereidt. De melding over controleren kan daarbij zichtbaar blijven. Er worden geen games gedownload. Na volledige voorbereiding kun je offline spelen.
 
 Controleer bij een fout je verbinding en de melding onder **Support**. Een onderdeel met een verkeerde grootte of SHA-256 wordt geweigerd. Wis hiervoor geen voortgang of geïmporteerde games.
 
@@ -15,6 +15,10 @@ Spelen vereist je eigen volledige ondersteunde Nederlandse gamemap of ZIP. Je br
 Met **Gamebestandenmap openen** maak je desgewenst een plek voor je eigen bronnen onder `Gamebestanden/A2 Racer I/` en `Gamebestanden/A2 Racer II/`. Selecteer ze daarna nog in de launcher; neerzetten importeert niets automatisch. Zet geen gamebestanden in `tools`, `assets` of `payload`.
 
 De launcher maakt eigen kopieën en behoudt je bron. Laat hem `local/` beheren en bewaar die map met instellingen en voortgang bij een portable update.
+
+## Deel II herkent mijn ZIP niet
+
+Kies via **Gamearchief kiezen** de volledige `A2-Racer-II_Win_NL.zip`. Open of pak de BIN/CUE niet eerst zelf uit. Vanaf beta 9 wordt de ondersteunde Nederlandse v1.01-cd aan zijn inhoud herkend, ook wanneer de ZIP anders verpakt is. Het oorspronkelijke archief blijft intact. NRG-images, gewijzigde images en andere versies zijn nog niet ondersteund.
 
 ## Een bestand verdwijnt of wordt geblokkeerd
 
