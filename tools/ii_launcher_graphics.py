@@ -24,7 +24,7 @@ from tools.trial_manifest import validate_tree, validate_slug, validate_ancestor
 
 CHOICES = {
     'race_resolution': {'720p': '1280 × 720 · 16:9', '1080p': '1920 × 1080 · 16:9', '4k': '3840 × 2160 · 16:9'},
-    'race_hud': {'native': 'Originele HUD', 'hd': 'HD HUD · tekst en kaders', 'hd-map': 'HD HUD + radar en meldingen · proef'},
+    'race_hud': {'native': 'Originele HUD', 'hd': 'HD HUD · tekst en kaders', 'hd-map': 'HD HUD + radar en meldingen · untested'},
     'sky_mode': {'original': 'Originele horizon en lucht', 'horizon-off': 'Horizon uit · wolken behouden', 'flat': 'Egale lucht · aanbevolen'},
     'race_distance': {'auto': 'Origineel · automatische afstand', '50': 'Ver vooruit · 50 baanstukken', '60': 'Maximaal · 60 baanstukken · aanbevolen'},
 }

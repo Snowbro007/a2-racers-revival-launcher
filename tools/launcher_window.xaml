@@ -309,7 +309,7 @@
                   </Grid>
                   <Border x:Name="IIOverviewPanel" Style="{StaticResource SettingsCard}" Visibility="Collapsed"><StackPanel>
                     <TextBlock Text="A2 Racer II spelmenu" FontSize="19" FontWeight="SemiBold" Foreground="#F4F7FD"/>
-                    <TextBlock Text="Kies bij Instellingen het aanbevolen Revival-menu of het oorspronkelijke, instabiele menu. In het Revival-menu kies je je speler, auto en baan." Style="{StaticResource OptionNote}" FontSize="12"/>
+                    <TextBlock Text="Kies bij Instellingen het aanbevolen Revival-menu of het gerestaureerde oorspronkelijke menu (race untested). In het Revival-menu kies je je speler, auto en baan." Style="{StaticResource OptionNote}" FontSize="12"/>
                   </StackPanel></Border>
                   <TextBlock x:Name="PlaySummary" Foreground="#A6B8CE" FontSize="12" TextWrapping="Wrap" LineHeight="18" Margin="0,8,0,0"/>
                 </StackPanel></ScrollViewer>
@@ -356,7 +356,7 @@
                       <TextBlock Text="Gameplay" Style="{StaticResource SettingsHeading}"/>
                       <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="18"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                         <StackPanel><TextBlock Text="FPS / speltempo" Style="{StaticResource OptionLabel}"/><TextBlock Text="60 FPS · Revival" FontSize="18" Margin="0,8,0,0"/><TextBlock Text="De race gebruikt zijn eigen speltempo." Style="{StaticResource OptionNote}"/></StackPanel>
-                        <StackPanel Grid.Column="2"><TextBlock Text="HUD" Style="{StaticResource OptionLabel}"/><ComboBox x:Name="IIHudChoice" AutomationProperties.Name="A2 Racer II HUD"/><TextBlock x:Name="IIHudNote" Text="HD HUD vereist 1080p of 4K. Radar en meldingen blijven een proef." Style="{StaticResource OptionNote}"/></StackPanel>
+                        <StackPanel Grid.Column="2"><TextBlock Text="HUD" Style="{StaticResource OptionLabel}"/><ComboBox x:Name="IIHudChoice" AutomationProperties.Name="A2 Racer II HUD"/><TextBlock x:Name="IIHudNote" Text="HD HUD vereist 1080p of 4K. Radar en meldingen: untested." Style="{StaticResource OptionNote}"/></StackPanel>
                       </Grid>
                     </StackPanel></Border>
                     <Border Style="{StaticResource SettingsCard}"><StackPanel>
@@ -434,7 +434,7 @@
                 <TextBox x:Name="LogText" Height="190" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" Background="#0C1521" Foreground="#C2D0E5" BorderBrush="#33465B" BorderThickness="1" Padding="12" FontFamily="Consolas" FontSize="12" Text="Nog geen launchersessie gestart."/>
               </StackPanel></ScrollViewer></TabItem>
               <TabItem Header="Spelen" Visibility="Collapsed"><ScrollViewer x:Name="IIIStartScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><StackPanel Margin="0,1,8,0">
-                <TextBlock Text="Je kunt je tour voorbereiden en een gamemap kiezen. Starten is tijdelijk geblokkeerd na een vastloper die de muis vasthield." TextWrapping="Wrap" Foreground="#A6B8CE" FontSize="12" LineHeight="18" Margin="0,0,0,8"/>
+                <TextBlock Text="Je kunt je tour voorbereiden en een gamemap kiezen. unstable · Starten is geblokkeerd na een vastloper die de muis vasthield." TextWrapping="Wrap" Foreground="#A6B8CE" FontSize="12" LineHeight="18" Margin="0,0,0,8"/>
                 <Grid x:Name="IIIOverviewPanel"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="12"/><ColumnDefinition Width="*"/><ColumnDefinition Width="12"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                   <Border Style="{StaticResource OverviewCard}"><StackPanel><TextBlock Text="RESOLUTIE" Style="{StaticResource OverviewLabel}"/><TextBlock x:Name="IIIResolutionOverview" Text="Origineel" Style="{StaticResource OverviewValue}"/></StackPanel></Border>
                   <Border Grid.Column="2" Style="{StaticResource OverviewCard}"><StackPanel><TextBlock Text="TOUR" Style="{StaticResource OverviewLabel}"/><TextBlock x:Name="IIITourOverview" Text="Tour 1" Style="{StaticResource OverviewValue}"/></StackPanel></Border>

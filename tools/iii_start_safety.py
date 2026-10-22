@@ -5,7 +5,7 @@ environment variable, CLI flag or user preference that bypasses this stop.
 """
 
 BLOCK_REASON = (
-    'Start van A2 Racer III is tijdelijk geblokkeerd: een raceproef liep vast '
+    'unstable · Start van A2 Racer III is tijdelijk geblokkeerd: een race liep vast '
     'en hield de muis vast. Eerst moeten de racehang en het vrijgeven van de '
     'muis bij focusverlies veilig zijn opgelost. Voorbereiden blijft mogelijk.'
 )
