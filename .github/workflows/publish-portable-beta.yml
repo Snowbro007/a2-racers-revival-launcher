@@ -62,27 +62,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Public ZIP build failed.' }
           python -B tools/portable_launcher.py audit --archive $zip
           if ($LASTEXITCODE -ne 0) { throw 'Public ZIP audit failed.' }
-          python -B tools/check_public_release.py --archive $zip --version $env:RELEASE_VERSION
+          python -B tools/check_public_release.py --archive $zip --version $env:RELEASE_VERSION --notes-template docs/public-release-notes.md --notes-output dist/portable-release-notes.md
           if ($LASTEXITCODE -ne 0) { throw 'Game-free ZIP check failed.' }
-          $notes = @"
-          # A2 Racers Revival $env:RELEASE_VERSION
-
-          Draagbare testbeta voor Windows 11. Pak de ZIP volledig uit en open **Launcher.cmd**.
-
-          - Duidelijkere knoppen en uitleg bij ontbrekende HUD/MAX-bronnen.
-          - **Gamebestandenmap openen** maakt een optionele plek voor je eigen games. De eerste start haalt alleen de kleine launcherbasis op; gamehulponderdelen volgen bij voorbereiden.
-          - Deel II: **Origineel menu · gerestaureerd** behoudt het artwork en de handcursor. Kies **Game voorbereiden** om dit met je eigen bestanden op te bouwen. Het menu is visueel getest; raceovergang en Alt+Tab zijn nog te testen. Het Revival-menu blijft aanbevolen.
-          - De losse helper **Maak-snelkoppeling.ps1** is verwijderd. Deel III blijft geblokkeerd wegens de gemelde muis- en stabiliteitsproblemen.
-
-          Games, lokale textureproeven en eigen voortgang zitten niet in deze download. Bewaar bij een portable update je map **local/** en je eigen **Gamebestanden/**. Python hoef je niet zelf te installeren. Voor de eerste voorbereiding is internet nodig.
-
-          Dit is een niet-ondertekende ZIP, geen goedgekeurde MSI-installer of automatische update. Geen nieuw antivirusrapport beschikbaar; er zijn eerdere antivirusmeldingen bekend. Zet je beveiliging niet uit bij een blokkade. De installer- en updater-vrijgavevoorwaarden blijven gelden.
-
-          Onofficieel fanproject, gemaakt met hulp van LLM's. Games en merken blijven van hun rechthebbenden; MIT geldt voor eigen code. Beta zonder garantie.
-          "@
-          $digest = (Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash.ToLowerInvariant()
-          $notes += "`n`nSHA-256 ZIP: ``$digest```n"
-          Set-Content -LiteralPath dist/portable-release-notes.md -Value $notes -Encoding utf8
       - name: Publish only the audited portable ZIP and checksum
         shell: pwsh
         run: |

@@ -272,19 +272,32 @@ def import_game(root: Path, archive: Path, game: str = 'a2racer1') -> dict:
     if game not in pins:
         raise ValueError('Deze game kan nog niet uit een archief worden geïmporteerd.')
     pin = pins[game]
-    if file_hash(archive, 2 * 1024**3) != pin:
-        raise ValueError('Dit gamearchief wordt niet herkend; kies de ondersteunde originele Nederlandse versie.')
-    extract_archive(archive, root / "local", game)
+    archive_hash = file_hash(archive, 2 * 1024**3)
+    image = None
+    if archive_hash != pin:
+        if game != 'a2racer2':
+            raise ValueError('Dit gamearchief wordt niet herkend; kies de ondersteunde originele Nederlandse versie.')
+        from tools.ii_archive_import import recognize_archive
+        image = recognize_archive(archive)
+    if image is None:
+        extract_archive(archive, root / 'local', game)
+    else:
+        # Bind extraction to the same verified member and bytes; rechecking
+        # before parsing/publishing prevents a changed ZIP replacing the image.
+        contract = {key: image[key] for key in ('member', 'size', 'sha256')}
+        extract_archive(archive, root / 'local', game, expected_image=contract)
     if game == 'a2racer1':
         from tools.local_game_data import check_local_source
         local_data = check_local_source(root / 'local/games' / game, full=True)
     else:
         from tools.ii_portable_prepare import inspect_source
         local_data = inspect_source(root / 'local/games' / game)
-    if file_hash(archive, 2 * 1024**3) != pin:
+    if file_hash(archive, 2 * 1024**3) != archive_hash:
         raise ValueError("Bronarchief veranderde tijdens import.")
     return {"game": game, "game_imported": True, "game_started": False,
-            "disc_image_required": False, "local_game_data": local_data, "source_unchanged": True}
+            "disc_image_required": False, "local_game_data": local_data, "source_unchanged": True,
+            "archive_recognition": 'verified-disc-image' if image else 'known-archive',
+            "disc_image_sha256": image['sha256'] if image else None}
 
 
 def build(root: Path, destination: Path, game_archive: Path | None = None) -> dict:
