@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 from dataclasses import dataclass
+import hashlib
 import json
 from pathlib import Path
 import shutil
@@ -282,7 +283,7 @@ def publish_stage(stage: Path, target: Path, expected_parent: Path):
                 raise
 
 
-def extract_archive(archive: Path, output_root: Path, game: str) -> dict:
+def extract_archive(archive: Path, output_root: Path, game: str, *, expected_image: dict | None = None) -> dict:
     if game not in GAMES:
         raise DiscError("Unknown game id")
     output_root = Path(output_root).absolute()
@@ -307,20 +308,29 @@ def extract_archive(archive: Path, output_root: Path, game: str) -> dict:
             if len(images) != 1:
                 raise DiscError("Archive must contain exactly one BIN or ISO image")
             selected = images[0]
+            if expected_image is not None:
+                if (set(expected_image) != {'member', 'size', 'sha256'}
+                        or selected.filename != expected_image['member']
+                        or selected.file_size != expected_image['size']):
+                    raise DiscError('Het gecontroleerde cd-image veranderde; import gestopt.')
             if selected.flag_bits & 1 or stat.S_ISLNK(selected.external_attr >> 16):
                 raise DiscError("Encrypted image or ZIP symlink is unsupported")
             if selected.file_size <= 0 or selected.file_size > MAX_IMAGE_BYTES:
                 raise DiscError("Image byte limit exceeded")
             image_path = media_stage / "disc.img"
             count = 0
+            digest = hashlib.sha256()
             with source.open(selected) as incoming, image_path.open("xb") as outgoing:
                 while chunk := incoming.read(1024 * 1024):
                     count += len(chunk)
                     if count > selected.file_size or count > MAX_IMAGE_BYTES:
                         raise DiscError("Image exceeds advertised or permitted length")
                     outgoing.write(chunk)
+                    digest.update(chunk)
             if count != selected.file_size:
                 raise DiscError("Truncated archive member")
+            if expected_image is not None and digest.hexdigest() != expected_image['sha256']:
+                raise DiscError('Het gecontroleerde cd-image veranderde; import gestopt.')
             with DiscImage(image_path) as disc:
                 entries = disc.inventory()
                 for entry in entries:
