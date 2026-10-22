@@ -3,7 +3,7 @@ param([switch]$CheckOnly, [switch]$Diagnostic, [switch]$Dismount, [string]$GameA
       [ValidateRange(-1, 120)][int]$RaceFPSLimit = -1,
       [ValidateSet('original', 'gdi', 'svga', 'no-dither')][string]$MapMode,
       [ValidateSet('original', 'borderless-4-3', 'hd-1280x960', 'hd-1280x960-fake', 'hd-1920x1440')][string]$DisplayProfile,
-      [string]$ProgressPath, [switch]$LauncherOnly)
+      [string]$ProgressPath, [switch]$LauncherOnly, [switch]$SkipMedia)
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $kitRoot = Split-Path -Parent $PSScriptRoot
@@ -36,6 +36,7 @@ try {
         [Environment]::GetEnvironmentVariable('PROCESSOR_ARCHITECTURE', 'Machine') -eq 'ARM64') {
         throw 'Dit testpakket is voor Windows x64 op Intel/AMD.'
     }
+    if ($SkipMedia -and -not $CheckOnly) { throw 'SkipMedia is uitsluitend voor voorbereiding zonder gamestart.' }
     Assert-PortablePath $kitRoot
     $publicMarker = Join-Path $kitRoot 'public-release.json'
     if (Test-Path -LiteralPath $publicMarker) {
@@ -43,7 +44,7 @@ try {
         if ((Get-Item -LiteralPath $publicMarker).Length -gt 4096) { throw 'Openbaar releaserecord is te groot.' }
         $publicRelease = [IO.File]::ReadAllText($publicMarker) | ConvertFrom-Json
         if ($publicRelease.schema -ne 1 -or $publicRelease.component_delivery -ne 'verified-provider-download' -or $publicRelease.games_bundled -ne $false) { throw 'Onbekende openbare release.' }
-        & (Join-Path $PSScriptRoot 'Initialize-A2Public.ps1') -KitPath $kitRoot -ProgressPath $ProgressPath -LauncherOnly:$LauncherOnly
+        & (Join-Path $PSScriptRoot 'Initialize-A2Public.ps1') -KitPath $kitRoot -ProgressPath $ProgressPath -LauncherOnly:$LauncherOnly -SkipMedia:$SkipMedia
         if (-not $?) { throw 'Componentdownload of hashcontrole faalde; niets gestart.' }
     }
     $pythonArchive = Join-Path $kitRoot 'payload\python-3.13.16-embed-amd64.zip'
@@ -91,6 +92,7 @@ try {
     $pythonPath = Join-Path $pythonRoot 'python.exe'
     $setupArguments = @('-B', (Join-Path $PSScriptRoot 'portable_test.py'), 'setup')
     if ($LauncherOnly) { $setupArguments += '--launcher-only' }
+    if ($SkipMedia) { $setupArguments += '--skip-media' }
     Write-Host $(if ($LauncherOnly) { 'Launcheronderdelen controleren; er wordt nog geen game gecontroleerd.' } else { 'Speelonderdelen en compatibiliteitsbestanden controleren...' })
     & $pythonPath @setupArguments
     if ($LASTEXITCODE -ne 0) { throw 'Componentvoorbereiding faalde; niets gestart.' }

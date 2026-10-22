@@ -130,7 +130,7 @@ $all=@(Get-A2PublicProviders);$launcher=@(Get-A2PublicProviders -LauncherOnly)
 $data=[Text.Encoding]::UTF8.GetBytes('fixture');$pin=Pin $data
 $payload=Join-Path $Folder 'payload';[IO.Directory]::CreateDirectory($payload)|Out-Null
 [IO.File]::WriteAllBytes((Join-Path $payload 'python.zip'),$data)
-function Get-A2PublicProviders([switch]$LauncherOnly) {
+function Get-A2PublicProviders([switch]$LauncherOnly,[switch]$SkipMedia) {
     $selected=@(@{name='python.zip';sha256=$pin;url='https://example.invalid/python.zip'})
     if(-not $LauncherOnly){$selected+=@{name='game.zip';sha256=$pin;url='https://example.invalid/game.zip'}}
     return $selected

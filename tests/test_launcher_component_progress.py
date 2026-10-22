@@ -64,7 +64,7 @@ class LauncherComponentProgressTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stderr)
             data = json.loads(result.stdout.strip())
             self.assertEqual(data['valid']['title'], 'Onderdelen downloaden')
-            self.assertIn('Video en muziek', data['valid']['message'])
+            self.assertIn('Introspeler voor A2 Racer I', data['valid']['message'])
             self.assertIn('1 van 2 MB', data['valid']['message'])
             self.assertIn('ontvangen', data['unknown']['message'])
             self.assertIn('uitgepakt', data['complete']['message'])

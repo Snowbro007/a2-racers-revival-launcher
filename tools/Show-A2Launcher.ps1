@@ -12,7 +12,7 @@ $script:operation = $null; $script:worker = $null; $script:sessionName = $null
 $script:catalog = $null; $script:settings = $null; $script:game = 'a2racer1'; $script:binding = $false
 $script:initialized = $false; $script:bootstrapAttempted = $false
 $script:releaseInitialized = $false
-$script:gameComponentsVerified = $false; $script:afterComponents = $null
+$script:gameComponentsVerified = $false; $script:mediaComponentsVerified = $false; $script:afterComponents = $null
 $script:installationScanAttempted = $false
 $script:installationScanNote = $null
 $script:developmentRuntimes = [bool](($PythonPath -and $PowerShellPath) -or
@@ -655,12 +655,20 @@ function Start-Model([string]$Kind, [string[]]$Arguments) {
 }
 
 function Start-GameComponentPreparation([string]$Kind, [string[]]$Arguments) {
-    if ($script:gameComponentsVerified -or -not (Test-Path -LiteralPath (Join-Path $workspacePath 'public-release.json'))) { return $false }
+    # Import never requires the intro player; II menu music is already WAV.
+    # Inspect the queued arguments so changing the UI cannot change this job.
+    $introIndex = [Array]::IndexOf($Arguments, '--intro')
+    $needsMedia = $Kind -eq 'start' -and $script:game -eq 'a2racer1' -and
+        $introIndex -ge 0 -and $introIndex + 1 -lt $Arguments.Count -and $Arguments[$introIndex + 1] -eq '1'
+    if (($script:gameComponentsVerified -and (-not $needsMedia -or $script:mediaComponentsVerified)) -or
+            -not (Test-Path -LiteralPath (Join-Path $workspacePath 'public-release.json'))) { return $false }
     if ($script:operation) { return $true }
-    $script:afterComponents = @{kind=$Kind;arguments=[string[]]$Arguments}
+    $script:afterComponents = @{kind=$Kind;arguments=[string[]]$Arguments;media=$needsMedia}
     Set-Status 'Spelonderdelen voorbereiden' 'Je hebt een game gekozen. Nu worden de onderdelen voor beeld, geluid en starten opgehaald; je game wordt niet gedownload.'
     $progress = Join-Path $workspacePath 'local\launcher\component-progress.json'
-    Start-Operation 'game-components' (Join-Path $env:SystemRoot 'System32\WindowsPowerShell\v1.0\powershell.exe') @('-NoLogo','-NoProfile','-STA','-ExecutionPolicy','Bypass','-File',(Join-Path $PSScriptRoot 'Start-A2Portable.ps1'),'-CheckOnly','-ProgressPath',$progress)
+    $prepareArguments = @('-NoLogo','-NoProfile','-STA','-ExecutionPolicy','Bypass','-File',(Join-Path $PSScriptRoot 'Start-A2Portable.ps1'),'-CheckOnly','-ProgressPath',$progress)
+    if (-not $needsMedia) { $prepareArguments += '-SkipMedia' }
+    Start-Operation 'game-components' (Join-Path $env:SystemRoot 'System32\WindowsPowerShell\v1.0\powershell.exe') $prepareArguments
     if (-not $script:operation) { $script:afterComponents = $null }
     return $true
 }
@@ -858,7 +866,7 @@ function Read-LauncherComponentProgress([string]$Root, [DateTime]$Since) {
             'PowerShell-7.6.5-win-x64.zip'='PowerShell'
             'cnc-ddraw-v7.0.0.0.zip'='Beeldondersteuning voor deel I'
             'dgVoodoo2_87_5.zip'='3D-ondersteuning'
-            'ffmpeg-9.0.2-essentials_build.zip'='Video en muziek'
+            'ffmpeg-9.0.2-essentials_build.zip'='Introspeler voor A2 Racer I'
         }
         if ($value.stage -eq 'complete') {
             return @{title='Onderdelen voorbereiden';message='Downloads gecontroleerd. De onderdelen worden nu uitgepakt en gecontroleerd.'}
@@ -902,6 +910,7 @@ function Poll-Launcher {
                 $script:gameComponentsVerified = $true
                 $next = $script:afterComponents; $script:afterComponents = $null
                 if (-not $next) { throw 'Er staat geen gameactie klaar na de voorbereiding.' }
+                if ($next.media) { $script:mediaComponentsVerified = $true }
                 Set-Status 'Gekozen game verwerken' 'De spelonderdelen staan klaar. Nu worden uitsluitend de door jou gekozen gamebestanden gecontroleerd.'
                 Start-Model $next.kind $next.arguments
                 return
