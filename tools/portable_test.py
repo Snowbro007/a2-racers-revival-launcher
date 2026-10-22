@@ -212,7 +212,7 @@ def save_exact(path: Path, data: bytes) -> None:
         handle.write(data)
 
 
-def setup_components(root: Path, *, launcher_only: bool = False) -> dict:
+def setup_components(root: Path, *, launcher_only: bool = False, skip_media: bool = False) -> dict:
     if launcher_only:
         # This stage never inspects or imports games and cannot imply game readiness.
         archive = payload(root, "python")
@@ -221,6 +221,8 @@ def setup_components(root: Path, *, launcher_only: bool = False) -> dict:
                 "gameplay_status": "niet gecontroleerd", "downloads": False}
     from tools import trial_manifest as tm
     for kind in PAYLOADS:
+        if skip_media and kind == 'ffmpeg':
+            continue
         payload(root, kind)
     extract_verified(payload(root, "powershell"), PAYLOADS["powershell"][1], root / "local/portable-runtime/powershell")
     cnc = root / "local/components/cnc-ddraw" / tm.CNC_DDRAW_VERSION / "extracted"
@@ -241,15 +243,16 @@ def setup_components(root: Path, *, launcher_only: bool = False) -> dict:
         if hashlib.sha256(config).hexdigest() != tm.DGVOODOO_CONFIG_SOURCE["sha256"]:
             raise ValueError("dgVoodoo-profiel wijkt af van de geteste configuratie.")
         save_exact(dg / tm.DGVOODOO_CONFIG_SOURCE["source"], config)
-    ff = root / "local/components/ffmpeg/9.0.2/ffmpeg-9.0.2-essentials_build.zip"
-    validate_ancestors(ff)
-    if ff.exists():
-        if file_hash(ff, MAX_ZIP) != ARCHIVE_SHA256:
-            raise ValueError("Bestaand FFmpeg-archief wijkt af.")
-    else:
-        ff.parent.mkdir(parents=True, exist_ok=True)
-        with payload(root, "ffmpeg").open("rb") as source, ff.open("xb") as target:
-            shutil.copyfileobj(source, target, 1024**2)
+    if not skip_media:
+        ff = root / "local/components/ffmpeg/9.0.2/ffmpeg-9.0.2-essentials_build.zip"
+        validate_ancestors(ff)
+        if ff.exists():
+            if file_hash(ff, MAX_ZIP) != ARCHIVE_SHA256:
+                raise ValueError("Bestaand FFmpeg-archief wijkt af.")
+        else:
+            ff.parent.mkdir(parents=True, exist_ok=True)
+            with payload(root, "ffmpeg").open("rb") as source, ff.open("xb") as target:
+                shutil.copyfileobj(source, target, 1024**2)
     source = root / "local/games/a2racer1"
     if source.exists():
         validate_tree(source)
@@ -385,16 +388,20 @@ def main() -> int:
                         help="Alleen build: voeg de bekende originele ZIP toe aan een persoonlijk pakket.")
     parser.add_argument("--launcher-only", action="store_true",
                         help="Alleen setup: bereid uitsluitend de Python-runtime voor de launcher voor.")
+    parser.add_argument("--skip-media", action="store_true",
+                        help="Alleen setup: controleer spelonderdelen zonder de introspeler.")
     args = parser.parse_args()
     try:
         if args.include_game_archive is not None and args.action != "build":
             raise ValueError("--include-game-archive is uitsluitend voor build.")
         if args.launcher_only and args.action != "setup":
             raise ValueError("--launcher-only is uitsluitend voor setup.")
+        if args.skip_media and args.action != "setup":
+            raise ValueError("--skip-media is uitsluitend voor setup.")
         if args.action == "settings":
             result = load_settings(ROOT)
         elif args.action == "setup":
-            result = setup_components(ROOT, launcher_only=args.launcher_only)
+            result = setup_components(ROOT, launcher_only=args.launcher_only, skip_media=args.skip_media)
         elif args.action == "import":
             if not args.archive:
                 raise ValueError("Geef --archive.")

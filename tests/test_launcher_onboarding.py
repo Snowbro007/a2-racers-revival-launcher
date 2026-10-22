@@ -24,6 +24,7 @@ $script:PythonPath=Join-Path $Root 'python.exe'
 $script:PowerShellPath=Join-Path $Root 'pwsh.exe'
 [IO.File]::WriteAllText($script:PythonPath,'synthetic non-executable fixture')
 $ui=@{LogText=[PSCustomObject]@{Text=''};StatusTitle=[PSCustomObject]@{Text=''}}
+$script:game='a2racer2';$script:mediaComponentsVerified=$false
 $script:worker=$null;$script:operation=$null;$script:afterComponents=$null
 $script:gameComponentsVerified=$false;$script:calls=@();$script:failStart=$false
 function Assert-LauncherPath([string]$Path){}
@@ -53,6 +54,7 @@ Start-Model 'library-folder' @('game-library-folder','--game','a2racer1')
 $libraryDirect=$script:calls[-1].kind -eq 'library-folder'
 $script:operation=$null
 Start-Model 'import' @('import-installation','--folder','literal game folder','--game','a2racer1')
+$importSkipsMedia=$script:calls[-1].arguments -contains '-SkipMedia'
 $queued=$script:calls[-1].kind -eq 'game-components'
 $fullCheck=$script:calls[-1].arguments -contains '-CheckOnly' -and $script:calls[-1].arguments -notcontains '-LauncherOnly'
 [IO.File]::WriteAllText($script:PowerShellPath,'synthetic non-executable fixture')
@@ -62,6 +64,18 @@ $successCleared=$null -eq $script:afterComponents
 $script:operation=$null
 Start-Model 'start' @('create-session')
 $verifiedDirect=$script:calls[-1].kind -eq 'start'
+$script:operation=$null;$script:game='a2racer1'
+Start-Model 'start' @('create-session','--intro','0')
+$noIntroDirect=$script:calls[-1].kind -eq 'start'
+$script:operation=$null
+Start-Model 'start' @('create-session','--intro','1')
+$introQueuesMedia=$script:calls[-1].kind -eq 'game-components' -and $script:calls[-1].arguments -notcontains '-SkipMedia'
+Complete-Fixture 0
+$introResumed=$script:calls[-1].kind -eq 'start' -and $script:mediaComponentsVerified
+$script:operation=$null
+Start-Model 'start' @('create-session','--intro','1')
+$introCached=$script:calls[-1].kind -eq 'start'
+$script:game='a2racer2'
 $script:operation=$null;$script:gameComponentsVerified=$false
 Start-Model 'start' @('create-session')
 $beforeFailure=$script:calls.Count
@@ -88,7 +102,7 @@ Start-InitialCheck
 $privateFull=$script:calls[-1].arguments -notcontains '-LauncherOnly'
 $outsideRefused=$false
 try{Open-GameLibraryResult ([PSCustomObject]@{schema=1;game='a2racer1';path=(Join-Path $Root 'outside')})}catch{$outsideRefused=$true}
-@{launcherOnly=$launcherOnly;gameRuntimeMissing=$gameRuntimeMissing;snapshotDirect=$snapshotDirect;libraryDirect=$libraryDirect;queued=$queued;fullCheck=$fullCheck;resumed=$resumed;successCleared=$successCleared;verifiedDirect=$verifiedDirect;failureStopped=$failureStopped;missingRuntimeStopped=$missingRuntimeStopped;retryQueued=$retryQueued;launchFailureCleared=$launchFailureCleared;publicMinimal=$publicMinimal;privateFull=$privateFull;outsideRefused=$outsideRefused}|ConvertTo-Json -Compress
+@{importSkipsMedia=$importSkipsMedia;noIntroDirect=$noIntroDirect;introQueuesMedia=$introQueuesMedia;introResumed=$introResumed;introCached=$introCached;launcherOnly=$launcherOnly;gameRuntimeMissing=$gameRuntimeMissing;snapshotDirect=$snapshotDirect;libraryDirect=$libraryDirect;queued=$queued;fullCheck=$fullCheck;resumed=$resumed;successCleared=$successCleared;verifiedDirect=$verifiedDirect;failureStopped=$failureStopped;missingRuntimeStopped=$missingRuntimeStopped;retryQueued=$retryQueued;launchFailureCleared=$launchFailureCleared;publicMinimal=$publicMinimal;privateFull=$privateFull;outsideRefused=$outsideRefused}|ConvertTo-Json -Compress
 '''
 
 
