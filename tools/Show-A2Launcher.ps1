@@ -36,8 +36,43 @@ function New-LauncherProcess([string]$Executable, [string[]]$Arguments, [switch]
     return @{ process=$process; output=$process.StandardOutput.ReadToEndAsync(); error=$process.StandardError.ReadToEndAsync() }
 }
 
+function ConvertTo-LauncherPlainText([string]$Text) {
+    $plain = [regex]::Replace($Text, '\x1B\[[0-?]*[ -/]*[@-~]', '')
+    return [regex]::Replace($plain, '\[(?:\d{1,3};)*\d{1,3}m', '').Trim()
+}
+
 function Set-Status([string]$Title, [string]$Message) {
-    $ui.StatusTitle.Text = $Title; $ui.StatusMessage.Text = $Message
+    $clean = ConvertTo-LauncherPlainText $Message
+    if ([string]::IsNullOrWhiteSpace($clean)) {
+        $clean = 'De actie is gestopt zonder foutdetails. Probeer opnieuw; bekijk Support als dit terugkomt.'
+    }
+    $stale = $clean -match 'Revival-menu moet opnieuw worden voorbereid'
+    $technical = $clean.Length -gt 350 -or $clean -match '(?im)(^\s*Exception:|^Traceback|^\s*at .+|\.ps1:\d+|^\s*File ")'
+    $failure = $Title -match '(onderbroken|niet|fout)'
+    $ui.StatusTitle.Text = $Title
+    if ($stale) {
+        $ui.StatusMessage.Text = 'De lokale speelkopie gebruikt een oudere menuversie. Klik op Game voorbereiden om deze bij te werken.'
+    } elseif ($technical) {
+        $ui.StatusMessage.Text = 'Bekijk Support voor de foutdetails en de volgende stap.'
+    } else { $ui.StatusMessage.Text = $clean }
+    if ($stale -or $technical -or $failure) {
+        $ui.LogText.Text = $clean
+        # Local-only, bounded last failure; no upload. A log write must never
+        # obscure the original failure when the folder is not writable.
+        try {
+            $folder = Join-Path $workspacePath 'local\launcher'
+            $path = Join-Path $folder 'last-error.txt'
+            Assert-LauncherPath $path
+            $null = [IO.Directory]::CreateDirectory($folder)
+            $record = [DateTime]::UtcNow.ToString('o') + "`r`n" + $Title + "`r`n" + $clean.Substring(0, [Math]::Min($clean.Length, 32000))
+            $bytes = (New-Object Text.UTF8Encoding $false).GetBytes($record)
+            $stream = [IO.File]::Open($path, [IO.FileMode]::Create, [IO.FileAccess]::Write, [IO.FileShare]::Read)
+            try { $stream.Write($bytes, 0, $bytes.Length) } finally { $stream.Dispose() }
+        } catch { }
+    }
+    if ($ui.ContainsKey('SupportDetails')) {
+        $ui.SupportDetails.Visibility = if ($stale -or $technical -or $failure) { 'Visible' } else { 'Collapsed' }
+    }
 }
 
 function Set-CoverArtwork([Windows.Controls.Image]$Control, [string]$Path) {
@@ -853,7 +888,14 @@ function Poll-Launcher {
             $pending = $script:operation; $script:operation = $null
             $output = $pending.output.GetAwaiter().GetResult(); $errorText = $pending.error.GetAwaiter().GetResult()
             $code = $pending.process.ExitCode; $pending.process.Dispose()
-            if ($code -ne 0) { throw $errorText.Substring(0, [Math]::Min($errorText.Length, 1600)) }
+            if ($code -ne 0) {
+                # Write-Host from the PowerShell bootstrap arrives on stdout.
+                # Preserve both streams, including errors after progress lines.
+                $detail = (@($errorText, $output) | Where-Object { -not [string]::IsNullOrWhiteSpace($_) } |
+                    ForEach-Object { $_.Substring([Math]::Max(0, $_.Length - 14000)) }) -join "`r`n"
+                if ([string]::IsNullOrWhiteSpace($detail)) { $detail = 'Het achtergrondproces gaf geen foutdetails terug.' }
+                throw ('Actie: ' + $pending.kind + ' / exitcode: ' + $code + "`r`n" + $detail.Substring([Math]::Max(0, $detail.Length - 30000)))
+            }
             if ($pending.kind -eq 'bootstrap') { Start-InitialCheck; return }
             if ($pending.kind -eq 'game-components') {
                 if (-not (Load-Runtimes) -or -not (Test-Path -LiteralPath $script:PowerShellPath -PathType Leaf)) { throw 'Spelonderdelen zijn niet volledig klaargezet; je game is niet gestart.' }
@@ -905,7 +947,7 @@ function Poll-Launcher {
     } catch {
         if ($pending -and $pending.kind -eq 'game-components') { $script:afterComponents = $null; $script:gameComponentsVerified = $false }
         $title = if ($pending -and $pending.kind -eq 'iii-import') { 'Deel III kon niet koppelen' } else { 'Kon niet doorgaan' }
-        Set-Status $title $_.Exception.Message; $ui.LogText.Text = $_.Exception.Message; Update-Buttons
+        Set-Status $title $_.Exception.Message; Update-Buttons
     }
 }
 
@@ -918,7 +960,7 @@ try {
             'IOptionsPanel','IIOptionsNotice','IOverviewPanel','IIOverviewPanel','IIMenuChoice','IIRaceDisplayChoice','IIResolutionChoice','IIHudChoice','IIHudNote','IISkyChoice','IIDistanceChoice','IIMenuNote','Pages','PlaySummary','PlayNote','ImportGame','GraphicsChoice',
             'GraphicsNote','ResolutionChoice','ResolutionNote','CameraNote','DistanceChoice','DistanceNote','ObjectDistanceChoice','ObjectDistanceNote','TextureChoice','TextureNote','MenuChoice','MenuNote',
             'HorizonChoice','FocusRecoveryChoice','FocusRecoveryNote','ChooseOptions','RecommendedOptions','OverviewResolution','OverviewFps','OverviewDistance','OverviewObjects','OverviewDetailLabel','SelectionNote','AdvancedOptions','StartScroll','SupportScroll','OptionsScroll','DashboardChoice','FpsChoice','FpsNote','IntroChoice','DebugChoice',
-            'OriginalProfile','MaxProfile','SaveOptions','ResetOptions','OpenLogs','OpenDevtools','RefreshState','LogText','StatusTitle','StatusMessage','PlayButton','LauncherVersion','CheckUpdates',
+            'OriginalProfile','MaxProfile','SaveOptions','ResetOptions','OpenLogs','OpenDevtools','RefreshState','LogText','StatusTitle','StatusMessage','SupportDetails','PlayButton','LauncherVersion','CheckUpdates',
             'InstallationPanel','InstallationTitle','InstallationChoice','InstallationNote','InstallationFoundSection','InstallationSourceChoices','InstallationFolderHint','DetectInstallations','ChooseInstallation','LinkInstallation','GetGame','PrepareGame',
             'GameLibraryPanel','GameLibraryHelp','GameLibraryInputPath','GameLibraryStorage','OpenGameLibrary')) {
         $ui[$name] = $window.FindName($name)
@@ -1084,6 +1126,15 @@ try {
     })
     $ui.GetGame.Add_Click({
         try { Open-GameSource } catch { Set-Status 'Pagina niet geopend' $_.Exception.Message }
+    })
+    $ui.SupportDetails.Add_Click({
+        if ($ui.Pages.SelectedIndex -eq 3) {
+            $ui.IIIStatus.Text = $ui.LogText.Text
+            $parent = [Windows.LogicalTreeHelper]::GetParent($ui.IIIStatus)
+            while ($parent -and $parent -isnot [Windows.Controls.Expander]) { $parent = [Windows.LogicalTreeHelper]::GetParent($parent) }
+            if ($parent) { $parent.IsExpanded = $true }
+            $ui.IIIStatus.BringIntoView()
+        } else { $ui.Pages.SelectedIndex = 2; $ui.SupportScroll.ScrollToTop() }
     })
     Initialize-LauncherUpdates $window $ui $workspacePath {
         if ($script:initialized -and $script:PythonPath -and (Test-Path -LiteralPath $script:PythonPath -PathType Leaf)) { return $script:PythonPath }

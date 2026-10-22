@@ -465,7 +465,8 @@
               <Grid>
                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="230"/></Grid.ColumnDefinitions>
                 <StackPanel VerticalAlignment="Center" Margin="0,0,18,0"><TextBlock x:Name="StatusTitle" Text="Launcher openen…" Foreground="#C4D5EA" FontWeight="SemiBold" FontSize="13"/>
-                  <TextBlock x:Name="StatusMessage" Text="De launcherbasis wordt klaargezet. Je hoeft nog geen game te hebben toegevoegd." Foreground="#A6B8CE" FontSize="11" TextWrapping="Wrap" LineHeight="17" Margin="0,5,0,0"/>
+                  <TextBlock x:Name="StatusMessage" MaxHeight="36" TextTrimming="CharacterEllipsis" Text="De launcherbasis wordt klaargezet. Je hoeft nog geen game te hebben toegevoegd." Foreground="#A6B8CE" FontSize="11" TextWrapping="Wrap" LineHeight="17" Margin="0,5,0,0"/>
+                  <Button x:Name="SupportDetails" Content="Details bekijken bij Support" Visibility="Collapsed" HorizontalAlignment="Left" Padding="0,5,0,0" Background="Transparent" BorderThickness="0" Foreground="#B7CBDF" FontSize="11"/>
                 </StackPanel>
                 <Button x:Name="PlayButton" Grid.Column="1" Content="Speel A2 Racer I" BorderBrush="#FFE057" Foreground="#142038" FontWeight="SemiBold" FontSize="18" VerticalAlignment="Center" IsEnabled="False" Padding="15,15">
                   <Button.Background><LinearGradientBrush StartPoint="0,0" EndPoint="0,1"><GradientStop Color="#FFE66D" Offset="0"/><GradientStop Color="#EFC339" Offset="1"/></LinearGradientBrush></Button.Background>
