@@ -276,11 +276,14 @@ function Update-LaterStatus {
 function Update-LaterButtons($Idle, $Running) {
     $laterRunning = [bool]($Running -and $script:worker.ContainsKey('kind') -and $script:worker.kind -eq 'later')
     $ui.GameFour.IsEnabled = [bool]($Idle -and $script:initialized)
-    foreach ($name in @('LaterGameChoice','LaterProfileChoice','LaterChooseFolder','LaterChooseArchive')) {
+    foreach ($name in @('LaterGameChoice','LaterProfileChoice','LaterChooseFolder','LaterChooseArchive','LaterPickIV','LaterPickVR')) {
         $ui[$name].IsEnabled = [bool]($Idle -and -not $Running -and $script:initialized)
     }
     $ui.LaterStop.Visibility = if ($laterRunning) { 'Visible' } else { 'Collapsed' }
     $ui.LaterStop.IsEnabled = [bool]($Idle -and $laterRunning -and $script:laterToken)
+    $picked = if ($ui.LaterGameChoice.SelectedItem) { [string]$ui.LaterGameChoice.SelectedItem.Tag } else { '' }
+    $ui.LaterPickIV.BorderBrush = if ($picked -eq 'a2racer4') { '#FFDD4A' } else { '#33465B' }
+    $ui.LaterPickVR.BorderBrush = if ($picked -eq 'vakantieracer') { '#FFDD4A' } else { '#33465B' }
     if ($ui.Pages.SelectedIndex -ne 4) { $ui.GameFour.BorderBrush = '#356E95'; return }
     $game = if ($ui.LaterGameChoice.SelectedItem) { [string]$ui.LaterGameChoice.SelectedItem.Tag } else { 'vakantieracer' }
     $state = Get-LaterGameState $game
@@ -1232,7 +1235,7 @@ try {
         if (-not $ui[$name]) { throw ('Ontbrekend launcherelement: ' + $name) }
     }
     foreach ($name in @('GameFour','GameFourAvailability','LaterGameChoice','LaterProfileChoice','LaterProfileNote','LaterChooseFolder','LaterChooseArchive',
-            'LaterStatus','LaterStop','LaterGameOverview','LaterProfileOverview','LaterReadyOverview','LaterStartScroll')) {
+            'LaterStatus','LaterStop','LaterPickIV','LaterPickVR','LaterGameOverview','LaterProfileOverview','LaterReadyOverview','LaterStartScroll')) {
         $ui[$name] = $window.FindName($name)
         if (-not $ui[$name]) { throw ('Ontbrekend launcherelement: ' + $name) }
     }
@@ -1265,7 +1268,7 @@ try {
     Add-Choice $ui.IIIProfileChoice '1080p · horizon en wolken uit · untested' 'fullhd-skyoff'
     Add-Choice $ui.IIIProfileChoice 'Origineel · unstable' 'original'
     $ui.IIIProfileChoice.SelectedIndex = 0
-    Add-Choice $ui.LaterGameChoice 'Vakantieracer' 'vakantieracer'; Add-Choice $ui.LaterGameChoice 'De Politie Slaat Terug (IV)' 'a2racer4'
+    Add-Choice $ui.LaterGameChoice 'De Politie Slaat Terug (IV)' 'a2racer4'; Add-Choice $ui.LaterGameChoice 'Vakantieracer' 'vakantieracer'
     $ui.LaterGameChoice.SelectedIndex = 0
     Add-Choice $ui.LaterProfileChoice 'HD 1080p · aanbevolen' 'hd1080'; Add-Choice $ui.LaterProfileChoice 'Origineel 640 × 480' 'compat'
     $ui.LaterProfileChoice.SelectedIndex = 0
@@ -1348,6 +1351,8 @@ try {
     foreach ($name in @('LaterGameChoice','LaterProfileChoice')) {
         $ui[$name].Add_SelectionChanged({ if ($script:initialized) { Update-LaterStatus; Update-Buttons } })
     }
+    $ui.LaterPickIV.Add_Click({ Select-Choice $ui.LaterGameChoice 'a2racer4' })
+    $ui.LaterPickVR.Add_Click({ Select-Choice $ui.LaterGameChoice 'vakantieracer' })
     $ui.LaterChooseFolder.Add_Click({
         try {
             $game = (Get-LaterSelection).game

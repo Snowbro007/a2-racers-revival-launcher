@@ -254,7 +254,8 @@
               <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="45"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                 <TextBlock Text="IV" FontFamily="Bahnschrift" FontWeight="Bold" FontSize="32" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Left"/>
                 <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                  <TextBlock Text="IV · Vakantieracer" FontFamily="Bahnschrift" FontWeight="SemiBold" FontSize="19" TextWrapping="Wrap"/>
+                  <TextBlock Text="IV + Vakantieracer" FontFamily="Bahnschrift" FontWeight="SemiBold" FontSize="19" TextWrapping="Wrap"/>
+                  <TextBlock Text="De Politie Slaat Terug" FontSize="11" Foreground="#D3E5FA" Margin="0,2,0,0"/>
                   <TextBlock x:Name="GameFourAvailability" Text="Wordt gecontroleerd" FontSize="12" Foreground="#D3E5FA" Margin="0,4,0,0" TextWrapping="Wrap"/>
                 </StackPanel>
               </Grid>
@@ -512,6 +513,14 @@
                 </StackPanel></Border></Expander>
               </StackPanel></ScrollViewer></TabItem>
               <TabItem Header="Spelen" Visibility="Collapsed"><ScrollViewer x:Name="LaterStartScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><StackPanel Margin="0,1,8,0">
+                <Grid Margin="0,0,0,10"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="12"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                  <Button x:Name="LaterPickIV" Padding="14,12" BorderThickness="2" HorizontalContentAlignment="Left" AutomationProperties.Name="De Politie Slaat Terug kiezen">
+                    <StackPanel><TextBlock Text="De Politie Slaat Terug" FontFamily="Bahnschrift" FontWeight="SemiBold" FontSize="17"/><TextBlock Text="A2 Racer IV" FontSize="11" Foreground="#A6B8CE" Margin="0,3,0,0"/></StackPanel>
+                  </Button>
+                  <Button x:Name="LaterPickVR" Grid.Column="2" Padding="14,12" BorderThickness="2" HorizontalContentAlignment="Left" AutomationProperties.Name="Vakantieracer kiezen">
+                    <StackPanel><TextBlock Text="Vakantieracer" FontFamily="Bahnschrift" FontWeight="SemiBold" FontSize="17"/><TextBlock Text="A2 Vakantieracer" FontSize="11" Foreground="#A6B8CE" Margin="0,3,0,0"/></StackPanel>
+                  </Button>
+                </Grid>
                 <TextBlock Text="Bevestigde HD-basis: origineel menu, je eigen gamebestanden en een aparte lokale speelkopie. Je bron blijft intact." TextWrapping="Wrap" Foreground="#A6B8CE" FontSize="12" LineHeight="18" Margin="0,0,0,8"/>
                 <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="12"/><ColumnDefinition Width="*"/><ColumnDefinition Width="12"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                   <Border Style="{StaticResource OverviewCard}"><StackPanel><TextBlock Text="GAME" Style="{StaticResource OverviewLabel}"/><TextBlock x:Name="LaterGameOverview" Text="Vakantieracer" Style="{StaticResource OverviewValue}"/></StackPanel></Border>
@@ -522,8 +531,8 @@
                   <TextBlock Text="Instellingen" Style="{StaticResource SettingsHeading}"/>
                   <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="16"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                   <StackPanel>
-                  <TextBlock Text="Game" Style="{StaticResource OptionLabel}"/>
-                  <ComboBox x:Name="LaterGameChoice" AutomationProperties.Name="Latere game kiezen"/>
+                  <TextBlock Text="Eigen game toevoegen" Style="{StaticResource OptionLabel}"/>
+                  <ComboBox x:Name="LaterGameChoice" Visibility="Collapsed" AutomationProperties.Name="Latere game kiezen"/>
                   <WrapPanel Margin="0,8,0,4">
                     <Button x:Name="LaterChooseFolder" Content="Gamemap kiezen" Margin="0,0,8,0" AutomationProperties.Name="Eigen gamemap kiezen"/>
                     <Button x:Name="LaterChooseArchive" Content="ZIP kiezen" AutomationProperties.Name="Eigen installatie-ZIP kiezen"/>
