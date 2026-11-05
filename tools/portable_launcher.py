@@ -30,6 +30,8 @@ PUBLIC_FILES = ('LICENSE', 'VERSION.txt', 'tools/prepare_public_release.py', 'do
                 'tools/windows/msi/README.md', 'tools/windows/msi/.gitignore',
                 'tools/windows/msi/audit_msi.ps1')
 EXTRA_FILES = (
+    'tools/Start-LaterGame.ps1', 'tools/later_games_runtime.py',
+    'tools/launcher_later_games.py', 'assets/later-game-sources.json',
     'tools/ii_frontend_art/hud-pixels.json',
     'tools/ii_frontend_art/vector-paint.json', 'tools/ii_frontend_art/vector-preview.png',
     'Controleren.cmd',
