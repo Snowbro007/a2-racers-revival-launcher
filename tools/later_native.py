@@ -8,7 +8,7 @@ import re
 import struct
 from tools import trial_manifest
 
-PROFILES=('compat','hd1080')
+PROFILES=('compat','hd1080','wide1080')
 
 SPECS={
  'a2racer4':{
@@ -176,13 +176,15 @@ def validate_profile(game,profile):
 
 def profile_metadata(profile):
     if profile not in PROFILES: raise ValueError('Onbekend beeldprofiel.')
-    return {'profile':profile,'logical_canvas_requested':[640,480],
-            'render_resolution_requested':[1440,1080] if profile=='hd1080' else [640,480],
-            'race_aspect_ratio_requested':[4,3],'widescreen_requested':False,
-            'race_windowed_requested':profile!='hd1080',
-            'wrapper_windowed_requested':True,
-            'fullscreen_size_requested':profile=='hd1080',
-            'wrapper_3d_resolution_requested':'h:1440, v:1080' if profile=='hd1080' else 'unforced'}
+    wide=profile=='wide1080';hd=profile!='compat'
+    return {'profile':profile,'logical_canvas_requested':[1920,1080] if wide else [640,480],
+            'race_canvas_requested':[1920,1080] if wide else [640,480],
+            'render_resolution_requested':[1920,1080] if wide else [1440,1080] if hd else [640,480],
+            'race_aspect_ratio_requested':[16,9] if wide else [4,3],
+            'widescreen_requested':wide,'user_feedback_status':'confirmed',
+            'race_windowed_requested':not hd,'wrapper_windowed_requested':True,
+            'fullscreen_size_requested':hd,
+            'wrapper_3d_resolution_requested':'h:1920, v:1080' if wide else 'h:1440, v:1080' if hd else 'unforced'}
 
 
 def race_config(raw,profile='compat'):
@@ -192,7 +194,7 @@ def race_config(raw,profile='compat'):
     for section,key,value in [('General','CaptureMouse','false'),('General','CenterAppWindow','true'),
                               ('General','FullScreenMode','false'),
                               ('General','ScalingMode','stretched_ar'),
-                              ('GeneralExt','WindowedAttributes','borderless,fullscreensize' if profile=='hd1080' else 'borderless'),
+                              ('GeneralExt','WindowedAttributes','borderless,fullscreensize' if profile!='compat' else 'borderless'),
                               ('GeneralExt','DesktopBitDepth','16'),
                               ('DirectX','VRAM','32'),
                               ('DirectX','Resolution',settings['wrapper_3d_resolution_requested']),
@@ -208,10 +210,20 @@ def race_ini(raw,game,profile='compat'):
     # trial requests native fullscreen while dgVoodoo forces a desktop-sized
     # window. Compat keeps the confirmed native-windowed path unchanged.
     # This is a requested presentation route, not a runtime resolution claim.
-    for key,value in [('RESOLUTION','3'),('WINDOWED','0' if profile=='hd1080' else '1')]:
+    for key,value in [('RESOLUTION','3'),('WINDOWED','0' if profile!='compat' else '1')]:
         raw=set_ini(raw,'PROGRAM',key,value)
     # The native logger opens/appends/closes its file on every message. Restore
     # the quiet startup used by the earlier variants that reached a race.
     # This avoids diagnostic I/O; it is not proof that a loading hang is fixed.
     raw=set_ini(raw,'HELPDESK','DEBUGON','0')
     return raw
+
+
+def profile_binary(raw,game,kind,profile='compat'):
+    validate_profile(game,profile)
+    output,details=patch_binary(raw,game,kind)
+    if kind=='race' and profile=='wide1080':
+        from tools import later_games_widescreen
+        output,wide=later_games_widescreen.patch(output,game)
+        details=dict(details,sha256=sha(output),widescreen=wide)
+    return output,details

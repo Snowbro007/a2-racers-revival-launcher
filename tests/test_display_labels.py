@@ -38,7 +38,7 @@ class DisplayLabelTests(unittest.TestCase):
 
     @unittest.skipUnless(os.name == 'nt', 'Windows PowerShell')
     def test_powershell_rule_matches_python_and_every_card_has_a_stage(self):
-        script = (". '" + str(ROOT / 'tools/launcher_common.ps1') + "'\n"
+        script = ("$ErrorActionPreference='Stop'\n. '" + str(ROOT / 'tools/launcher_common.ps1') + "'\n"
                   "$out=[ordered]@{}\n"
                   "$out.a=Format-A2Resolution 1440 1080 '4:3' -Status aanbevolen\n"
                   "$out.b=Format-A2Resolution 640 480 '4:3' -Original\n"
@@ -49,7 +49,7 @@ class DisplayLabelTests(unittest.TestCase):
                   "$bad=0;foreach($s in @({Format-A2Resolution 640 0 '4:3'},{Format-A2Resolution -Ratio '21:9'},{Format-A2Resolution},{Get-A2GameStage 'x'})){try{& $s;}catch{$bad++}}\n"
                   "$out.bad=$bad\n"
                   "[Console]::OutputEncoding=[Text.Encoding]::UTF8;$out|ConvertTo-Json -Compress")
-        host = Path(os.environ['SystemRoot']) / 'System32/WindowsPowerShell/v1.0/powershell.exe'
+        host = shutil.which('pwsh') or (Path(os.environ['SystemRoot']) / 'System32/WindowsPowerShell/v1.0/powershell.exe')
         result = subprocess.run([str(host), '-NoProfile', '-NonInteractive', '-Command', script],
                                 capture_output=True, timeout=60)
         self.assertEqual(result.returncode, 0, result.stderr.decode('utf-8', 'replace'))

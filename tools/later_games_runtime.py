@@ -33,6 +33,7 @@ REPORTS='reports/later-games'
 MUTABLE={'game.ini','menu.ini','raser.ini','debug.ini','static.ini'}
 sha=native.sha
 patch_binary=native.patch_binary
+profile_binary=native.profile_binary
 set_ini=native.set_ini
 race_ini=native.race_ini
 profile_metadata=native.profile_metadata
@@ -144,7 +145,7 @@ def prepare(root,game,profile='compat'):
     validate_profile(game,profile)
     provider=load_probe(root);spec=provider.SOURCES[game];mapped=provider.check_source(root,spec)
     wrappers=component_plan(root,game,profile);parent=root/game_base(game,profile);metadata_path=parent/'prepared.json';game_dir=parent/'game'
-    baseline='wrapper-hd1080-v3-mouse-shutdown' if profile=='hd1080' else 'compat640-v2-mouse-shutdown'
+    baseline='native-wide1080-v1-horplus-hud' if profile=='wide1080' else 'wrapper-hd1080-v3-mouse-shutdown' if profile=='hd1080' else 'compat640-v2-mouse-shutdown'
     if metadata_path.exists():
         plain(metadata_path)
         if metadata_path.stat().st_size>4*1024*1024: raise ValueError('Voorbereidingsrecord is te groot.')
@@ -155,7 +156,7 @@ def prepare(root,game,profile='compat'):
         expected={r['target'].casefold():r['sha256'] for r in mapped}
         for kind,name in [('menu','menu.exe'),('race','spel.dat')]:
             source=next(r for r in mapped if r['target'].casefold()==name)
-            expected[name]=patch_binary((root/spec.source/source['source']).read_bytes(),game,kind)[1]['sha256']
+            expected[name]=profile_binary((root/spec.source/source['source']).read_bytes(),game,kind,profile)[1]['sha256']
         expected.update({name.casefold():sha(raw) for name,raw in wrappers.items()})
         if {r['path'].casefold():r['sha256'] for r in metadata['files'] if not is_mutable(r['path'])}!={k:v for k,v in expected.items() if not is_mutable(k)}:
             raise ValueError('Baseline-manifest wijkt af van de eigen bron.')
@@ -177,7 +178,7 @@ def prepare(root,game,profile='compat'):
     menu_ini.write_bytes(set_ini(menu_ini.read_bytes(),'GENERAL','INTROAVI',str(final_game_dir/'INTRO1.MPG')))
     for kind,name in [('menu','menu.exe'),('race','spel.dat')]:
         row=next(r for r in copied if r['target'].casefold()==name);path=game_dir/row['target']
-        updated,details=patch_binary(path.read_bytes(),game,kind);path.write_bytes(updated);patches.append(details)
+        updated,details=profile_binary(path.read_bytes(),game,kind,profile);path.write_bytes(updated);patches.append(details)
     ini=next(game_dir/r['target'] for r in copied if r['target'].casefold()=='raser.ini')
     ini.write_bytes(race_ini(ini.read_bytes(),game,profile))
     for name,raw in wrappers.items(): write_new(game_dir/name,raw)
@@ -192,7 +193,7 @@ def prepare(root,game,profile='compat'):
     metadata.update(profile_metadata(profile))
     metadata['virtual_vram_mb_requested']=32
     if game=='a2racer4': metadata['vram_probe_max_handles']=1024
-    metadata['graphics_revision']=('hd1080-appfullscreen-windowed4:3-v2-20261105' if profile=='hd1080'
+    metadata['graphics_revision']=('native-wide1080-horplus-hud-v1' if profile=='wide1080' else 'hd1080-appfullscreen-windowed4:3-v2-20261105' if profile=='hd1080'
                                    else 'compat640-native16-chain-v2-20261104')
     metadata['graphics_runtime_verified']=False
     metadata['race_startup_grace_seconds']=RaceBaselinePolicy.startup_seconds
