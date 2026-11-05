@@ -34,9 +34,17 @@ Publiceer pas na expliciete vrijgave van de beheerder dezelfde gecontroleerde co
 
 ## Draagbare ZIP-testbeta
 
-**Publish game-free portable beta** publiceert na een expliciete opdracht de bestaande draagbare ZIP-route: launcherbron met `Launcher.cmd` en SHA-256, zonder games, EXE, MSI of andere meegeleverde runtimes. De workflow controleert versie, synthetische tests, documenten en de daadwerkelijke ZIP-inhoud. Bestaande tags en downloads worden niet vervangen.
+**Publish game-free portable beta** publiceert de draagbare ZIP-route: launcherbron met `Launcher.cmd` en SHA-256, zonder games, EXE, MSI of andere meegeleverde runtimes. De workflow controleert versie, synthetische tests, documenten en de daadwerkelijke ZIP-inhoud. Bestaande tags en downloads worden niet vervangen.
 
-Deze ZIP is een niet-ondertekende testbeta. Vermeld ontbrekende antivirus- en runtimebeoordeling in de releasetekst. De bovenstaande MSI-vrijgavevoorwaarden blijven gelden; de updater accepteert deze ZIP niet als goedgekeurde installerupdate. Gebruik voor een volgende installer een nieuwe, hogere versie. Werk de README-downloadlink pas bij nadat de ZIP-release geslaagd is.
+Zo publiceer je een nieuwe draagbare versie:
+
+1. Zet in één pull request `VERSION.txt`, beide `public-release.json`-bestanden en de eerste regel van `docs/public-release-notes.md` op dezelfde nieuwe, hogere versie.
+2. Laat de controles slagen en voeg samen in `main`.
+3. Een push naar `main` die `VERSION.txt` wijzigt, start de workflow automatisch. Na geslaagde controles publiceert die de ZIP en het `.sha256`-bestand als release. Een versie die al gepubliceerd is, wordt automatisch overgeslagen. Handmatig starten kan nog steeds en weigert een bestaande versie.
+
+Draagbare launchers vanaf de versie na beta 11 bieden zo'n release automatisch aan en werken zichzelf na toestemming van de gebruiker bij; zie [updates](updates.md). Elke samengevoegde versieverhoging bereikt dus spelers. Verhoog de versie alleen voor wijzigingen die klaar zijn om uit te brengen.
+
+Deze ZIP is een niet-ondertekende testbeta. Vermeld ontbrekende antivirus- en runtimebeoordeling in de releasetekst. De bovenstaande MSI-vrijgavevoorwaarden blijven gelden: een MSI-installatie accepteert deze ZIP niet als installerupdate. Werk de README-downloadlink bij na een geslaagde ZIP-release.
 
 ## Versie-identiteit
 

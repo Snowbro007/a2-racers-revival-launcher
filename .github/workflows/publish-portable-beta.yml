@@ -1,6 +1,12 @@
 name: Publish game-free portable beta
 
 on:
+  # A version bump on main publishes that version automatically, after the
+  # same documentation check, full synthetic test suite and ZIP audit.
+  # Pushes that do not change VERSION.txt never start a release.
+  push:
+    branches: [main]
+    paths: [VERSION.txt]
   workflow_dispatch:
     inputs:
       version:
@@ -22,7 +28,7 @@ jobs:
     timeout-minutes: 20
     env:
       GH_TOKEN: ${{ github.token }}
-      RELEASE_VERSION: ${{ inputs.version }}
+      INPUT_VERSION: ${{ inputs.version }}
     steps:
       - uses: actions/checkout@v6
         with:
@@ -31,23 +37,36 @@ jobs:
         with:
           python-version: '3.12'
       - name: Validate version and refuse replacing a release
+        id: version
         shell: pwsh
         run: |
-          if ($env:RELEASE_VERSION -notmatch '^\d+\.\d+\.\d+-beta\.\d+$' -or
-              (Get-Content VERSION.txt -Raw).Trim() -cne $env:RELEASE_VERSION) {
-            throw 'Version does not match the checked-in beta.'
+          $checkedIn = (Get-Content VERSION.txt -Raw).Trim()
+          $version = if ($env:GITHUB_EVENT_NAME -eq 'workflow_dispatch') { $env:INPUT_VERSION } else { $checkedIn }
+          if ($version -notmatch '^\d+\.\d+\.\d+(-beta\.\d+)?$' -or $checkedIn -cne $version) {
+            throw 'Version does not match the checked-in version.'
           }
-          $tag = 'v'+$env:RELEASE_VERSION
+          "RELEASE_VERSION=$version" >> $env:GITHUB_ENV
+          $tag = 'v'+$version
           $PSNativeCommandUseErrorActionPreference = $false
           gh release view $tag --repo $env:GITHUB_REPOSITORY --json tagName *> $null
-          if ($LASTEXITCODE -eq 0) { throw 'Release already exists.' }
+          $releaseExists = $LASTEXITCODE -eq 0
           git ls-remote --exit-code --tags origin "refs/tags/$tag" | Out-Null
-          if ($LASTEXITCODE -eq 0) { throw 'Tag already exists.' }
-          if ($LASTEXITCODE -ne 2) { throw 'Unable to check remote tag.' }
+          $tagState = $LASTEXITCODE
+          if ($tagState -ne 0 -and $tagState -ne 2) { throw 'Unable to check remote tag.' }
+          if ($releaseExists -or $tagState -eq 0) {
+            # Manual runs must never replace a release; an automatic run for an
+            # already published version simply has nothing to do.
+            if ($env:GITHUB_EVENT_NAME -eq 'workflow_dispatch') { throw 'Release or tag already exists.' }
+            "publish=false" >> $env:GITHUB_OUTPUT
+            "Version $version is already published; nothing to do."
+          } else {
+            "publish=true" >> $env:GITHUB_OUTPUT
+          }
           # A missing tag is the expected git exit code 2. GitHub's PowerShell
           # wrapper otherwise carries that status into a failed job step.
           exit 0
       - name: Validate source and run synthetic tests
+        if: steps.version.outputs.publish == 'true'
         shell: pwsh
         run: |
           python tools/check_public_docs.py
@@ -55,6 +74,7 @@ jobs:
           python -m unittest discover -s tests -v
           if ($LASTEXITCODE -ne 0) { throw 'Synthetic tests failed.' }
       - name: Build and audit code-only portable ZIP
+        if: steps.version.outputs.publish == 'true'
         shell: pwsh
         run: |
           $zip = 'dist/A2-Racers-Revival-'+$env:RELEASE_VERSION+'-Windows-x64.zip'
@@ -65,8 +85,11 @@ jobs:
           python -B tools/check_public_release.py --archive $zip --version $env:RELEASE_VERSION --notes-template docs/public-release-notes.md --notes-output dist/portable-release-notes.md
           if ($LASTEXITCODE -ne 0) { throw 'Game-free ZIP check failed.' }
       - name: Publish only the audited portable ZIP and checksum
+        if: steps.version.outputs.publish == 'true'
         shell: pwsh
         run: |
           $zip = 'dist/A2-Racers-Revival-'+$env:RELEASE_VERSION+'-Windows-x64.zip'
-          gh release create ('v'+$env:RELEASE_VERSION) $zip ($zip+'.sha256') --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --title ('A2 Racers Revival '+$env:RELEASE_VERSION) --notes-file dist/portable-release-notes.md --prerelease
+          # The launcher updater accepts exactly this ZIP plus its .sha256 file.
+          $kind = if ($env:RELEASE_VERSION -like '*-beta.*') { @('--prerelease') } else { @() }
+          gh release create ('v'+$env:RELEASE_VERSION) $zip ($zip+'.sha256') --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --title ('A2 Racers Revival '+$env:RELEASE_VERSION) --notes-file dist/portable-release-notes.md @kind
           if ($LASTEXITCODE -ne 0) { throw 'Portable release upload failed.' }
