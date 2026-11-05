@@ -90,6 +90,7 @@ jobs:
         run: |
           $zip = 'dist/A2-Racers-Revival-'+$env:RELEASE_VERSION+'-Windows-x64.zip'
           # The launcher updater accepts exactly this ZIP plus its .sha256 file.
-          $kind = if ($env:RELEASE_VERSION -like '*-beta.*') { @('--prerelease') } else { @() }
-          gh release create ('v'+$env:RELEASE_VERSION) $zip ($zip+'.sha256') --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --title ('A2 Racers Revival '+$env:RELEASE_VERSION) --notes-file dist/portable-release-notes.md @kind
+          # One explicit flag value; splatting a one-item if-result passed it letter by letter.
+          $prerelease = if ($env:RELEASE_VERSION -like '*-beta.*') { 'true' } else { 'false' }
+          gh release create ('v'+$env:RELEASE_VERSION) $zip ($zip+'.sha256') --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --title ('A2 Racers Revival '+$env:RELEASE_VERSION) --notes-file dist/portable-release-notes.md ("--prerelease=" + $prerelease)
           if ($LASTEXITCODE -ne 0) { throw 'Portable release upload failed.' }

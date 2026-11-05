@@ -262,7 +262,7 @@ class FrontendModelTests(unittest.TestCase):
     def test_duplicate_keys_no_mutation_and_state_backup(self):
         with self.assertRaises(Exception):model.race_inputs(self.state,GAME+b'[PLAYER]\ncar=1\n',RASER)
         model.save_state(self.base,self.state)
-        changed=model.mutate(self.state,'name',{'name':'Robin'},self.cat);model.save_state(self.base,changed)
+        changed=model.mutate(self.state,'name',{'name':'Speler'},self.cat);model.save_state(self.base,changed)
         self.assertEqual(json.loads((self.base/'menu-state.previous.json').read_bytes())['profiles'][0]['name'],'Speler')
 
     def test_reset_wipes_all_profiles_records_settings_and_previous_state(self):

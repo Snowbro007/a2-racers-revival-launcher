@@ -26,7 +26,7 @@ def fixture():
 
 class StateTests(unittest.TestCase):
     def setUp(self):
-        self.state = model.mutate(model.initial_state(), 'new', {'name': 'Robin'})
+        self.state = model.mutate(model.initial_state(), 'new', {'name': 'Speler'})
 
     def pending(self):
         data, pending = model.race_input(self.state, OPTIONS)
@@ -146,7 +146,7 @@ class BackendTests(unittest.TestCase):
     def test_check_writes_nothing_and_state_survives_new_trial(self):
         model.dispatch(self.base, 'check', {})
         self.assertFalse(Path(self.cfg['state_path']).exists())
-        result = model.dispatch(self.base, 'new', {'name': 'Robin'})['state']
+        result = model.dispatch(self.base, 'new', {'name': 'Speler'})['state']
         self.assertEqual(model.dispatch(self.base, 'check', {})['state'], result)
         model.dispatch(self.base, 'start', {})
         reset = model.dispatch(self.base, 'load', {})['state']
@@ -154,7 +154,7 @@ class BackendTests(unittest.TestCase):
         self.assertEqual(model.profile(reset)['money'], 1000)
 
     def test_transaction_restores_ini_if_saving_fails(self):
-        model.dispatch(self.base, 'new', {'name': 'Robin'})
+        model.dispatch(self.base, 'new', {'name': 'Speler'})
         path = self.base / 'game/INFIO.INI';path.write_bytes(b'synthetic previous result')
         before = Path(self.cfg['state_path']).read_bytes()
         with patch.object(model, 'save', side_effect=OSError('synthetic write failure')):
@@ -163,7 +163,7 @@ class BackendTests(unittest.TestCase):
         self.assertEqual(Path(self.cfg['state_path']).read_bytes(), before)
 
     def test_legacy_check_is_read_only_and_clear_persists_with_backup(self):
-        state = model.mutate(model.initial_state(), 'new', {'name': 'Robin'})
+        state = model.mutate(model.initial_state(), 'new', {'name': 'Speler'})
         model.profile(state).update(stage=1, times=[600])
         state['schema'] = 1
         for p in state['profiles']:del p['score_start']
@@ -196,12 +196,12 @@ class BackendTests(unittest.TestCase):
 
     def test_native_save_files_not_touched(self):
         for name in ('SLOT.A2R', 'SCORE.A2R', 'OPTIE.A2R'):(self.base / 'game' / name).write_bytes(b'preserve')
-        model.dispatch(self.base, 'new', {'name': 'Robin'});model.dispatch(self.base, 'start', {})
+        model.dispatch(self.base, 'new', {'name': 'Speler'});model.dispatch(self.base, 'start', {})
         for name in ('SLOT.A2R', 'SCORE.A2R', 'OPTIE.A2R'):
             self.assertEqual((self.base / 'game' / name).read_bytes(), b'preserve')
 
     def test_wpf_buttons_name_field_and_hidden_lifetime_without_game(self):
-        shell = Path(r'C:\Users\Robin W\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.exe')
+        shell = Path(shutil.which('pwsh') or 'pwsh-unavailable')
         if not shell.is_file():self.skipTest('WPF runtime unavailable')
         self.cfg.update(python=sys.executable, files=[], synthetic_fixture=True,
                         profile_scope='trial', state_path=str(self.base / 'players.json'))
