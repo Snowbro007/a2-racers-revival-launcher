@@ -257,10 +257,10 @@ function Update-LaterStatus {
     $profile = if ($ui.LaterProfileChoice.SelectedItem) { [string]$ui.LaterProfileChoice.SelectedItem.Tag } else { 'hd1080' }
     $state = Get-LaterGameState $game
     $ui.LaterGameOverview.Text = Get-LaterGameTitle $game
-    $ui.LaterProfileOverview.Text = if ($profile -eq 'hd1080') { '1440 × 1080' } else { '640 × 480' }
+    $ui.LaterProfileOverview.Text = if ($profile -eq 'hd1080') { Format-A2Resolution 1440 1080 '4:3' } else { Format-A2Resolution 640 480 '4:3' -Original }
     $ui.LaterReadyOverview.Text = if (-not $script:laterCatalog) { 'Controleren…' } elseif ($state -and $state.ready) { 'Klaar' } else { 'Eigen game nodig' }
     $ui.LaterStatus.Text = if (-not $script:laterCatalog) { 'De gamebestanden worden gecontroleerd.' }
-        elseif ($state -and $state.ready) { 'Je eigen gamebestanden zijn toegevoegd. Kies je beeldoptie en start de game.' }
+        elseif ($state -and $state.ready) { 'Je eigen gamebestanden zijn toegevoegd. Kies je resolutie en start de game.' }
         elseif ($state -and [string]$state.reason -match '^\[(WinError|Errno) [23]\]') { 'Nog geen eigen game toegevoegd. Kies je volledige gamemap of installatie-ZIP.' }
         elseif ($state) { [string]$state.reason } else { 'Deze game staat niet in de catalogus.' }
     $note = if ($profile -eq 'hd1080') { 'Bevestigde HD-basis in de oorspronkelijke 4:3-verhouding, schermvullend weergegeven.' } else { 'Bevestigde lage resolutie als terugvaloptie.' }
@@ -269,19 +269,21 @@ function Update-LaterStatus {
         if ($entry -and $entry.description) { $note = [string]$entry.description }
     }
     $ui.LaterProfileNote.Text = $note
-    $ui.GameFourAvailability.Text = if (-not $script:laterCatalog) { 'Wordt gecontroleerd' }
-        elseif (@($script:laterCatalog.games | Where-Object { $_.ready }).Count) { 'Klaar om te spelen' } else { 'Eigen game nodig' }
+    foreach ($card in @(@('GameFour','a2racer4'),@('GameFive','vakantieracer'))) {
+        $cardState = Get-LaterGameState $card[1]
+        $ui[($card[0] + 'Availability')].Text = if (-not $script:laterCatalog) { 'Wordt gecontroleerd' } elseif ($cardState -and $cardState.ready) { 'Klaar om te spelen' } else { 'Eigen game nodig' }
+    }
 }
 
 function Update-LaterButtons($Idle, $Running) {
     $laterRunning = [bool]($Running -and $script:worker.ContainsKey('kind') -and $script:worker.kind -eq 'later')
-    $ui.GameFour.IsEnabled = [bool]($Idle -and $script:initialized)
+    $ui.GameFour.IsEnabled = [bool]($Idle -and $script:initialized); $ui.GameFive.IsEnabled = $ui.GameFour.IsEnabled
     foreach ($name in @('LaterGameChoice','LaterProfileChoice','LaterChooseFolder','LaterChooseArchive')) {
         $ui[$name].IsEnabled = [bool]($Idle -and -not $Running -and $script:initialized)
     }
     $ui.LaterStop.Visibility = if ($laterRunning) { 'Visible' } else { 'Collapsed' }
     $ui.LaterStop.IsEnabled = [bool]($Idle -and $laterRunning -and $script:laterToken)
-    if ($ui.Pages.SelectedIndex -ne 4) { $ui.GameFour.BorderBrush = '#356E95'; return }
+    if ($ui.Pages.SelectedIndex -ne 4) { $ui.GameFour.BorderBrush = '#356E95'; $ui.GameFive.BorderBrush = '#356E95'; return }
     $game = if ($ui.LaterGameChoice.SelectedItem) { [string]$ui.LaterGameChoice.SelectedItem.Tag } else { 'vakantieracer' }
     $state = Get-LaterGameState $game
     $ready = [bool]($state -and $state.ready)
@@ -291,12 +293,13 @@ function Update-LaterButtons($Idle, $Running) {
     $ui.PlayNote.Text = 'Origineel menu · eigen lokale speelkopie. Sluit de game via het menu of met Game stoppen.'
     $ui.GameTitle.Text = $title
     $ui.GameSubtitle.Text = if ($game -eq 'a2racer4') { 'A2 Racer IV · bevestigde HD-basis' } else { 'A2 Vakantieracer · bevestigde HD-basis' }
-    $ui.GameFour.BorderBrush = '#FFDD4A'
+    $ui.GameFour.BorderBrush = if ($game -eq 'a2racer4') { '#FFDD4A' } else { '#356E95' }
+    $ui.GameFive.BorderBrush = if ($game -eq 'vakantieracer') { '#FFDD4A' } else { '#356E95' }
     $ui.GameOne.BorderBrush = '#356E95'; $ui.GameTwo.BorderBrush = '#356E95'; $ui.GameThree.BorderBrush = '#356E95'
     $ui.GameOneSelected.Visibility = 'Collapsed'; $ui.GameTwoSelected.Visibility = 'Collapsed'
     $keep = @('Start onderbroken','Kon niet doorgaan','Latere game kon niet doorgaan','Game afgesloten','Game gestopt','Gamebestanden toegevoegd','Game gestart','Stoppen gevraagd')
     if (-not $Running -and -not $script:operation -and $script:laterCatalog -and $ui.StatusTitle.Text -notin $keep) {
-        if ($ready) { Set-Status ($title + ' is klaar') 'Kies je beeldoptie en klik op Speel.' }
+        if ($ready) { Set-Status ($title + ' is klaar') 'Kies je resolutie en klik op Speel.' }
         else { Set-Status 'Eigen game nodig' 'Kies je volledige eigen gamemap of installatie-ZIP.' }
     }
 }
@@ -311,8 +314,9 @@ function Update-IIIStatus {
     if ($ui.IIIProfileChoice.SelectedItem) {
         $profile = [string]$ui.IIIProfileChoice.SelectedItem.Tag
         $profileState = $tourState.profiles.($profile)
-        $ui.IIIResolutionOverview.Text = if ($profile -eq 'fullhd-skyoff') { '1920 × 1080' } else { 'Origineel' }
+        $ui.IIIResolutionOverview.Text = if ($profile -eq 'fullhd-skyoff') { Format-A2Resolution 1920 1080 '16:9' } else { 'Origineel' }
         $ui.IIIProfileNote.Text = if ($profileState) { [string]$profileState.reason } else { 'Koppel eerst de gamemap van deze tour.' }
+        if ($profile -eq 'fullhd-skyoff') { $ui.IIIProfileNote.Text = 'Horizon en wolken staan uit. ' + $ui.IIIProfileNote.Text }
     }
 }
 
@@ -656,8 +660,8 @@ function Select-Game([string]$GameName) {
         foreach($entry in $script:catalog.ii_menus.PSObject.Properties){Add-Choice $ui.IIMenuChoice $entry.Value.label $entry.Name $entry.Value.available}
         Select-Choice $ui.IIMenuChoice $preferences.menu_profile
         $ui.IIRaceDisplayChoice.Items.Clear()
-        Add-Choice $ui.IIRaceDisplayChoice 'Breedbeeld · 16:9' 'widescreen'
-        Add-Choice $ui.IIRaceDisplayChoice 'Klassiek 4:3 · 640 × 480' 'classic'
+        Add-Choice $ui.IIRaceDisplayChoice (Format-A2Resolution -Name 'Breedbeeld' -Ratio '16:9') 'widescreen'
+        Add-Choice $ui.IIRaceDisplayChoice (Format-A2Resolution 640 480 '4:3' -Name 'Klassiek') 'classic'
         Select-Choice $ui.IIRaceDisplayChoice $preferences.race_display
         $iiChoices=@{
             IIResolutionChoice=@(@('1280 × 720 · 16:9','720p'),@('1920 × 1080 · 16:9','1080p'),@('3840 × 2160 · 16:9','4k'));
@@ -860,6 +864,12 @@ function Start-IIIGame {
         Set-Status 'Deel III starten' ('Tour '+$tour+' · zonder gemounte cd')
         Update-Buttons
     } catch { Set-Status 'Deel III kon niet starten' $_.Exception.Message }
+}
+
+function Open-LaterGame([string]$Game) {
+    Select-Choice $ui.LaterGameChoice $Game
+    $ui.Pages.SelectedIndex = 4; $ui.LaterStartScroll.ScrollToTop(); Update-LaterStatus; Update-Buttons
+    if (-not $script:operation -and -not ($script:worker -and -not $script:worker.process.HasExited) -and (Load-Runtimes)) { Start-LaterModel 'later-catalog' @('catalog') }
 }
 
 function Start-LaterModel([string]$Kind, [string[]]$Arguments) {
@@ -1231,7 +1241,7 @@ try {
         $ui[$name] = $window.FindName($name)
         if (-not $ui[$name]) { throw ('Ontbrekend launcherelement: ' + $name) }
     }
-    foreach ($name in @('GameFour','GameFourAvailability','LaterGameChoice','LaterProfileChoice','LaterProfileNote','LaterChooseFolder','LaterChooseArchive',
+    foreach ($name in @('GameFour','GameFourAvailability','GameFive','GameFiveAvailability','GameOneStage','GameTwoStage','GameThreeStage','GameFourStage','GameFiveStage','LaterGameChoice','LaterProfileChoice','LaterProfileNote','LaterChooseFolder','LaterChooseArchive',
             'LaterStatus','LaterStop','LaterGameOverview','LaterProfileOverview','LaterReadyOverview','LaterStartScroll')) {
         $ui[$name] = $window.FindName($name)
         if (-not $ui[$name]) { throw ('Ontbrekend launcherelement: ' + $name) }
@@ -1261,13 +1271,14 @@ try {
     } finally { $iconStream.Dispose() }
     Add-Choice $ui.IIITourChoice 'Tour 1' '1'; Add-Choice $ui.IIITourChoice 'Tour 2' '2'
     $ui.IIITourChoice.SelectedIndex = 0
-    Add-Choice $ui.IIIProfileChoice 'Compatibiliteit · untested' 'compat'
-    Add-Choice $ui.IIIProfileChoice '1080p · horizon en wolken uit · untested' 'fullhd-skyoff'
-    Add-Choice $ui.IIIProfileChoice 'Origineel · unstable' 'original'
+    Add-Choice $ui.IIIProfileChoice (Format-A2Resolution -Name 'Compatibel' -Status untested) 'compat'
+    Add-Choice $ui.IIIProfileChoice (Format-A2Resolution 1920 1080 '16:9' -Status untested) 'fullhd-skyoff'
+    Add-Choice $ui.IIIProfileChoice (Format-A2Resolution -Original -Status unstable) 'original'
     $ui.IIIProfileChoice.SelectedIndex = 0
-    Add-Choice $ui.LaterGameChoice 'Vakantieracer' 'vakantieracer'; Add-Choice $ui.LaterGameChoice 'De Politie Slaat Terug (IV)' 'a2racer4'
+    Add-Choice $ui.LaterGameChoice 'De Politie Slaat Terug (IV)' 'a2racer4'; Add-Choice $ui.LaterGameChoice 'Vakantieracer' 'vakantieracer'
     $ui.LaterGameChoice.SelectedIndex = 0
-    Add-Choice $ui.LaterProfileChoice 'HD 1080p · aanbevolen' 'hd1080'; Add-Choice $ui.LaterProfileChoice 'Origineel 640 × 480' 'compat'
+    Add-Choice $ui.LaterProfileChoice (Format-A2Resolution 1440 1080 '4:3' -Status aanbevolen) 'hd1080'; Add-Choice $ui.LaterProfileChoice (Format-A2Resolution 640 480 '4:3' -Original) 'compat'
+    foreach ($stage in @(@('GameOneStage','a2racer1'),@('GameTwoStage','a2racer2'),@('GameThreeStage','a2racer3'),@('GameFourStage','a2racer4'),@('GameFiveStage','vakantieracer'))) { $ui[$stage[0]].Text = Get-A2GameStage $stage[1] }
     $ui.LaterProfileChoice.SelectedIndex = 0
     if ($CheckOnly -or $PreviewPath) {
         if (-not $script:developmentRuntimes) {
@@ -1341,10 +1352,8 @@ try {
         })
     }
     $ui.GameThree.Add_Click({ $ui.Pages.SelectedIndex = 3; Update-IIIStatus; Update-Buttons })
-    $ui.GameFour.Add_Click({
-        $ui.Pages.SelectedIndex = 4; $ui.LaterStartScroll.ScrollToTop(); Update-LaterStatus; Update-Buttons
-        if (-not $script:operation -and -not ($script:worker -and -not $script:worker.process.HasExited) -and (Load-Runtimes)) { Start-LaterModel 'later-catalog' @('catalog') }
-    })
+    $ui.GameFour.Add_Click({ Open-LaterGame 'a2racer4' })
+    $ui.GameFive.Add_Click({ Open-LaterGame 'vakantieracer' })
     foreach ($name in @('LaterGameChoice','LaterProfileChoice')) {
         $ui[$name].Add_SelectionChanged({ if ($script:initialized) { Update-LaterStatus; Update-Buttons } })
     }

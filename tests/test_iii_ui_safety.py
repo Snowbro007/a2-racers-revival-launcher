@@ -11,6 +11,7 @@ FIXTURE = r'''param([string]$Source,[string]$Xaml)
 Set-StrictMode -Version Latest
 $ErrorActionPreference='Stop'
 Add-Type -AssemblyName PresentationFramework,PresentationCore,WindowsBase
+. (Join-Path (Split-Path -Parent $Source) 'launcher_common.ps1')
 $tokens=$null;$errors=$null
 $ast=[Management.Automation.Language.Parser]::ParseFile($Source,[ref]$tokens,[ref]$errors)
 if($errors.Count){throw 'Launcher parser error'}

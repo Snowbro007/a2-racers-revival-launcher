@@ -44,3 +44,32 @@ function Get-LauncherProcesses([string]$Root, [DateTime]$After = [DateTime]::Min
         } catch { } # Access denied/exited process; never guess ownership or kill it.
     }
 }
+
+# One naming rule for every game (see tools/display_labels.py):
+# [Origineel ·] [naam ·] B × H · verhouding [· status]. Status always last.
+function Format-A2Resolution([int]$Width = 0, [int]$Height = 0, [string]$Ratio, [switch]$Original, [string]$Name, [string]$Status) {
+    if (($Width -gt 0) -ne ($Height -gt 0)) { throw 'Geef breedte en hoogte samen op.' }
+    if ($Ratio -and $Ratio -notin @('4:3','16:9')) { throw ('Onbekende beeldverhouding: ' + $Ratio) }
+    if ($Status -and $Status -cnotin @('aanbevolen','untested','unstable','vervallen')) { throw ('Onbekende status: ' + $Status) }
+    $parts = @()
+    if ($Original) { $parts += 'Origineel' }
+    if ($Name) { $parts += $Name }
+    if ($Width -gt 0) { $parts += ([string]$Width + ' ' + [char]0x00D7 + ' ' + [string]$Height) }
+    if ($Ratio) { $parts += $Ratio }
+    if ($Status) { $parts += $Status }
+    if (-not $parts.Count) { throw 'Lege resolutienaam.' }
+    return ($parts -join (' ' + [char]0x00B7 + ' '))
+}
+
+# Development stage per library card, kept in one place so every card uses
+# the same words. Change the text here when a game moves on.
+function Get-A2GameStage([string]$Game) {
+    switch ($Game) {
+        'a2racer1' { return 'Bijna af' }
+        'a2racer2' { return 'Speelbaar ' + [char]0x00B7 + ' wordt verbeterd' }
+        'a2racer3' { return 'In ontwikkeling' }
+        'a2racer4' { return 'Nieuw ' + [char]0x00B7 + ' HD-basis speelbaar' }
+        'vakantieracer' { return 'Nieuw ' + [char]0x00B7 + ' HD-basis speelbaar' }
+    }
+    throw ('Onbekende game: ' + $Game)
+}
