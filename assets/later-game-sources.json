@@ -1,0 +1,2574 @@
+{
+  "schema": 1,
+  "kind": "supported-nl-flat-original-files",
+  "games": {
+    "a2racer4": {
+      "version": "original-nl-v1",
+      "parent": "A2RACER4.EXE",
+      "files": [
+        {
+          "path": "A2RACER4.EXE",
+          "size": 36864,
+          "sha256": "8b5acf2e534c4111e7eeebfe9961e95378678ee1ff557b26369b27c7b5bb0f09"
+        },
+        {
+          "path": "AGENT.INI",
+          "size": 3766,
+          "sha256": "739a1ad3dc4aed7eb0fb9849baf4e1b947a9c5489ae9bc7a7245a2fb35e93bc9"
+        },
+        {
+          "path": "ANMTYPES.INI",
+          "size": 2790,
+          "sha256": "e6637eaa05f4a191880ef25d695376aa0d54754834301e65bd3994c0493977ca"
+        },
+        {
+          "path": "BEHAVIOR.INI",
+          "size": 6794,
+          "sha256": "edd4b06c6bea8ff995f21ad4f4093ace464a2de32d7fb684230995c402890d5d"
+        },
+        {
+          "path": "BONUS.DSO",
+          "size": 25177,
+          "sha256": "cb6de7e518c6716498214b564bf8d3e3c323acd915784c0ae4c49e6c2cf79082"
+        },
+        {
+          "path": "CAR_CFG.INI",
+          "size": 9049,
+          "sha256": "7a552a0d90310b625df5f95c3a692376c241e10cbe4e95fa5c4d4db6667e3b11"
+        },
+        {
+          "path": "CAR_SND.INI",
+          "size": 10364,
+          "sha256": "cdf1d0196b99a4918da0581c8fd23107c7beafb2772911b49fea786269870d02"
+        },
+        {
+          "path": "CH00.AVI",
+          "size": 1418240,
+          "sha256": "532e653b3410254977ee4f9e24b375192546af567ec0a3796faa7b7fa4bdce99"
+        },
+        {
+          "path": "CH01.AVI",
+          "size": 1342976,
+          "sha256": "990a6e5c49d4116a51d2e90af86eb16eaa6d72cb1342fc24af2dceddbbdd91c8"
+        },
+        {
+          "path": "CH02.AVI",
+          "size": 1330688,
+          "sha256": "68d9c67a8fdaa310b4fffc093ad1c7009facfed9bdcbcc32a33025d4ec0f016d"
+        },
+        {
+          "path": "CH03.AVI",
+          "size": 1344512,
+          "sha256": "d68b45bd6deaa970370a14ab64b1e89b87b1124de1d6f25b460989bfdf86fc5f"
+        },
+        {
+          "path": "CH04.AVI",
+          "size": 1421824,
+          "sha256": "5571d0f80d343ab1907277c86710b1040ae1ec4a625bcd82fbf67a40eb2a3603"
+        },
+        {
+          "path": "COMMUNI.INI",
+          "size": 21828,
+          "sha256": "379dc57caa26b6ab06a76f643eec259b5192c70ee8f98c875ceae561fd5b5114"
+        },
+        {
+          "path": "COPS.INI",
+          "size": 2547,
+          "sha256": "97c740a16c15785baf7e2694f48139fac464e02d187696cd707b07a452bbb402"
+        },
+        {
+          "path": "DAMAGE.INI",
+          "size": 12588,
+          "sha256": "14aea18b81757f48b4a3ae8b4802172006db5e6d3d3ca5d129b9e6750a98f0ad"
+        },
+        {
+          "path": "DEBUG.INI",
+          "size": 254,
+          "sha256": "67e1aeed6125a2fb075994d173ddca9958a220b48a5cc5df10b93fc456b91f50"
+        },
+        {
+          "path": "E00_ANIM.INI",
+          "size": 4067,
+          "sha256": "823c30e8c01f455203c511d71a7e0c1bc56be7c61fa4cfedcddd3a0f9b13f062"
+        },
+        {
+          "path": "E01_ANIM.INI",
+          "size": 3511,
+          "sha256": "159fc5ea70409864b1b3c1b78feff80caf0ae74bf28a3da97e1b624144897ffb"
+        },
+        {
+          "path": "E02_ANIM.INI",
+          "size": 3002,
+          "sha256": "2875ab0c95b87946b974937d76de5cf5995501fff614da514ff4ba98c6fc7d2d"
+        },
+        {
+          "path": "E03_ANIM.INI",
+          "size": 3628,
+          "sha256": "19792897da3f522d7054436e6d194a10a30af1e3f3a00e9e4b47277c41890349"
+        },
+        {
+          "path": "E04_ANIM.INI",
+          "size": 3624,
+          "sha256": "3836b5d4ca17b29bfa1925332a2ceb9a3374688a7e7d26f3ce84c42d809f1b9b"
+        },
+        {
+          "path": "E05_ANIM.INI",
+          "size": 3004,
+          "sha256": "97e1a9bfa996093985ac3848b511b2ea30e55f80e2fe3f4b060f39684e30b607"
+        },
+        {
+          "path": "E06_ANIM.INI",
+          "size": 3954,
+          "sha256": "d574f081c917f834b52416f11e9848b68927e57c215efbc0b696dae28167cada"
+        },
+        {
+          "path": "E07_ANIM.INI",
+          "size": 3435,
+          "sha256": "9b0556685d2f94646f67479d2789bd3169c38d03df0423084999e454f566f801"
+        },
+        {
+          "path": "E08_ANIM.INI",
+          "size": 3354,
+          "sha256": "dd3e08e59ab7ec66c2dda3b00fa984cc00769558f0043209188bb8db92912527"
+        },
+        {
+          "path": "E09_ANIM.INI",
+          "size": 2200,
+          "sha256": "4fabd8e6b7cd8c779be3314410787c7e19a310e21fbf5e0198de826c6c98860b"
+        },
+        {
+          "path": "ETAPPE0.CMP",
+          "size": 14236,
+          "sha256": "e01dfbf42b92c5d76f8ef4d4a24fa58261c80dd77d99f757e71ca01c346a1fac"
+        },
+        {
+          "path": "ETAPPE0.DMP",
+          "size": 52240,
+          "sha256": "7d4b93cb225d2ae2d455cc76e504ebb74d6d7cd02ccf2d1a610409fd0aa0cd3f"
+        },
+        {
+          "path": "ETAPPE0.INI",
+          "size": 47451,
+          "sha256": "a138b2f9dd33bcda52c1048ca615238abc121604a637376734bd79bf43c7f49b"
+        },
+        {
+          "path": "ETAPPE0.OMP",
+          "size": 70520,
+          "sha256": "5d84a42677c52ca9b8c4561a147ef45746bdff32399d4a24516cefdec527e301"
+        },
+        {
+          "path": "ETAPPE0.PMP",
+          "size": 19796,
+          "sha256": "94b78f109acc89bbb775182eb7f0159e48df10f6237a56c5b7fd0f9a8e721f0c"
+        },
+        {
+          "path": "ETAPPE0.PTH",
+          "size": 456,
+          "sha256": "9466a50a4aafeb015e907154030629d8b73ea6bafe69b0a12edf6b4649f1a200"
+        },
+        {
+          "path": "ETAPPE0.RMP",
+          "size": 886740,
+          "sha256": "22ebd9408a9adcf46c2ec5bab0bcdb62c01ecc32873464e17f60f4e6e321d935"
+        },
+        {
+          "path": "ETAPPE1.CMP",
+          "size": 12052,
+          "sha256": "420723bcff9bc4d30f8a9e87debaa0022067c064226a49f3b6f99961d6fcce5e"
+        },
+        {
+          "path": "ETAPPE1.DMP",
+          "size": 79852,
+          "sha256": "bfbc3400e71db3563ded9afecfdd135518602bbe16c2aea69c85d1d485bbdaa6"
+        },
+        {
+          "path": "ETAPPE1.HBP",
+          "size": 8,
+          "sha256": "72a4fa3544e43a836ffcb268ce06ccdbc55d44d5e6b1b1c19216a53ea98301fd"
+        },
+        {
+          "path": "ETAPPE1.INI",
+          "size": 42579,
+          "sha256": "09875b8982c862a09efb7281f72f7856df431624b4a95a54b8cb0b5a4bc1de3a"
+        },
+        {
+          "path": "ETAPPE1.OMP",
+          "size": 41892,
+          "sha256": "fcc1f28ed6b3167392cbbff2060503ebd220bba96316cea0421b8d79e89d5899"
+        },
+        {
+          "path": "ETAPPE1.PMP",
+          "size": 27108,
+          "sha256": "f458e7bec5e98c813764a048f6390505b8ffddfb8df2fe426b684e96d27d7627"
+        },
+        {
+          "path": "ETAPPE1.PTH",
+          "size": 1272,
+          "sha256": "3338171eac715a83e9d01fe990f5a2e3fc335167db252772f587d9ac25fec531"
+        },
+        {
+          "path": "ETAPPE1.RMP",
+          "size": 1341204,
+          "sha256": "f52754202904fa0b7e1f12f785286ed184b3a0bf1afed0be412796acdddc87c6"
+        },
+        {
+          "path": "ETAPPE2.CMP",
+          "size": 20596,
+          "sha256": "4d3ffbfc64c1a95d2e53a8f039ca370009de3eaeae67ba426507d6d5b55e1e2f"
+        },
+        {
+          "path": "ETAPPE2.DMP",
+          "size": 48496,
+          "sha256": "df5564dd248e640c75817c62f028c892a5ba0ccb060c6c54be4cd9b376de479c"
+        },
+        {
+          "path": "ETAPPE2.INI",
+          "size": 26490,
+          "sha256": "90a18a5971a6ba4216109cb5e6623768f458cdd4059f76d20e658cbb8a33629d"
+        },
+        {
+          "path": "ETAPPE2.OMP",
+          "size": 42708,
+          "sha256": "1d316c6c7ee9768e171152c64626bec7dfd9ef4ee3c6c724f570b7fd4bb6d11d"
+        },
+        {
+          "path": "ETAPPE2.PMP",
+          "size": 21624,
+          "sha256": "a2855ce61465ffb8b325e4c7ae6667192653b361ae61fd2eaae25332b66a6742"
+        },
+        {
+          "path": "ETAPPE2.PTH",
+          "size": 176,
+          "sha256": "5bb8cc83449e27afee13c448bf4d8c7a14cfd0a3119ec2bc278beb8500339d98"
+        },
+        {
+          "path": "ETAPPE2.RMP",
+          "size": 1035652,
+          "sha256": "cff9a81f3943f4de656705127949c2bcb0393b9e0d244f4b1cbdff9f8a76b45d"
+        },
+        {
+          "path": "ETAPPE3.CMP",
+          "size": 20068,
+          "sha256": "ed9f55cec83ac33b090aae599f6f7dacd25179886a4993470ca57738bc573986"
+        },
+        {
+          "path": "ETAPPE3.DMP",
+          "size": 80860,
+          "sha256": "408c132a899f0d714804444ec03de8125a45576f73a3f7e3de09d81b56796af6"
+        },
+        {
+          "path": "ETAPPE3.INI",
+          "size": 33042,
+          "sha256": "78d979aca6ce3064dbecaff3fb7bd59342a8b57c12bcc483e2da9269d2229f23"
+        },
+        {
+          "path": "ETAPPE3.OMP",
+          "size": 67392,
+          "sha256": "7d95f5e2424304681e5267160aa277b18a088b990ba5bdaa293f071a92324266"
+        },
+        {
+          "path": "ETAPPE3.PMP",
+          "size": 32972,
+          "sha256": "bc0886446fd65ac4ac8b855c483223986d8da78b4a9037c3776064838f5a0f6e"
+        },
+        {
+          "path": "ETAPPE3.PTH",
+          "size": 1208,
+          "sha256": "0fef224240e182366694b45f9a1d95a036eb5cdf4103bddf5d736d90df753330"
+        },
+        {
+          "path": "ETAPPE3.RMP",
+          "size": 1905972,
+          "sha256": "9e656836d9bd12774270c1ba548d3628777e97a3ac19770d032d31bbd8e38193"
+        },
+        {
+          "path": "ETAPPE4.CMP",
+          "size": 26860,
+          "sha256": "bec487d48b3b09b22528df5c59f3af03438a160c4f58f34fd8defac115eae51c"
+        },
+        {
+          "path": "ETAPPE4.DMP",
+          "size": 100444,
+          "sha256": "e060376696b35541c9b906bda1aec94974d9cfd2d06245f76a84f0c538772c92"
+        },
+        {
+          "path": "ETAPPE4.INI",
+          "size": 46634,
+          "sha256": "faa2c83ede6f5fb7b517ed20042f205b6de622bb6483c1295216e0a21b339c81"
+        },
+        {
+          "path": "ETAPPE4.OMP",
+          "size": 69024,
+          "sha256": "a9f2bcd1c552cfe9d65bef51ff237a979eb1b34b991656970344b9e1ccd944aa"
+        },
+        {
+          "path": "ETAPPE4.PMP",
+          "size": 35928,
+          "sha256": "384d6e6cde33c647d1751a723f333ac66a4c9ed0f8d6d088f7d6f24c6b822e5b"
+        },
+        {
+          "path": "ETAPPE4.PTH",
+          "size": 1880,
+          "sha256": "f2f4f49049d684b79acc56e7477384229960cfc54fbab1a5c09352daeadd453c"
+        },
+        {
+          "path": "ETAPPE4.RMP",
+          "size": 1874476,
+          "sha256": "4e91297b571b76c6916e8270ea186641d119af459329b8db541665d86a211842"
+        },
+        {
+          "path": "ETAPPE5.CMP",
+          "size": 16804,
+          "sha256": "3dbb16cc201c8c82770c30deee068f6c5d96936790102d4824c740f2a4effa02"
+        },
+        {
+          "path": "ETAPPE5.DMP",
+          "size": 43384,
+          "sha256": "14bf43ad12568055d3e787746631a729870ee9c267b06f32b246d047920d1863"
+        },
+        {
+          "path": "ETAPPE5.HBP",
+          "size": 8,
+          "sha256": "72a4fa3544e43a836ffcb268ce06ccdbc55d44d5e6b1b1c19216a53ea98301fd"
+        },
+        {
+          "path": "ETAPPE5.INI",
+          "size": 22980,
+          "sha256": "8fc0b93d56110db359c62b22cc60ab99bcc99415bfd05840888e61ee4c5cd32c"
+        },
+        {
+          "path": "ETAPPE5.OMP",
+          "size": 22308,
+          "sha256": "714d41d8375a50139c13d826c7fad263eaebfdfa2a6f8d22868416e82777b6cd"
+        },
+        {
+          "path": "ETAPPE5.PMP",
+          "size": 18056,
+          "sha256": "6eca3a482df35845b4246100bf652f9cbd961222bc6969c090242ef6e063e6b1"
+        },
+        {
+          "path": "ETAPPE5.PTH",
+          "size": 8,
+          "sha256": "72a4fa3544e43a836ffcb268ce06ccdbc55d44d5e6b1b1c19216a53ea98301fd"
+        },
+        {
+          "path": "ETAPPE5.RMP",
+          "size": 798428,
+          "sha256": "46155fc105c32d0b0fe440c261cbcb3577806bdf4829ee1ea5d34fdb8918cea2"
+        },
+        {
+          "path": "ETAPPE6.CMP",
+          "size": 20212,
+          "sha256": "8b0568c1cf66082f660e4a32f07b5fd1cc53df7cbd01f433e56c0cd46b485c9c"
+        },
+        {
+          "path": "ETAPPE6.DMP",
+          "size": 40288,
+          "sha256": "9643d477e5f2ecfc7e9e560c821be6b3aa471e3afa564a4a19a26c3a56dca70f"
+        },
+        {
+          "path": "ETAPPE6.INI",
+          "size": 26911,
+          "sha256": "7e380f009888edf152bd320e68a2138a43fe1e492ae9d51bae0ef13af2eb28b8"
+        },
+        {
+          "path": "ETAPPE6.OMP",
+          "size": 39852,
+          "sha256": "23d75931f9d3ab4b20186c3fcd7166d3cfbc7ea56600e6e6dbc84b9721ccc25a"
+        },
+        {
+          "path": "ETAPPE6.PMP",
+          "size": 18536,
+          "sha256": "f263dcb0d7f7c23af04960a4836b4a037e943ffd9409f7b5a7f9b0222db5d995"
+        },
+        {
+          "path": "ETAPPE6.PTH",
+          "size": 664,
+          "sha256": "9306c9362138fff3228e6fa90f1eff0303ee4631942dc601e39f4c45357fa77a"
+        },
+        {
+          "path": "ETAPPE6.RMP",
+          "size": 885196,
+          "sha256": "a0f7dae1793dbd46ff56205b53fde5bb667d716d3a0ec1c9768150ce76b600ce"
+        },
+        {
+          "path": "ETAPPE7.CMP",
+          "size": 29476,
+          "sha256": "66d88dd82753e8f7300fe4d8cae1af2abcd663d81d1f845a18dccf609484cf89"
+        },
+        {
+          "path": "ETAPPE7.DMP",
+          "size": 67036,
+          "sha256": "ce19cf49629ddfc6735f9a3fce8a59f33c6df6c2a52d8b78c81b99aa74b7f0ca"
+        },
+        {
+          "path": "ETAPPE7.INI",
+          "size": 35386,
+          "sha256": "b411fbfea9e6dc1f22327fbfec2b5d3dfa907abc829d0b9545d8824ae7164741"
+        },
+        {
+          "path": "ETAPPE7.OMP",
+          "size": 25232,
+          "sha256": "36c942d3fb840860ebd69dbd8223442efe7e4a736ce78238171ad3f32656df69"
+        },
+        {
+          "path": "ETAPPE7.PMP",
+          "size": 27628,
+          "sha256": "04cd766896524a4895728411b101dd707246511f77e90a1b4de5aa656dee79c9"
+        },
+        {
+          "path": "ETAPPE7.PTH",
+          "size": 112,
+          "sha256": "2df0a32f57d12cb2f90bac4a91eb47b0eef05cca1fedfdaad17c223a25f4750c"
+        },
+        {
+          "path": "ETAPPE7.RMP",
+          "size": 1260804,
+          "sha256": "bf11ae85b38cb8649407e35b96dc14a4bd2db786f2f53d9c7127753fa78ce375"
+        },
+        {
+          "path": "ETAPPE8.CMP",
+          "size": 27580,
+          "sha256": "19eda12286202c811fa9e2e49fa694d50addcfd69636ae66cefdb8e85c963ab2"
+        },
+        {
+          "path": "ETAPPE8.DMP",
+          "size": 118552,
+          "sha256": "4ca77d5b8d230e8b481736e0aafa4f6eb0b2f7f99c388104b41ac80ee3285da5"
+        },
+        {
+          "path": "ETAPPE8.INI",
+          "size": 29651,
+          "sha256": "2971f16724e813b5c5d60e3ba62b18f46b36d1a4c6f45e5f5c880747a95763d7"
+        },
+        {
+          "path": "ETAPPE8.OMP",
+          "size": 52364,
+          "sha256": "47fc2a999c0b47f039e005e35b679b86c5cd5c22cafa8f9739a06bb63097f3e5"
+        },
+        {
+          "path": "ETAPPE8.PMP",
+          "size": 37196,
+          "sha256": "951a177ff4199def93b94a73086755187e8ba33cb31c6eb0078257df105f14f4"
+        },
+        {
+          "path": "ETAPPE8.PTH",
+          "size": 624,
+          "sha256": "bd1e808609070126d78fc05c0fd74ae4edb20ee6aacb1ba69d74b2ad8cabff15"
+        },
+        {
+          "path": "ETAPPE8.RMP",
+          "size": 2207404,
+          "sha256": "64b142a4768d3d9b95263a03aa295d4779f2c063c13ecf70abc1e195c0123a37"
+        },
+        {
+          "path": "GAME.INI",
+          "size": 16638,
+          "sha256": "3c67f3d4758c4b549507698e2d0693056e694b359561b73567a2614956e382d5"
+        },
+        {
+          "path": "GARAGE.INI",
+          "size": 3263,
+          "sha256": "f5123cb2763c6f293153c303a09a7d0fd5ba8f8b28f16eca0d71dfcb6fe596ed"
+        },
+        {
+          "path": "GEN_ANIM.INI",
+          "size": 20056,
+          "sha256": "a237427af2bfb7e0962a8a80f6f0d006b0fee62e3d8da58b8b49f1a2eb9a9b4f"
+        },
+        {
+          "path": "HUNNY.ACS",
+          "size": 179385,
+          "sha256": "c2512b3d238dfc1868da44064799fbd8710cf39512c3ca51eb56660d9cb13f94"
+        },
+        {
+          "path": "ING_MENU.INI",
+          "size": 339,
+          "sha256": "ce6f23f5b25538dcf92cd6b99605c622a77a6a90922b635c8b3efd7d9066b282"
+        },
+        {
+          "path": "INTEL.INI",
+          "size": 5414,
+          "sha256": "84508fddb2ffb42bca65ae59c3da1db25d6af76a0cabf8fbb9fc5211d66b775c"
+        },
+        {
+          "path": "INTRO1.MPG",
+          "size": 33700324,
+          "sha256": "8c19766ecf6944f8c01995f5b9b7d3413d1f4ae56fdb8835a8e261b53147d822"
+        },
+        {
+          "path": "L0_ANIM.INI",
+          "size": 2677,
+          "sha256": "776bc62b48a2123a33f89df6304e728f1df0ff3dc0d07cea2ae70a6a0e984eb1"
+        },
+        {
+          "path": "L1_ANIM.INI",
+          "size": 2677,
+          "sha256": "776bc62b48a2123a33f89df6304e728f1df0ff3dc0d07cea2ae70a6a0e984eb1"
+        },
+        {
+          "path": "L2_ANIM.INI",
+          "size": 2677,
+          "sha256": "776bc62b48a2123a33f89df6304e728f1df0ff3dc0d07cea2ae70a6a0e984eb1"
+        },
+        {
+          "path": "LANGUAGE.INI",
+          "size": 4064,
+          "sha256": "8f7596359a7e119295cd5c49abb09996ba0105b5c8ed402628cb03fc193386e4"
+        },
+        {
+          "path": "MENU.EXE",
+          "size": 1158656,
+          "sha256": "d56c94301a56dc6c20ac278e15abb2fdccc9a144b6e59986897c67740ba2b0f0"
+        },
+        {
+          "path": "MENU.GID",
+          "size": 8628,
+          "sha256": "a2aa36152b73828d89ce49e5a0881bbb5dae402a1dfa8f6027dbcf77d541b734"
+        },
+        {
+          "path": "MENU.HLP",
+          "size": 1172488,
+          "sha256": "65557c8ac24b2ea126a214362fe4fc088c47b4f98d5bd1f8dfe6378d718667c6"
+        },
+        {
+          "path": "MENU.INI",
+          "size": 2786,
+          "sha256": "340d13f0de874262a8ecb652623af92df01e49942b2995b9061aebf6362062dc"
+        },
+        {
+          "path": "MENUCAPS.INI",
+          "size": 8797,
+          "sha256": "3cbef3bccd5e1a903278411533af178bca67955688f7d16a50c3259318fe402a"
+        },
+        {
+          "path": "MENUMSC.WAV",
+          "size": 5650458,
+          "sha256": "b7d7560317c445ec8ecb1332fad462d6084b692a32b144689b5ce7001f3527a0"
+        },
+        {
+          "path": "MENURCS.CHK",
+          "size": 4974,
+          "sha256": "07c653fca538c5076d5ad3c2315e6dcf111929594f5e0d30bb2912df79ea3cde"
+        },
+        {
+          "path": "MENURCS.IMG",
+          "size": 94400362,
+          "sha256": "c0133230f237b401d9dc84b2bb799ef130dd27afd7700500e6d9c1197c146a66"
+        },
+        {
+          "path": "MENURCS.IND",
+          "size": 13850,
+          "sha256": "6a85de4a68f465a900e5e78ae76581d8288be2fb652f22f9d251018624d489ab"
+        },
+        {
+          "path": "OPPONENT.INI",
+          "size": 8788,
+          "sha256": "cbf7327badfcbaa2fb14ecbc197d77f3f617e76e2bfb7ac99dd8b920aaf5e879"
+        },
+        {
+          "path": "OVERLAY0.INI",
+          "size": 20111,
+          "sha256": "ec2b0f06be5a2aed84e98ff9d71bfc949f2ffe87425342c7d9babf997685e1a0"
+        },
+        {
+          "path": "OVERLAY1.INI",
+          "size": 20119,
+          "sha256": "00b09b9fa58018c97d0d560d7c20c4a93dca9e2157f1fd174c93f12804f1cd98"
+        },
+        {
+          "path": "OVERLAY2.INI",
+          "size": 20117,
+          "sha256": "626033d736cd0330b8f2744beb7da9d9339b529d91da1a6c9563d254e671b888"
+        },
+        {
+          "path": "OVERLAY3.INI",
+          "size": 20119,
+          "sha256": "9ff89a48a122187e5cd06d8b626bf1d22117275f5e915acecc6ac0ea87eba45a"
+        },
+        {
+          "path": "OVERLAY4.INI",
+          "size": 20119,
+          "sha256": "018705f5aaef6023cdd25d2efb5999837b9b1a04586b05ee902db6ba4704ee45"
+        },
+        {
+          "path": "OVERLAY5.INI",
+          "size": 20119,
+          "sha256": "ab1ecabea3f5f1f3cfcd7c404c0e3292ca2c445dc7723a66f6b57951c464ca00"
+        },
+        {
+          "path": "OVERLAY6.INI",
+          "size": 20265,
+          "sha256": "228fd04755a88dfdea45e7130692e1a93052b9479b966de88189ad38866549ce"
+        },
+        {
+          "path": "RASER.INI",
+          "size": 9465,
+          "sha256": "4c816d8533b74951d43c1384f28609742bb6ede7c690a89cec1a1dc82a7e4f06"
+        },
+        {
+          "path": "RC.IMG",
+          "size": 1259939,
+          "sha256": "f1e81bd2b67bead7a514a4306c051425ee31e0a2828c4da2124569a12b612684"
+        },
+        {
+          "path": "RC.IND",
+          "size": 746,
+          "sha256": "520814e4c2ca715c59853ef209f4da4e440fbbaecab3ee0df80ad0f99eba3661"
+        },
+        {
+          "path": "RCS.CHK",
+          "size": 22278,
+          "sha256": "23567d3059b5249b64a6a550006bf7870b33fecb2bb62f0dc486038ee4afdbd0"
+        },
+        {
+          "path": "RCS.IMG",
+          "size": 114235152,
+          "sha256": "ff45b6a2eba87a2ffc52aaa1974e1c47d5665eec4660af24500b405d23368445"
+        },
+        {
+          "path": "RCS.IND",
+          "size": 66890,
+          "sha256": "4e28f1c3db89529d83065153d9749fb729d59ae6160270729869be9ab63500c3"
+        },
+        {
+          "path": "RSC.DLL",
+          "size": 217134,
+          "sha256": "9dd77374ae5b636734260e993830f9d4ea10f21728a5d1debe0c10de87f3cda4"
+        },
+        {
+          "path": "SETDEBUG.EXE",
+          "size": 326144,
+          "sha256": "0e467b035138b3b741830fdbd93e92ba2dcc1b89157b572cd8d582739a877192"
+        },
+        {
+          "path": "SFX.IMG",
+          "size": 61600,
+          "sha256": "b47bfb1b4b15a9cdeca60c7278f82bb5788d18b2dd7e2eb2d89e2e1513c18adf"
+        },
+        {
+          "path": "SFX.IND",
+          "size": 61600,
+          "sha256": "b47bfb1b4b15a9cdeca60c7278f82bb5788d18b2dd7e2eb2d89e2e1513c18adf"
+        },
+        {
+          "path": "SOUND.INI",
+          "size": 8459,
+          "sha256": "6632559e6da6d20bc6c9c6e5f6167635a711aac45e086b77067ae3f2e4487278"
+        },
+        {
+          "path": "SPEL.DAT",
+          "size": 1875968,
+          "sha256": "ccd1b03472b25c8b7acacf4ba7e6abf60f657dfff2efd90f29e740b03f62286b"
+        },
+        {
+          "path": "STATIC.INI",
+          "size": 12270,
+          "sha256": "b0a0f7a11db6c9c601da27a1a9b3755d7568e50fc46a3a973fb09b23fee691e4"
+        },
+        {
+          "path": "TRAFFIC.INI",
+          "size": 2868,
+          "sha256": "a7631764f8cdc7a921c470076fc5998b19ec37d72e33a85b47d4dac7364dc5ae"
+        },
+        {
+          "path": "VDYNS.DAT",
+          "size": 61600,
+          "sha256": "81de2712393ba638cf844e059b05f5d58eacbba961b6b571b05032a9be3e57d9"
+        },
+        {
+          "path": "VERSION.TXT",
+          "size": 112,
+          "sha256": "68443473a0f518f3926a22926a1c04e03b72ace0d7ca07310707ecf80528997b"
+        }
+      ],
+      "core_pins": {
+        "A2RACER4.EXE": "8b5acf2e534c4111e7eeebfe9961e95378678ee1ff557b26369b27c7b5bb0f09",
+        "MENU.EXE": "d56c94301a56dc6c20ac278e15abb2fdccc9a144b6e59986897c67740ba2b0f0",
+        "RSC.DLL": "9dd77374ae5b636734260e993830f9d4ea10f21728a5d1debe0c10de87f3cda4",
+        "SPEL.DAT": "ccd1b03472b25c8b7acacf4ba7e6abf60f657dfff2efd90f29e740b03f62286b"
+      }
+    },
+    "vakantieracer": {
+      "version": "original-nl-v1",
+      "parent": "VRACER.EXE",
+      "files": [
+        {
+          "path": "ANMTYPES.INI",
+          "size": 1578,
+          "sha256": "b142c58488c43c5236f289547cc7bf602194f4cb8065eb81ce1e3a830ec2848a"
+        },
+        {
+          "path": "APPLAUS.WAV",
+          "size": 110502,
+          "sha256": "3823f1adaef5bf227041a75a5477e92fc300f0e701c915236e2ea4793c8b4c5a"
+        },
+        {
+          "path": "BONUS.DSO",
+          "size": 8091,
+          "sha256": "0b410bd718ac2ff0bd01a351efc87f3659c5ea6cef6f8c071d8a74912b1243d5"
+        },
+        {
+          "path": "BUY.WAV",
+          "size": 9524,
+          "sha256": "cbc3868f767f4842136990879777f38e1268d291328cea46546dc211bc24da3e"
+        },
+        {
+          "path": "CAR_CFG.INI",
+          "size": 5750,
+          "sha256": "d96297b7d72dcb3094addc1b134556ae2286602599f9a31ea8764170f9e3cd70"
+        },
+        {
+          "path": "CAR_HIP.BMP",
+          "size": 202538,
+          "sha256": "6df374a3e1b1ea4c680bb49d8bab8cd25e75cf070f7e2a2ab4acd2751f6f6cb6"
+        },
+        {
+          "path": "CAR_JOH.BMP",
+          "size": 202538,
+          "sha256": "495201ee3fb5b49d98ec0e48fbbaf50fb15499bd877daf6a43d11c47ee898212"
+        },
+        {
+          "path": "CAR_OUD.BMP",
+          "size": 202538,
+          "sha256": "841ea0551462c2de54da6aa6959cd37a97659d31521c28d5164a28cac9ad4c8d"
+        },
+        {
+          "path": "CAR_SJA.BMP",
+          "size": 202538,
+          "sha256": "20b25f7695f6656a2fdeba8656acf208c0c3e392ac9e95d08ea2510abba16425"
+        },
+        {
+          "path": "CAR_SMA.BMP",
+          "size": 202538,
+          "sha256": "d0a6737ac0adfd5d49f1f4e436f365b7113614acd6cad54f3be132861649abac"
+        },
+        {
+          "path": "CAR_SND.INI",
+          "size": 9759,
+          "sha256": "9b2dc9a5dbe7f0001fdc5c87b8c9643bf7865d9b36535e0849cbfade9efa7d63"
+        },
+        {
+          "path": "CARS0.DAT",
+          "size": 2480,
+          "sha256": "5b10d92ceb3377e906a4b27b91e9bb1c1721e271323a843232620911ec1aa29e"
+        },
+        {
+          "path": "CARS1.DAT",
+          "size": 2480,
+          "sha256": "5e8be2c07162ad7ac79f09d18732a96f120614abab776edbb6a842a42607f54d"
+        },
+        {
+          "path": "CARS2.DAT",
+          "size": 2480,
+          "sha256": "2cccd277f316e9352a7fed6bf1554b4c075db8887a21a2f2b7474c8e397805c6"
+        },
+        {
+          "path": "CHARACTE.BMP",
+          "size": 1440054,
+          "sha256": "51ed89e3bfe50efeea6a9dfa888fcb16a9814f083566d4d63ac731e70dd6fa76"
+        },
+        {
+          "path": "COPS.INI",
+          "size": 1744,
+          "sha256": "6ed49307d6d52fcc5e92e3334b48ae2cf9bce7f6e66cfc3200a63a564c0eaf41"
+        },
+        {
+          "path": "DEBUG.INI",
+          "size": 20,
+          "sha256": "e6247455bb932ce75f1af873aca2c61860fb3a25b24adb45ac8bb47a9bf4d3f6"
+        },
+        {
+          "path": "DIFFICUL.BMP",
+          "size": 1440054,
+          "sha256": "ac8d9e2ada6e510b556f176859cd686d82a09b7a3e3e9d16e60b2fd962e71dda"
+        },
+        {
+          "path": "E00_ANIM.INI",
+          "size": 2396,
+          "sha256": "6278232dd83b46a29803d55403dd3f1bd7f75d9e8c6ec814f7dc40e9a07e39b1"
+        },
+        {
+          "path": "E01_ANIM.INI",
+          "size": 2400,
+          "sha256": "cac15b5f0543404ca1968384fad1327bda7294e27ab3a16f17cfe4bff8c02122"
+        },
+        {
+          "path": "E02_ANIM.INI",
+          "size": 2396,
+          "sha256": "f3aa872a2f89e51fa340267e2a69267802d934d59de1b7ca458b79e7775f8f33"
+        },
+        {
+          "path": "E03_ANIM.INI",
+          "size": 2404,
+          "sha256": "f95aa5bb8c686f21586a8af6de13015ddc96e1b2015876238651fd6c46d2534f"
+        },
+        {
+          "path": "E04_ANIM.INI",
+          "size": 2849,
+          "sha256": "82ac7b50b0ee8dcb9d49585520f1f38a2f31acf8d10b00122048531f4f01312c"
+        },
+        {
+          "path": "E05_ANIM.INI",
+          "size": 2398,
+          "sha256": "7551bf3685058103baf47b027ea2cb6e985cbd9ffca5bc75270a8ebf247b544d"
+        },
+        {
+          "path": "EMPTY.BMP",
+          "size": 1440054,
+          "sha256": "dd933b22835b0b32f4440b7901984c06611ae54fa3960d5017e6f6e062207582"
+        },
+        {
+          "path": "ETAPPE0.CMP",
+          "size": 40636,
+          "sha256": "b2e41a0a3e7b2a634a25548fa9c87f29faa71fb486463a85a30f9f21d547bc24"
+        },
+        {
+          "path": "ETAPPE0.DMP",
+          "size": 88888,
+          "sha256": "6e309ad091de46e23e75c263b0ee56345e1367e191500b831e52f57d09407ccd"
+        },
+        {
+          "path": "ETAPPE0.IBI",
+          "size": 30589,
+          "sha256": "42cbfae965a4da841ddf005b48475dd36b0bb4c5b0ed259765ee37c5e05c4da9"
+        },
+        {
+          "path": "ETAPPE0.INI",
+          "size": 30589,
+          "sha256": "42cbfae965a4da841ddf005b48475dd36b0bb4c5b0ed259765ee37c5e05c4da9"
+        },
+        {
+          "path": "ETAPPE0.OMP",
+          "size": 87724,
+          "sha256": "b94bf64b896015b628a8d1af03ebbdab398b1d85c4022473a382272d3715483c"
+        },
+        {
+          "path": "ETAPPE0.PMP",
+          "size": 32972,
+          "sha256": "1ed58d18b5e9db5aac760d17130afc750bbea0dbbe46f8423b7ab29603f0d97d"
+        },
+        {
+          "path": "ETAPPE0.PTH",
+          "size": 296,
+          "sha256": "aadf871b5f5cfaa4f4e2db212eb310c23dfe9876ae880ec79937b7d6ed22c992"
+        },
+        {
+          "path": "ETAPPE0.RMP",
+          "size": 1969572,
+          "sha256": "f726b18e1e5607c6ab0c58747b98f1a1bb8701192197c77da6315ef685e6a4da"
+        },
+        {
+          "path": "ETAPPE1.CMP",
+          "size": 33076,
+          "sha256": "4955809704d235f75b205d14129b82161771f385a0758a2066dbdfcb128c68ea"
+        },
+        {
+          "path": "ETAPPE1.DMP",
+          "size": 75604,
+          "sha256": "0ad114359e22253f72feb40ead1d9a27605e9dad5108ff94835817195e6dbfbe"
+        },
+        {
+          "path": "ETAPPE1.IBI",
+          "size": 34748,
+          "sha256": "9dbeb8926844adc77236a90332b02d32f89f70a51dfd3ed7b892fc9721dd4957"
+        },
+        {
+          "path": "ETAPPE1.INI",
+          "size": 34748,
+          "sha256": "9dbeb8926844adc77236a90332b02d32f89f70a51dfd3ed7b892fc9721dd4957"
+        },
+        {
+          "path": "ETAPPE1.OMP",
+          "size": 122268,
+          "sha256": "edd9ace2ab39d93e9a56df5cd0ffba483b53579ab0dd273bbc4d557cf9391dc0"
+        },
+        {
+          "path": "ETAPPE1.PMP",
+          "size": 32956,
+          "sha256": "f869dbc7160c20f847c3d1d917e9a18bbd6133cc10f00fa4bd4385e86860ff15"
+        },
+        {
+          "path": "ETAPPE1.PTH",
+          "size": 1128,
+          "sha256": "c671c61e3bed34213caad53b8fa44862379ee532fd6c08c0f03407e4b47136ac"
+        },
+        {
+          "path": "ETAPPE1.RMP",
+          "size": 1541092,
+          "sha256": "e8cdee5134478763ca194ecde359755ab4ae5c817c098eaac872bfdc27da2d51"
+        },
+        {
+          "path": "ETAPPE2.CMP",
+          "size": 65596,
+          "sha256": "2b24d8252318b2fcbf54b71791936d78b737d8ae736b4139e3ead3dede0f32d8"
+        },
+        {
+          "path": "ETAPPE2.DMP",
+          "size": 138172,
+          "sha256": "0f3470e169ca1e279c9548aee981cc4d1e87e8761f259db0104a4d3cdeba9e7f"
+        },
+        {
+          "path": "ETAPPE2.IBI",
+          "size": 26078,
+          "sha256": "da4887e2cf9171e64ba4134d10ff71aa35faf7cc35577b9b944403dabb0901e5"
+        },
+        {
+          "path": "ETAPPE2.INI",
+          "size": 26078,
+          "sha256": "da4887e2cf9171e64ba4134d10ff71aa35faf7cc35577b9b944403dabb0901e5"
+        },
+        {
+          "path": "ETAPPE2.OMP",
+          "size": 82148,
+          "sha256": "c43bf620bc7cc9f61583e5236cb100a6f6cf6f46f714d3b2ef7ed7f381dfaa8e"
+        },
+        {
+          "path": "ETAPPE2.PMP",
+          "size": 48656,
+          "sha256": "97f356664b2748334e4d9ee2bc06d6069aaad12ca7d085dc69b5c19db4c147d7"
+        },
+        {
+          "path": "ETAPPE2.PTH",
+          "size": 352,
+          "sha256": "351992260c77aa6f55ea814a7940c54934d123922ae828da51f766fb23538bb8"
+        },
+        {
+          "path": "ETAPPE2.RMP",
+          "size": 2565516,
+          "sha256": "7ddf916798737ed9d3825ee79c19bffa3f181dcf97c997d0c1903e5e5e54356a"
+        },
+        {
+          "path": "ETAPPE3.CMP",
+          "size": 23476,
+          "sha256": "6215fe9977693bfcd97fa875ca0598b601a47144ac2771f5d68c4cc7373930c8"
+        },
+        {
+          "path": "ETAPPE3.DMP",
+          "size": 40972,
+          "sha256": "4708d02444044a84f8c13a2de92bd3a560bab81f7e985a8a0ace65670ce8e735"
+        },
+        {
+          "path": "ETAPPE3.IBI",
+          "size": 26736,
+          "sha256": "039bae33e6ae4825ec810727ed713bda106c8e6de0b554bd962c60bd5e92d4e3"
+        },
+        {
+          "path": "ETAPPE3.INI",
+          "size": 26736,
+          "sha256": "039bae33e6ae4825ec810727ed713bda106c8e6de0b554bd962c60bd5e92d4e3"
+        },
+        {
+          "path": "ETAPPE3.OMP",
+          "size": 64740,
+          "sha256": "1f34d518b28386ed2493f48c4d5342bf685b3cc900961e56738bc73aa2ef12f1"
+        },
+        {
+          "path": "ETAPPE3.PMP",
+          "size": 21012,
+          "sha256": "d4ac97e42386fb78d35d534c3ee43197e0d93277ee5fbee307ef2db61fc65d77"
+        },
+        {
+          "path": "ETAPPE3.PTH",
+          "size": 736,
+          "sha256": "a8851da0d1f04631a5694e630989c629c16877ba8499ae8a9f34fcfbab8da8f2"
+        },
+        {
+          "path": "ETAPPE3.RMP",
+          "size": 1178444,
+          "sha256": "91ec9eaeb8892a85c7df21734cc4a540fa322187d6b095bd80a6f0ed4b103998"
+        },
+        {
+          "path": "ETAPPE4.CMP",
+          "size": 16852,
+          "sha256": "41a7bf8cbe11a3daf7844e9f2a816ca2fdc2003e499920bbfcf4fea9532d5b37"
+        },
+        {
+          "path": "ETAPPE4.DMP",
+          "size": 33196,
+          "sha256": "f4569ffbf9fc8338b1cbf10a58f736facea17ca93c84d227f7de53728fdc4390"
+        },
+        {
+          "path": "ETAPPE4.HBP",
+          "size": 8,
+          "sha256": "72a4fa3544e43a836ffcb268ce06ccdbc55d44d5e6b1b1c19216a53ea98301fd"
+        },
+        {
+          "path": "ETAPPE4.INI",
+          "size": 49614,
+          "sha256": "b68a2d4237f09184d46ce7bcb573f5e4a11dc679c59f7b9cada407cfabafaebc"
+        },
+        {
+          "path": "ETAPPE4.OMP",
+          "size": 61136,
+          "sha256": "740d23c58fb77a5ac779f7603817fa737c9c425d418b00a6173d5b6b28fd10e4"
+        },
+        {
+          "path": "ETAPPE4.PMP",
+          "size": 16964,
+          "sha256": "334ae52d3092e8231f8205bbf8bf8cc58a0a16a2735624732be4edfbaae1a907"
+        },
+        {
+          "path": "ETAPPE4.PTH",
+          "size": 640,
+          "sha256": "17a52c0d36c7500e335d4bca2130d28efc526ebb74442942d05f46e31ad87115"
+        },
+        {
+          "path": "ETAPPE4.RMP",
+          "size": 704604,
+          "sha256": "70608f291400977b569f26ecc44572bcf0f26ac5b2c9260c13584795b2e65f8a"
+        },
+        {
+          "path": "ETAPPE5.CMP",
+          "size": 35932,
+          "sha256": "54b43a80b108ac8259193b009d61c58c690942251bfefa16f12b45a74f39f907"
+        },
+        {
+          "path": "ETAPPE5.DMP",
+          "size": 87700,
+          "sha256": "3db14e483cfebeb9cab95e4e0630ec52489f0d29c0ef9cd2e5b2d23ee7189e7f"
+        },
+        {
+          "path": "ETAPPE5.HBP",
+          "size": 8,
+          "sha256": "72a4fa3544e43a836ffcb268ce06ccdbc55d44d5e6b1b1c19216a53ea98301fd"
+        },
+        {
+          "path": "ETAPPE5.IBI",
+          "size": 49685,
+          "sha256": "a5b1cc948b59639aa88c56a3955e990efa8c4636bf5cfcc9a4cf87ea4455b704"
+        },
+        {
+          "path": "ETAPPE5.INI",
+          "size": 49685,
+          "sha256": "a5b1cc948b59639aa88c56a3955e990efa8c4636bf5cfcc9a4cf87ea4455b704"
+        },
+        {
+          "path": "ETAPPE5.OMP",
+          "size": 65352,
+          "sha256": "60feabfdb04c31359150822b8d85e5d73847da3c4dea10de0a8e75443bf90a9a"
+        },
+        {
+          "path": "ETAPPE5.PMP",
+          "size": 35224,
+          "sha256": "749b824098219df69bf1637eb1209c9ec0cec0a3520060fe72f4f91ab9956187"
+        },
+        {
+          "path": "ETAPPE5.PTH",
+          "size": 8,
+          "sha256": "72a4fa3544e43a836ffcb268ce06ccdbc55d44d5e6b1b1c19216a53ea98301fd"
+        },
+        {
+          "path": "ETAPPE5.RMP",
+          "size": 1588596,
+          "sha256": "f7b94a7d3530ef8340c9d2ec56ff81bb0ba619ac32bd8b6f18d04c883850f562"
+        },
+        {
+          "path": "GAME.INI",
+          "size": 15700,
+          "sha256": "09a00c81d5be6520ee024c83359f1d8aaf4f9697fc11137b185d46511158567d"
+        },
+        {
+          "path": "GARAGE.BMP",
+          "size": 1440054,
+          "sha256": "74e3eb8244b099c70b36b81cf642f7e825eb11b82ae6e3a9d413fd77da01ea61"
+        },
+        {
+          "path": "GARAGE.INI",
+          "size": 3263,
+          "sha256": "f5123cb2763c6f293153c303a09a7d0fd5ba8f8b28f16eca0d71dfcb6fe596ed"
+        },
+        {
+          "path": "GEN_ANIM.INI",
+          "size": 6023,
+          "sha256": "aa40c22d00b711794eee9098943a9fe9f12a2088ec031e9a649eedc72821ee2d"
+        },
+        {
+          "path": "HIPPIE.AVI",
+          "size": 701952,
+          "sha256": "ce15474fe23b9ee351b98a370ee50bda680db6bebf0a8799a0b8c4e4d5e4795d"
+        },
+        {
+          "path": "HIPPIE.BMP",
+          "size": 217054,
+          "sha256": "e54b93069565c29133f40d6b2ba0125d6ea32e61a068c3d8d02b0d201061560f"
+        },
+        {
+          "path": "HOST.BMP",
+          "size": 1440054,
+          "sha256": "4d6ce47881d912389eab7ac04d73f896863d9c68dbd947c7944339f317f979a8"
+        },
+        {
+          "path": "ING_MENU.INI",
+          "size": 339,
+          "sha256": "ce6f23f5b25538dcf92cd6b99605c622a77a6a90922b635c8b3efd7d9066b282"
+        },
+        {
+          "path": "INTEL.INI",
+          "size": 3791,
+          "sha256": "7550ffba2e153b8d7bc782a9632b6678b2d011fe46184f27401b5eaa42a20e78"
+        },
+        {
+          "path": "INTRO1.MPG",
+          "size": 51097788,
+          "sha256": "408d2375a0c27f302c33b3001a102a6ddbfefc0d6609f43629b7752d332af81c"
+        },
+        {
+          "path": "JAC_HLP0.WAV",
+          "size": 39412,
+          "sha256": "2bbb7c658aa29ba7a5b99f69c2d6c2466cbb45e4d59e300f4d5f8722d078b8d8"
+        },
+        {
+          "path": "JAC_HLP1.WAV",
+          "size": 44148,
+          "sha256": "7ee45cc44f7e9cc71754d91d41e9997eb6afd558e8a71683ce1dd1f19d5d8607"
+        },
+        {
+          "path": "JAC_HLP2.WAV",
+          "size": 46140,
+          "sha256": "2a99c425c3bad4f9413157a1f8cd21267b8448d6d89e0c628087afafd5cca4c5"
+        },
+        {
+          "path": "JOHNNY.BMP",
+          "size": 217054,
+          "sha256": "4e62a2c96614fd5d1cd16a9f1e89053b8989c170b8c48f99e5a99525fafbceb5"
+        },
+        {
+          "path": "L0_ANIM.INI",
+          "size": 2239,
+          "sha256": "5cc7e2090014ba1aa07813a8d9c19c49d03b7fab5c544f7b28e26cc8deaf98d1"
+        },
+        {
+          "path": "L1_ANIM.INI",
+          "size": 2239,
+          "sha256": "5cc7e2090014ba1aa07813a8d9c19c49d03b7fab5c544f7b28e26cc8deaf98d1"
+        },
+        {
+          "path": "L2_ANIM.INI",
+          "size": 2239,
+          "sha256": "5cc7e2090014ba1aa07813a8d9c19c49d03b7fab5c544f7b28e26cc8deaf98d1"
+        },
+        {
+          "path": "L_BLUE.BMP",
+          "size": 222,
+          "sha256": "64ce7ced8a03859924bf59e0a93c2f04c6a1dd7fbd309ae46981b8135002cef1"
+        },
+        {
+          "path": "L_GREEN.BMP",
+          "size": 222,
+          "sha256": "0603d878d8a5e05183da53a8ff0703c81991a6ce85ebb91e6b7fd7b6d44b16b2"
+        },
+        {
+          "path": "L_LBLUE.BMP",
+          "size": 222,
+          "sha256": "f78fde9c4ca304d71263fcdf41efe976419267aa9c257bc8875fc3fc4a39e0e2"
+        },
+        {
+          "path": "L_RED.BMP",
+          "size": 222,
+          "sha256": "5a518a1f5a120b620cd2634796cd40a1d1845777407c4eed1618342fe0fdaa33"
+        },
+        {
+          "path": "LANGUAGE.INI",
+          "size": 3773,
+          "sha256": "96fd2d858b4e9cefafb2ea14b4b847481dfa77240107c20c8cfa46dcd45f6dc9"
+        },
+        {
+          "path": "MAINSCRE.BMP",
+          "size": 1440054,
+          "sha256": "0cc37e6bc66235a0f39ef60a0e4d924441061c6d281312dc49da3aaf53b2fd48"
+        },
+        {
+          "path": "MENU.EXE",
+          "size": 6444544,
+          "sha256": "bbd3b40f0a48630e30aa73456fa97dd95c3c0b7e424e98cb9efc6050acb5116b"
+        },
+        {
+          "path": "MENU.INI",
+          "size": 2935,
+          "sha256": "687d9ccc72109f8ae70700e00e0f032e3ec0ae2597438342422f39dadcc92904"
+        },
+        {
+          "path": "MENUCAPS.INI",
+          "size": 11567,
+          "sha256": "ab8c3ca46884d2b84e48ca59f4d9eb3345755759aeb3ca9959b05769123d8f09"
+        },
+        {
+          "path": "MENUMSC.WAV",
+          "size": 5081074,
+          "sha256": "79d9c55c0a9e3d0540a9f4ba3e504055f2b27387fd8f28b59012d9e1df4484b7"
+        },
+        {
+          "path": "NEXTTRCK.WAV",
+          "size": 80850,
+          "sha256": "014cdbf178688b82a8fdce5e8783abba79a7d8b22b2d766c75de38c603fa71f8"
+        },
+        {
+          "path": "OPPONENT.INI",
+          "size": 6322,
+          "sha256": "2935206d93fc8ca9d05faf7d4928fb8d806808c7617c4f99793de1eec72f5cc1"
+        },
+        {
+          "path": "OPT_DHIG.BMP",
+          "size": 4982,
+          "sha256": "44ed142709a2dcf5fe8ed40fa88ce82542775b573476de1087d19b3edd8afd3b"
+        },
+        {
+          "path": "OPT_DLOW.BMP",
+          "size": 4982,
+          "sha256": "ffb4d55d67d237453275c2af0fe2baaa500c1aae29c5f840fb658b54f21399c1"
+        },
+        {
+          "path": "OPT_MUZ1.BMP",
+          "size": 11334,
+          "sha256": "38b76c60d9345241cc6801ac79a8bc7bdd5492b64ed8286c94d92a8c9912e09a"
+        },
+        {
+          "path": "OPT_SFX1.BMP",
+          "size": 11334,
+          "sha256": "4570fad1143052e0a8dc3939eff6a10a2eee65095c274032b8e501e435d04b57"
+        },
+        {
+          "path": "OPT_STE1.BMP",
+          "size": 11334,
+          "sha256": "5953ac966890d212382064c0215b664daa8b5ca4e95c9a3362d80d2d63c2a5eb"
+        },
+        {
+          "path": "OPTIONS.BMP",
+          "size": 1440054,
+          "sha256": "72a9a0f5bf7eec886106db3eb027cb1f9946d21329a2fb1e3487d7efb8378b1b"
+        },
+        {
+          "path": "OUDJES.AVI",
+          "size": 708608,
+          "sha256": "2ed7a46e89c33140da335094420a1d8928ed8f741666539f6600c171992f0320"
+        },
+        {
+          "path": "OUDJES.BMP",
+          "size": 217054,
+          "sha256": "88f3b4fb25472d7762ee72084d0c1bc6f51bbd21701b0a9a0d392cc29a6f0139"
+        },
+        {
+          "path": "OVERLAY.INI",
+          "size": 10663,
+          "sha256": "be8288a6d025b6d02813f408bbe33c7a09ffb1f8bf5dd4a45d100471c3f6a288"
+        },
+        {
+          "path": "PHYS0.DAT",
+          "size": 4800,
+          "sha256": "11dcb569869ade1cae83aa45d91eadca6d8235dc27f1f990c99dfd22e992a510"
+        },
+        {
+          "path": "PHYS1.DAT",
+          "size": 4800,
+          "sha256": "38caf3e8a73ea829663ceb9e0a0ac38f81e1d159a85e3d01027b76c94d241ec0"
+        },
+        {
+          "path": "PHYS2.DAT",
+          "size": 4800,
+          "sha256": "30432d31602ab116eb40aec204c89da8c09a846b1a6dbd791a54ff04b989c63c"
+        },
+        {
+          "path": "PIGRAC0.WAV",
+          "size": 419646,
+          "sha256": "b25764a05431db1c8afacf83d21577233d3991d5f5e6654af37f70fa60f61357"
+        },
+        {
+          "path": "PIGRAC1.WAV",
+          "size": 521340,
+          "sha256": "245371a624ecb04103cc3de6bfa1961acb9c8b7b7f83bec8ebb90da519e7c2ae"
+        },
+        {
+          "path": "PIGRAC2.WAV",
+          "size": 462892,
+          "sha256": "15b621accb93606d9ccbf55b3483d6ade4b3f1c22ef921b4c4d8ebd70099e77a"
+        },
+        {
+          "path": "PIGRAC3.WAV",
+          "size": 317484,
+          "sha256": "b775d4fef99f4b85f92c33ce143f90b6df537405e7811aa672a62147dc035e70"
+        },
+        {
+          "path": "PIGRAC4.WAV",
+          "size": 649260,
+          "sha256": "0562eb2f862cf79e64756d9c3e881f858a7e288572ec6a1906f44f0d7e2bd1a1"
+        },
+        {
+          "path": "PIINRAC0.WAV",
+          "size": 325492,
+          "sha256": "9296949d89d80c68fc68dff6eb6ae7a599d5bc8768b7f84f01b2ab2dfb81cc76"
+        },
+        {
+          "path": "PIINRAC1.WAV",
+          "size": 537460,
+          "sha256": "b14c05e1e4ba4ee5126e09bf47ea499a1b16b1e73b0fdc56d5672bdda59d35a8"
+        },
+        {
+          "path": "PIINRAC2.WAV",
+          "size": 359540,
+          "sha256": "2c2435233282f9788d18f516d7801bc1c4816bba23e5dd6b01522a8b7329275c"
+        },
+        {
+          "path": "PIINRAC3.WAV",
+          "size": 494981,
+          "sha256": "8313f5d2b4ef2efb403ab0b8f9e6ef0f043a991d1fe3c23569097597909c4487"
+        },
+        {
+          "path": "PIINRAC4.WAV",
+          "size": 449652,
+          "sha256": "e28c2d7820ca8ba3a171d08d816489e1f0e4eb028c7b4ae47e2653aa4f03e0cd"
+        },
+        {
+          "path": "PLAYER.BMP",
+          "size": 1440054,
+          "sha256": "1203e16e2c25d13e2c8a31228a55fdcf35abb19555278ece298902b17efbd7e5"
+        },
+        {
+          "path": "POP_CHSP.BMP",
+          "size": 281862,
+          "sha256": "90858e6e4ffe5536e7ae1a0a9b7c58e247d826c33e5c1b2aa281943784c03730"
+        },
+        {
+          "path": "POP_GWIN.BMP",
+          "size": 281862,
+          "sha256": "ed89fca434743d1bfc4a9b62045f7c2adc1c9d40f06858eb340f50c7646fb37c"
+        },
+        {
+          "path": "POP_JOYS.BMP",
+          "size": 281862,
+          "sha256": "dabc656cb5ab66d4270a9b5850a6e1ca0fc0c80a5539c13f73306bdd15d1126c"
+        },
+        {
+          "path": "POP_KEYS.BMP",
+          "size": 764766,
+          "sha256": "436a330b6c4d4df5a480ecd430925eb689c01c102dea334d9c7ed49aeca8ed02"
+        },
+        {
+          "path": "POP_NOCD.BMP",
+          "size": 281862,
+          "sha256": "918b26786ee1bda2eae9b8a009ae639cea85e6be4c304e82438677d4b28de879"
+        },
+        {
+          "path": "POP_REMP.BMP",
+          "size": 281862,
+          "sha256": "0091b66376471283d904e4eb57f6ffe309c410dd97c83245cdb571b935c43585"
+        },
+        {
+          "path": "POP_ROND.BMP",
+          "size": 281862,
+          "sha256": "80419792f3d34f2dc22d216f32beabb56e1118ed417e263586e51cb83ed7982b"
+        },
+        {
+          "path": "POP_SPLR.BMP",
+          "size": 281862,
+          "sha256": "db5c09b8cc2af3b44ac777c11274d2dabfc4f7b8733207f480fce0ff131d4ff6"
+        },
+        {
+          "path": "POP_STD1.BMP",
+          "size": 281862,
+          "sha256": "43f68b937da02492a05dd21e0d9497ce8256ace58d1e3951e426b9c845247a20"
+        },
+        {
+          "path": "POP_STD2.BMP",
+          "size": 281862,
+          "sha256": "4ff738ae01ae0c5ceb6115bb13255fad5ae813d0606b29e69041516a57ed39fd"
+        },
+        {
+          "path": "POP_STRT.BMP",
+          "size": 764766,
+          "sha256": "b532ad1f65e000047b511172cdb40277cf3d282368153a79efbdd82e6fb1f033"
+        },
+        {
+          "path": "POP_WHEE.BMP",
+          "size": 281862,
+          "sha256": "2ba4d9ca098720d7442d54382ac5f64b3da843b46ebde4af9a061a8bf2fa8e92"
+        },
+        {
+          "path": "PRE_HIP1.BMP",
+          "size": 428706,
+          "sha256": "38b73a36d7074ed99733ffe4e42bff30b90f5cd9d9eb050e13088c20dc83b1eb"
+        },
+        {
+          "path": "PRE_HIP2.BMP",
+          "size": 428706,
+          "sha256": "3c60f9fa9081538842a45fd6b2853157ca79e616675c7b188cbb1f35503ea428"
+        },
+        {
+          "path": "PRE_JOH1.BMP",
+          "size": 428706,
+          "sha256": "314af22341414119b20266a876ee7197906a6b8ddf3711a3acc4d99cbab497b5"
+        },
+        {
+          "path": "PRE_JOH2.BMP",
+          "size": 428706,
+          "sha256": "1c1e8a8a9f9c28c38215590be442a2d90143d1309340db2b54cf9fb16d911378"
+        },
+        {
+          "path": "PRE_OUD1.BMP",
+          "size": 428706,
+          "sha256": "be8a872b3d6051ab3ff3fa9cdfd6b1566257381d05ba0ee465020219a3f612fb"
+        },
+        {
+          "path": "PRE_OUD2.BMP",
+          "size": 428706,
+          "sha256": "18e96b7b9e9f162f91cfde0b5e261b13ae89b399ab7aca8b0124d70d198c69e9"
+        },
+        {
+          "path": "PRE_SJA1.BMP",
+          "size": 428706,
+          "sha256": "81e421fde496f7ac9716b492637a8b0dfff7839a866d6bfae405d367d7ed54fc"
+        },
+        {
+          "path": "PRE_SJA2.BMP",
+          "size": 428706,
+          "sha256": "190b9e39f06d7857ef1bc01dade154279460cb8404f9b19e40e8f871c8d2cbde"
+        },
+        {
+          "path": "PRE_SMA1.BMP",
+          "size": 428706,
+          "sha256": "53a8efed93e3a7c070a74fb04f8600507bad132e3273a3370665645736640263"
+        },
+        {
+          "path": "PRE_SMA2.BMP",
+          "size": 428706,
+          "sha256": "227b9319de8f5ecbf453f0a1330bc1462ec227dcc3f364b1ee511472393b9d5d"
+        },
+        {
+          "path": "PRF1TR0.WAV",
+          "size": 219668,
+          "sha256": "4a43cf75a349415874c433c00c1508be2edb31af6d295dac31f7168da95d001e"
+        },
+        {
+          "path": "PRF1TR1.WAV",
+          "size": 300788,
+          "sha256": "44eef0b7ae565a5d659b81553491e238b2049d15e6dc04df9fb104fa35517cb7"
+        },
+        {
+          "path": "PRF1TR2.WAV",
+          "size": 319604,
+          "sha256": "dc7b841099c6495fb78ba2c25bba630cd243be32d4a0fc4d542fd8708dffa20e"
+        },
+        {
+          "path": "PRF1TR3.WAV",
+          "size": 367476,
+          "sha256": "cb723917add26b2ab7a3b0e4009f41ab8483cd1ec01de16e42fd0efc16717867"
+        },
+        {
+          "path": "PRF1TR4.WAV",
+          "size": 299380,
+          "sha256": "e3d7945d3d181560c901444d2fba17d546e20517b245768839277f77375f86d4"
+        },
+        {
+          "path": "PRF1TR5.WAV",
+          "size": 476532,
+          "sha256": "d715e14fe6f7fdd02ba1c1c9650a716cdb4780ffbda584a819923f95e737a406"
+        },
+        {
+          "path": "PRF2TR0.WAV",
+          "size": 299476,
+          "sha256": "407d27efd059429247fbc1f401403bdae78ca20705a69f01c4aa8624590d2f81"
+        },
+        {
+          "path": "PRF2TR1.WAV",
+          "size": 263284,
+          "sha256": "00e83a213d71b12cb7a22e524fd2dc1440cc99555bf0fd8134ca05259995a476"
+        },
+        {
+          "path": "PRF2TR2.WAV",
+          "size": 296564,
+          "sha256": "df8258812578321ca53ea873bec44ba9d48f8257d134933f4b431ea609ca37ef"
+        },
+        {
+          "path": "PRF2TR3.WAV",
+          "size": 342900,
+          "sha256": "08330cde399e29c6a5d73ffc13b201ebbe7d4af35f0923616c5c344d5025c3b9"
+        },
+        {
+          "path": "PRF2TR4.WAV",
+          "size": 285556,
+          "sha256": "70f2cbf13cff1db8c9d08d6e9ac21cb357299dae0109e0d54b97d0ab6412f4ec"
+        },
+        {
+          "path": "PRF2TR5.WAV",
+          "size": 281204,
+          "sha256": "8e8afcc2ddd905fd7e39648135d69da7bedea433181c81b40618ccafe9ee52d2"
+        },
+        {
+          "path": "PRF3TR0.WAV",
+          "size": 311732,
+          "sha256": "0d54e4a88006e52d7ae5366b0c16f5dd851f0a56979b09ef356b08f5ab4317cd"
+        },
+        {
+          "path": "PRF3TR1.WAV",
+          "size": 359028,
+          "sha256": "bfae9c5e7e743a9383767d392ba4f6b6302fe10d911a80dcc65a44dce3c455ea"
+        },
+        {
+          "path": "PRF3TR2.WAV",
+          "size": 329268,
+          "sha256": "2443128f41373e513b293146bd251f3ec52d9154e3b0fb82f4a40e28ff0f1efd"
+        },
+        {
+          "path": "PRF3TR3.WAV",
+          "size": 325748,
+          "sha256": "4f92d2da276d1e20e3eb7090cf7c4c8a9bfc8daafd8bf853000da748c64739d7"
+        },
+        {
+          "path": "PRF3TR4.WAV",
+          "size": 280308,
+          "sha256": "8931c2c061df7bfb658781f47e144aa9b5de3cada5b0f051b0b4fff1e593fb3b"
+        },
+        {
+          "path": "PRF3TR5.WAV",
+          "size": 359028,
+          "sha256": "bfae9c5e7e743a9383767d392ba4f6b6302fe10d911a80dcc65a44dce3c455ea"
+        },
+        {
+          "path": "PRINTR0.WAV",
+          "size": 373364,
+          "sha256": "6636b3d2f007ffe46aa5ad5068f086d66664cf99cd880ce9b175d1f5b8bbd5f9"
+        },
+        {
+          "path": "PRINTR1.WAV",
+          "size": 482932,
+          "sha256": "46da2588d998f2fba3ad2d1e5b9ef29c2eebadff926e9c13a5ca67bb4568889e"
+        },
+        {
+          "path": "PRINTR2.WAV",
+          "size": 479348,
+          "sha256": "6d344e89650a2fccc2b77a78a19692e3603e8ef2558e8e9e49f4ce9976cbe746"
+        },
+        {
+          "path": "PRINTR3.WAV",
+          "size": 311156,
+          "sha256": "bc0cea17f76feb4002236b2bd3f3b5a9a5acd621edf109989699f4cad51ca2d3"
+        },
+        {
+          "path": "PRINTR4.WAV",
+          "size": 307444,
+          "sha256": "82e7f9289a8ff440b1f91d766d6b68cccff8560ccd61fd9b4ff1d98a928348b8"
+        },
+        {
+          "path": "PRINTR5.WAV",
+          "size": 646516,
+          "sha256": "df3fff8d30f8e5d3b88527652a506539d0af431c59abaa5a2627ec9f1319a309"
+        },
+        {
+          "path": "PRY_000.BMP",
+          "size": 24174,
+          "sha256": "ea1acce2c61a31dcd137bbe8be62df078f230fb906772c22653adfdef1da3e36"
+        },
+        {
+          "path": "PRY_010.BMP",
+          "size": 24174,
+          "sha256": "e59e39535fe47df042b8732bc195c22996471239b9ba0f2566faabf37262caf3"
+        },
+        {
+          "path": "PRY_025.BMP",
+          "size": 24174,
+          "sha256": "dee0868d7babb2663245a882fb10501a6e3da5509c1029412352fda9b74388c5"
+        },
+        {
+          "path": "PRY_100.BMP",
+          "size": 24174,
+          "sha256": "9242293a8df92eefdf5fc66d32525eae9889d7bfd76ca945c99c97b8a0f5dd6d"
+        },
+        {
+          "path": "PRY_150.BMP",
+          "size": 24174,
+          "sha256": "c846558a40388988670100ebec52ce56c96ee833c9093930e1739516330ac5fd"
+        },
+        {
+          "path": "PRY_BAND.BMP",
+          "size": 24174,
+          "sha256": "c334a86355cf0797226acc3fb5f8338afcb48ad8bcda4d8029c257807f995bd5"
+        },
+        {
+          "path": "PRY_MOTO.BMP",
+          "size": 24174,
+          "sha256": "339235ddc181b98c11e3cfb187093c58d799efb22c2374aceec2fb61a50436e7"
+        },
+        {
+          "path": "PRY_REM.BMP",
+          "size": 24174,
+          "sha256": "c649c660c3ad5d0c277daee2fb095d74225550d5023e25e7d582be5bfa5cd561"
+        },
+        {
+          "path": "PRY_TURB.BMP",
+          "size": 24174,
+          "sha256": "346c183c3c04dab3c95d9870bc8e0e9fef038a68a8249d9e1573f4c2773c5880"
+        },
+        {
+          "path": "QR_HIP.BMP",
+          "size": 104382,
+          "sha256": "26a390111b4f41fb7a9fc723ff472a19810dc106b608354b4c66f85d765df661"
+        },
+        {
+          "path": "QR_JOH.BMP",
+          "size": 104382,
+          "sha256": "2d2570a0d507bc489e136b132fd88e0647cee7da2b68a4bea4bdd17971de4a8f"
+        },
+        {
+          "path": "QR_OUD.BMP",
+          "size": 104382,
+          "sha256": "42d11b6770e95b028c212d49cb95afe267387717c4582ef55d57b729deda46ef"
+        },
+        {
+          "path": "QR_PRE.BMP",
+          "size": 104382,
+          "sha256": "e5abacbc5f4b18283b1d7fb4e09ead9cd205648bd97fd4a536e1cb475c7bb990"
+        },
+        {
+          "path": "QR_SJA.BMP",
+          "size": 104382,
+          "sha256": "16c09f8ee2decc24f6ba621f9325d26dd1954ef916944186b00841406bea706d"
+        },
+        {
+          "path": "QR_SMA.BMP",
+          "size": 104382,
+          "sha256": "77e62163da5e2f803c7d1e83c3de77802973dd74cbd5fafb726eafee09684323"
+        },
+        {
+          "path": "QR_TRC0.BMP",
+          "size": 104382,
+          "sha256": "b24c65ba5847893477b486a8dadf393325cb7192ff383d1c13f19c2b7748020d"
+        },
+        {
+          "path": "QR_TRC1.BMP",
+          "size": 104382,
+          "sha256": "63b78bf7b1711fc470368ac2f2761f5e9f962a5063ee7cd67ba4eaf6fc416973"
+        },
+        {
+          "path": "QR_TRC2.BMP",
+          "size": 104382,
+          "sha256": "25be6c6e9e45e5e052813954912517ed4020ae20801a85660f6471e270d9fda1"
+        },
+        {
+          "path": "QR_TRC3.BMP",
+          "size": 104382,
+          "sha256": "449d6c379797917e1ee351f96b997686817ffc6a3a071a0cbb8be2b8f168c399"
+        },
+        {
+          "path": "QR_TRC4.BMP",
+          "size": 104382,
+          "sha256": "95071ee5d0768f3c755348959284d30c8d864fded45353f1a1dd4235beab77b7"
+        },
+        {
+          "path": "QR_TRC5.BMP",
+          "size": 104382,
+          "sha256": "c1b81589adc93849f9649f4659f8897fcf3b869b0eb39612941d5d60698cb0ba"
+        },
+        {
+          "path": "QUICKRAC.BMP",
+          "size": 1440054,
+          "sha256": "791edcff7e401bcd0972c285a563dcbd0d32b59339d5397604024d4853a0924a"
+        },
+        {
+          "path": "RAC0F0.WAV",
+          "size": 62708,
+          "sha256": "00cdb72a90e054e51dc4252be048b5486739977b3cae0259d7470733beeaf771"
+        },
+        {
+          "path": "RAC0F1.WAV",
+          "size": 51700,
+          "sha256": "23e57f87bbb7f85d9c39b3e42668a7b3f8bb4c5566d8b3b405242250d734d89d"
+        },
+        {
+          "path": "RAC0F2.WAV",
+          "size": 30516,
+          "sha256": "7ccc835d46944be2af1ac7caa2f92e7c51c09256d263cd4a57ce1ccf940235d9"
+        },
+        {
+          "path": "RAC0F3.WAV",
+          "size": 71796,
+          "sha256": "a2bf4c1c8202734105319948c3d56187f793dcb3ea20890a211a0a83a78bce4a"
+        },
+        {
+          "path": "RAC0F4.WAV",
+          "size": 60532,
+          "sha256": "502a09404f55ab3cf778d74f3a330c444e2a467548be0b3bbac96436deed70bf"
+        },
+        {
+          "path": "RAC0F5.WAV",
+          "size": 93236,
+          "sha256": "9da13b38f215b724657e39fcab4f0c512f15e6134884ab31eca16b99928ea475"
+        },
+        {
+          "path": "RAC0LOS0.WAV",
+          "size": 19924,
+          "sha256": "344470e28d2afa8375da198fe17b0f6c4485be94e0def995da429db31c662fce"
+        },
+        {
+          "path": "RAC0LOS1.WAV",
+          "size": 53364,
+          "sha256": "79568a34986801e523a8f5345211d58289e952672757d5c71501271f2c31a9af"
+        },
+        {
+          "path": "RAC0LOS2.WAV",
+          "size": 51444,
+          "sha256": "89850d2faf5e811acd0a8fe72538eeec79f528ed6d81a9b9c5229397523f8ca4"
+        },
+        {
+          "path": "RAC0LOS3.WAV",
+          "size": 56948,
+          "sha256": "12e0179c35f1f22ad1087d00e03e0531dc57b14073011292fb80f5f6877f3136"
+        },
+        {
+          "path": "RAC0S0.WAV",
+          "size": 23604,
+          "sha256": "aa1d198aa53c05426a8bf9f4fcb3f7b11f8a0ddb3392d8d86b9db34d034e5198"
+        },
+        {
+          "path": "RAC0S1.WAV",
+          "size": 56084,
+          "sha256": "f980befeb923c9358a78f62ebccd53bcff1c19c025b3a3a9a9f72fd568d4b1b6"
+        },
+        {
+          "path": "RAC0S2.WAV",
+          "size": 61044,
+          "sha256": "6eea3662ac94843b1549ffe84486a832e8aed3e8636152a2723c8019fda86c3b"
+        },
+        {
+          "path": "RAC0WIN0.WAV",
+          "size": 30324,
+          "sha256": "99220289483f6d653d0d22a776048d42a85676d827a1f3bb8bf0a560052c19e4"
+        },
+        {
+          "path": "RAC0WIN1.WAV",
+          "size": 63732,
+          "sha256": "6d32252993004655c645d75cad2d62ccb80c394d8eef139d8dee68f10274771f"
+        },
+        {
+          "path": "RAC0WIN2.WAV",
+          "size": 55124,
+          "sha256": "4fb4788583e5a456fe061b76d7e8e1092a56350b4eaefe8a037e5e3ccc125d95"
+        },
+        {
+          "path": "RAC0WIN3.WAV",
+          "size": 29044,
+          "sha256": "af5a45f3086839023e01c5344bb473578e9af5edad08ca01653dd08db33a1176"
+        },
+        {
+          "path": "RAC1F0.WAV",
+          "size": 164212,
+          "sha256": "bbd64fef557d45662b450b0767bf9eb0ea2a8c29caf7415fe474afb61ca53bf8"
+        },
+        {
+          "path": "RAC1F1.WAV",
+          "size": 157300,
+          "sha256": "2b2aacba7d063073b8aa3e6ee92523056caaa369b6faa06909ec794f8d9d8175"
+        },
+        {
+          "path": "RAC1F2.WAV",
+          "size": 254196,
+          "sha256": "3e207638eb3296f2983a7a757a54e7612b4681d63f5dce0eaa80db399ab98cdb"
+        },
+        {
+          "path": "RAC1F3.WAV",
+          "size": 47988,
+          "sha256": "c87a7d1e6a63d39075b0f45bc50b5cb63017e214e93f62b14052332f666cae1e"
+        },
+        {
+          "path": "RAC1F4.WAV",
+          "size": 193524,
+          "sha256": "7304617f97031b1fa56d5375af40b2d51df7c9abcb025c582925b0548b42a892"
+        },
+        {
+          "path": "RAC1LOS0.WAV",
+          "size": 33972,
+          "sha256": "dceaddeeec9f867b2a033b274ccfe80594604a050435cae8bd8f1794fd919064"
+        },
+        {
+          "path": "RAC1LOS1.WAV",
+          "size": 24564,
+          "sha256": "aa61d1234e7c4a080f64e5cb786ad9fd86328d4b123cb57c42c9b874b1a25d7b"
+        },
+        {
+          "path": "RAC1LOS2.WAV",
+          "size": 53876,
+          "sha256": "8df02c4d9213ad4b997b42a134affbdfb1fb7d95961a1c7a776620868fdf3c52"
+        },
+        {
+          "path": "RAC1LOS3.WAV",
+          "size": 39284,
+          "sha256": "7a5c3035d323bce2e2f439f02eaf6139ea17931eabb8d79336d945c4dcf73618"
+        },
+        {
+          "path": "RAC1S0.WAV",
+          "size": 45684,
+          "sha256": "06ba177a1fe9110b9a58afea4affc708625ee7523093697816d72f74af4137ab"
+        },
+        {
+          "path": "RAC1S1.WAV",
+          "size": 51252,
+          "sha256": "9dceba8e4c4e3c4a95ec9358cbc3849071a6984ae0bd4fea82a64408ba36349a"
+        },
+        {
+          "path": "RAC1S2.WAV",
+          "size": 53108,
+          "sha256": "bad634c09cc6a0b8a9af380e2214a53ee53ba2b65b3eef581e56244a3124255b"
+        },
+        {
+          "path": "RAC1S3.WAV",
+          "size": 37812,
+          "sha256": "297c2b9feac7bdfb905d499460b518396a389bfe326153e8dbc2adf5f6195208"
+        },
+        {
+          "path": "RAC1S4.WAV",
+          "size": 34036,
+          "sha256": "84ede8c8693912779959c2d120d087a397064ebdeb12073ef651758bdb2d2d9a"
+        },
+        {
+          "path": "RAC1S5.WAV",
+          "size": 56180,
+          "sha256": "4bf570b5a5266700c015daaf37d18a8815921f4ecaeb27805c9158b0b1d6346b"
+        },
+        {
+          "path": "RAC1WIN0.WAV",
+          "size": 31220,
+          "sha256": "83fd0c934d38a30e9e485a9b08a24327ed846a71ebf9c7ded9d451fc90891f99"
+        },
+        {
+          "path": "RAC1WIN1.WAV",
+          "size": 58484,
+          "sha256": "959e2e2ce71369302819da1192a79c0960fb29c300dda26ce95313bbcec7da29"
+        },
+        {
+          "path": "RAC1WIN2.WAV",
+          "size": 21428,
+          "sha256": "5e47c268b9cf3a09d6b0f042bfeeb49cf7e23bb0cc90651ec8903ed00617b9d5"
+        },
+        {
+          "path": "RAC1WIN3.WAV",
+          "size": 34356,
+          "sha256": "032ac12111b9f72556451505c39a5c38236fdbf9d192a1994a46bf05c45bf0d9"
+        },
+        {
+          "path": "RAC2F0.WAV",
+          "size": 251124,
+          "sha256": "d6f008cc5520cf5824268b7af41e1d10fc8bcf0f710bd9cf233569876d57c563"
+        },
+        {
+          "path": "RAC2F1.WAV",
+          "size": 219828,
+          "sha256": "dd09af9d8158b1c347443d25114385dcd40ba8b8da4de1bd066a3a4a8afa339b"
+        },
+        {
+          "path": "RAC2F2.WAV",
+          "size": 169908,
+          "sha256": "7dbf965161249fdf6353abd610d12b0bb30190f2476107072d1671391919728a"
+        },
+        {
+          "path": "RAC2F3.WAV",
+          "size": 302324,
+          "sha256": "5da4c4204abdb5b452183c8c59165fa88405474a9134eec3c8f82fa1f761aa28"
+        },
+        {
+          "path": "RAC2F4.WAV",
+          "size": 120820,
+          "sha256": "a92900bfb51a3b318d5e4793f455a9a7e64b1118354119b8079d5ce2c3108354"
+        },
+        {
+          "path": "RAC2LOS0.WAV",
+          "size": 27572,
+          "sha256": "67f6ae8cfe5cd51754f811e90485f23813c17d62df063affc5fc8953e28f44d1"
+        },
+        {
+          "path": "RAC2LOS1.WAV",
+          "size": 63732,
+          "sha256": "632166243d61055458d9b656f56ecdc133bb6bd744f88b4dfe2edb04161b3ab5"
+        },
+        {
+          "path": "RAC2LOS2.WAV",
+          "size": 92820,
+          "sha256": "b6ef1cb4e7d76a7721650cad816bc58d47ed7d6ff2989ba86bf6218c20bfedb7"
+        },
+        {
+          "path": "RAC2LOS3.WAV",
+          "size": 62964,
+          "sha256": "7588283c9c7c6cca593e1898dac6f7950b9b9fb518068b315992c468b2ec77ac"
+        },
+        {
+          "path": "RAC2S1.WAV",
+          "size": 70644,
+          "sha256": "9b230faec40f6b94cfb6484efae63d8504396bdc5d902b1bbcbcdb514be225c1"
+        },
+        {
+          "path": "RAC2S2.WAV",
+          "size": 18932,
+          "sha256": "81cd80795da70404281d2af36da3ce52cfb62de8c6b5b530156b9bb17d3a37df"
+        },
+        {
+          "path": "RAC2S3.WAV",
+          "size": 39604,
+          "sha256": "8fc7e2e921694bff172b45328d1e347c6dcfaca255a46dc4f66d943a0a326d62"
+        },
+        {
+          "path": "RAC2S4.WAV",
+          "size": 16852,
+          "sha256": "b2c5ee5e77a6b35e1cae9ff0cbb387c52015a259e110b7575bf6b70513270efe"
+        },
+        {
+          "path": "RAC2WIN0.WAV",
+          "size": 33012,
+          "sha256": "24ad042378274e186927122f664770301a0be549e4037588d5837eb57e84d142"
+        },
+        {
+          "path": "RAC2WIN1.WAV",
+          "size": 23032,
+          "sha256": "82df6e2c60ab5fb328c04078276e787a4fab4a6b018d9e2a2a6d8e96d15dc693"
+        },
+        {
+          "path": "RAC2WIN2.WAV",
+          "size": 47092,
+          "sha256": "cd61c427294c7550495efa40967e022bf39252f16da57b7301bcb6fc801327f1"
+        },
+        {
+          "path": "RAC2WIN3.WAV",
+          "size": 56052,
+          "sha256": "479c73bf90dffaf51f21d1a25b294eea1c6410fc9090b8293d8a797beaae3c65"
+        },
+        {
+          "path": "RAC3F1.WAV",
+          "size": 53652,
+          "sha256": "ea2a874a7fdd7f78c187ea56768cd0b1dd8b0f62eeffa50e4651e0a2f13e6a22"
+        },
+        {
+          "path": "RAC3F2.WAV",
+          "size": 50644,
+          "sha256": "6bb39b21371b1436b197249e405a6f6c3c0e3a5174a44c61f748547619f406d1"
+        },
+        {
+          "path": "RAC3F3.WAV",
+          "size": 51380,
+          "sha256": "698c42d3c0382f33db8700c86b33c297191a797e7bca4ba2a0c7ee5fb2eb4622"
+        },
+        {
+          "path": "RAC3LOS0.WAV",
+          "size": 12692,
+          "sha256": "093cdc8a9c54757d9b62c6734f5f61119fe40656f5e21c53381fb4c3fdac21be"
+        },
+        {
+          "path": "RAC3LOS1.WAV",
+          "size": 13620,
+          "sha256": "0db8cf33b6a7406f69b89edc493442d15ba02029fe39bdeb0d85c78745631d67"
+        },
+        {
+          "path": "RAC3LOS2.WAV",
+          "size": 21452,
+          "sha256": "6d4f2899b3e1da7b56a9e377ca6fd9fd1c5b1a1913bed3fa19e94c6cfb6bf3a2"
+        },
+        {
+          "path": "RAC3LOS3.WAV",
+          "size": 29620,
+          "sha256": "0a94056832faa7bcc1e6b3074e572006947ff8f2b3b7cb5c31b14d461f770a28"
+        },
+        {
+          "path": "RAC3P0.WAV",
+          "size": 21364,
+          "sha256": "1b3b85c0c8f78748e36c860f0e4bf720d034e91e36d09bdb54fa6bd9468dd61a"
+        },
+        {
+          "path": "RAC3S0.WAV",
+          "size": 27380,
+          "sha256": "1494d8365999e560bd870bc6a7b4b508e0b6ead1a6317758083aedd9a7f5fd72"
+        },
+        {
+          "path": "RAC3S1.WAV",
+          "size": 23540,
+          "sha256": "5f26cab3d1067375f5bc1ca1fd0632d52601e8cd17a5505d392f5119d15ef5c4"
+        },
+        {
+          "path": "RAC3S2.WAV",
+          "size": 5652,
+          "sha256": "3888633f03294db6a37d8d21f91704b84f86231e87b02effbbcaff41e3edc1ad"
+        },
+        {
+          "path": "RAC3S3.WAV",
+          "size": 32948,
+          "sha256": "bbe56947ef0bd930a1688cc0c7af4a3ec0e1fdf1378aebdf33dce8667281a0cd"
+        },
+        {
+          "path": "RAC3S4.WAV",
+          "size": 22836,
+          "sha256": "79d40489dabcc52a8f61b9bebc9e1e182ced219423f6618c19bd9e5912f6cf80"
+        },
+        {
+          "path": "RAC3WIN0.WAV",
+          "size": 17812,
+          "sha256": "54275b86586d52a2dda35937c367689b1d50ea8c329f3d5a3e185861cca91cf5"
+        },
+        {
+          "path": "RAC3WIN1.WAV",
+          "size": 24244,
+          "sha256": "a30d5a8c46a55b5b2927b7238ab3164a36a6676ee9e69332f44b11b4f35345d7"
+        },
+        {
+          "path": "RAC3WIN2.WAV",
+          "size": 26228,
+          "sha256": "8e83570a961ea0fa20dade3eae9fe76027ce85fc9a0b0a4e07a3becc39af75cd"
+        },
+        {
+          "path": "RAC3WIN3.WAV",
+          "size": 33556,
+          "sha256": "87a825c5dfdb70bd63e3e45c25672e5391fab26cc0e9dfd86f800e455fa5e715"
+        },
+        {
+          "path": "RAC4F0.WAV",
+          "size": 26100,
+          "sha256": "50f28e581bbbbe574f5f8e33a2b1267f514df05c0b4523ad4a81a50dfa37d8c1"
+        },
+        {
+          "path": "RAC4F1.WAV",
+          "size": 32860,
+          "sha256": "b06469aceef4b790618ecaeddbb602a3964eda5f6839e927df9cdbab619ee29b"
+        },
+        {
+          "path": "RAC4F2.WAV",
+          "size": 53620,
+          "sha256": "4d4de28d83ce17e1da14d9cc71928376d982fa09ddd8d43409593d2c6536036e"
+        },
+        {
+          "path": "RAC4F3.WAV",
+          "size": 47028,
+          "sha256": "a31209bae18958f2a3db6f75fa5464f1de57eaa0fd68de0f0714d100b22ba241"
+        },
+        {
+          "path": "RAC4F4.WAV",
+          "size": 61044,
+          "sha256": "2c03cda4428fce3ddd473762ee10286b0359f3cdcb93c2f58641d937096d55ba"
+        },
+        {
+          "path": "RAC4F5.WAV",
+          "size": 43764,
+          "sha256": "0d4febc9f01845504a5a90e9c958fe02c0c2127b885180f9bbb72722aaea1285"
+        },
+        {
+          "path": "RAC4LOS0.WAV",
+          "size": 53364,
+          "sha256": "64f2a41306ec5314c9a5c23409f4ee32615c84d9a74e2cbff6e37fbb067ca75a"
+        },
+        {
+          "path": "RAC4LOS1.WAV",
+          "size": 146548,
+          "sha256": "b92ae9d219549c5aae5c1497c8171c237af8efbb6fd9c9e71cdcf8c8a6f351a8"
+        },
+        {
+          "path": "RAC4LOS2.WAV",
+          "size": 42420,
+          "sha256": "e64dbdf9aad1f37da4dd6a03fdabbc5120d7050cff3d2b5930ae6cee2c9b67aa"
+        },
+        {
+          "path": "RAC4LOS3.WAV",
+          "size": 42420,
+          "sha256": "e64dbdf9aad1f37da4dd6a03fdabbc5120d7050cff3d2b5930ae6cee2c9b67aa"
+        },
+        {
+          "path": "RAC4S1.WAV",
+          "size": 35188,
+          "sha256": "6e047d0e06660ec36fcb8d2367b9b512f312eb5d43eb81c27d9ba43f897aee8c"
+        },
+        {
+          "path": "RAC4S2.WAV",
+          "size": 23284,
+          "sha256": "455b0a331ba301418be0b5f4d2c1fd4d5ec98432816c6d790ddd00306cfa01de"
+        },
+        {
+          "path": "RAC4S3.WAV",
+          "size": 14964,
+          "sha256": "47e949116c7335a14c3782fd45179888eda32f912c9ff854335622612a64cec3"
+        },
+        {
+          "path": "RAC4S4.WAV",
+          "size": 18804,
+          "sha256": "f0079d9fb0e301950c81318b526d4c3141c92d60d5a27d186fdaa16c70e9f2ba"
+        },
+        {
+          "path": "RAC4WIN0.WAV",
+          "size": 23668,
+          "sha256": "5025601eb04991916c1a5f74b472cf77e698dd70b4220c59038cf188215c14ac"
+        },
+        {
+          "path": "RAC4WIN1.WAV",
+          "size": 21268,
+          "sha256": "b5780874ead9a42c0aa64a3892efecf96bff8409f4d85279ff0c78364b011738"
+        },
+        {
+          "path": "RAC4WIN2.WAV",
+          "size": 35380,
+          "sha256": "15af01af7c605e2ed9653a8d5960e97283e104654095c11d5227ddc76b5590fa"
+        },
+        {
+          "path": "RAC4WIN3.WAV",
+          "size": 36916,
+          "sha256": "5b92aa6317ceab6d5155f36db6e19e776900526bec8e557890cd23397b529521"
+        },
+        {
+          "path": "RAD_HIP.BMP",
+          "size": 74178,
+          "sha256": "6c404e47cac62ea2ac08ade1fd37920afc8789e008980add7ccbb9619ada7fc4"
+        },
+        {
+          "path": "RAD_JOH.BMP",
+          "size": 74178,
+          "sha256": "a42c1c0cf4e054b721365ed39783b65c0f159ba8fd4654737eca617bd3bc615b"
+        },
+        {
+          "path": "RAD_OUD.BMP",
+          "size": 74178,
+          "sha256": "27e004705ba09ddcfbfda51a2fd22c38c89ce3367634aacd40f1a9fac696d634"
+        },
+        {
+          "path": "RAD_SJA.BMP",
+          "size": 74178,
+          "sha256": "4afe1089926bc404d7a1782e0a9df18c6385c60f22d792029ff294ec45ccc532"
+        },
+        {
+          "path": "RAD_SMA.BMP",
+          "size": 74178,
+          "sha256": "f755c0551a14a24551b78bc778746159ccf01fdce911c095879370820ae384ac"
+        },
+        {
+          "path": "RASER.INI",
+          "size": 9367,
+          "sha256": "b7e8102ceee03513c147b8a0131f65a0eee594e77ca8edf240b0edb7af37da56"
+        },
+        {
+          "path": "RC.IMG",
+          "size": 1259939,
+          "sha256": "f1e81bd2b67bead7a514a4306c051425ee31e0a2828c4da2124569a12b612684"
+        },
+        {
+          "path": "RC.IND",
+          "size": 746,
+          "sha256": "520814e4c2ca715c59853ef209f4da4e440fbbaecab3ee0df80ad0f99eba3661"
+        },
+        {
+          "path": "RCS.CHK",
+          "size": 18038,
+          "sha256": "9ed382f01514d4b4872f80df60d46468bd2e60974a07f57c4d209d5456688f19"
+        },
+        {
+          "path": "RCS.IMG",
+          "size": 108721603,
+          "sha256": "6a9fae681399b4b72caafdca0d81bb3416d0c1d2b2f419a793392c64100bbc41"
+        },
+        {
+          "path": "RCS.IND",
+          "size": 54098,
+          "sha256": "fe5090d0e92fb0c49efe5d3814938cc56b8497e3e8646781a08e54ecc34ea6fd"
+        },
+        {
+          "path": "RES_HIP.BMP",
+          "size": 22102,
+          "sha256": "27babefedbfbf98634e2a8c913a942f4026ed6214e62f97ae80f5d6c5e9ef406"
+        },
+        {
+          "path": "RES_JOH.BMP",
+          "size": 22102,
+          "sha256": "1e1009f18fc54f4029c4d2204b06187ff20dc484c502f86bc272a855c1511e6b"
+        },
+        {
+          "path": "RES_OUD.BMP",
+          "size": 22102,
+          "sha256": "ee033869fd8668cf9fa58edaa76d4832d5c355608c0db5083fcb55b54e7d4322"
+        },
+        {
+          "path": "RES_POS1.BMP",
+          "size": 9462,
+          "sha256": "ee269c14638c6a7824fbf0776e7ef9b48b4832ab2799523a62e66a4b9d40546a"
+        },
+        {
+          "path": "RES_POS2.BMP",
+          "size": 9462,
+          "sha256": "2bca9a417c65fc93501506d285d96ce8f950c875b1c3428dcb3a44acde9ac9fb"
+        },
+        {
+          "path": "RES_POS3.BMP",
+          "size": 9462,
+          "sha256": "f78556b9b27845cfd8d1412946560d79e92647629b31240ff822b67cd91e66cf"
+        },
+        {
+          "path": "RES_POS4.BMP",
+          "size": 9462,
+          "sha256": "986ea524073e6f6e8aa51df3a30f534a39984c1721b84250bcbe2a8271b413b9"
+        },
+        {
+          "path": "RES_POS5.BMP",
+          "size": 9462,
+          "sha256": "0f796226c245efa3505ff71560953aa5da84f2ee4965ccc830aa8b6913aed8f9"
+        },
+        {
+          "path": "RES_POSF.BMP",
+          "size": 11214,
+          "sha256": "b9a5507caf940765bb29641d1b10289e6d19bd3873cbc89e2f85e2f148d1328c"
+        },
+        {
+          "path": "RES_PRE.BMP",
+          "size": 22102,
+          "sha256": "e772cef48db116ce1570f92fd453f02297c7e18080f22d4bd54494969642484a"
+        },
+        {
+          "path": "RES_SJA.BMP",
+          "size": 22102,
+          "sha256": "51baaec9b59bdfc188401499aa8a22246ec0d0cfc01f95e5fd2ade7091fbef5b"
+        },
+        {
+          "path": "RES_SMA.BMP",
+          "size": 22102,
+          "sha256": "b7d297d7f498e60d953461a79329b255ad3820e6dc7bd1164a6bff778a8c4b2a"
+        },
+        {
+          "path": "RESULTS.BMP",
+          "size": 1440054,
+          "sha256": "4ac4c971213a3cac066e70832b25c6ab1f702e4ef6685feb21aaa13e38dbf85d"
+        },
+        {
+          "path": "SJAAK.AVI",
+          "size": 717312,
+          "sha256": "72bcf0ed4a7e8c62c1e9f7c393e1256ce68084f23db4d4c10af39598381b6af7"
+        },
+        {
+          "path": "SJAAK.BMP",
+          "size": 217054,
+          "sha256": "f8f8eb7026da388927376f31c89397c4948f34c11f1afc8f666c94080ef26409"
+        },
+        {
+          "path": "SJABAD0.WAV",
+          "size": 151796,
+          "sha256": "b482076b8c38e876e07110eb6750fd87b4755bd64d7168c0f79bb7789e8a9707"
+        },
+        {
+          "path": "SJABAD1.WAV",
+          "size": 112244,
+          "sha256": "b2fec40721b7e5227467842ff8bb71e0660122afe8ac7fe95f5c1d4f090c9f7a"
+        },
+        {
+          "path": "SJABAD2.WAV",
+          "size": 159476,
+          "sha256": "f5991a70012892506639fe6b13ebd986e59e0c52c404d83ca4498c5b49f22060"
+        },
+        {
+          "path": "SJABAD3.WAV",
+          "size": 160116,
+          "sha256": "3b74c5c3cb5c550a180b30c3590b755926c505756983cd59ee1c0246d20a0f72"
+        },
+        {
+          "path": "SJABAD4.WAV",
+          "size": 109140,
+          "sha256": "e44d00b7d393671b62b610a45b59493103542f11bb2899d4b298ac61a2c78b96"
+        },
+        {
+          "path": "SJADIFF.WAV",
+          "size": 153460,
+          "sha256": "fa3690bf02494d459471b565d40daabdac4b2e26068a0b0c74a146bf6e85dbef"
+        },
+        {
+          "path": "SJAGOED0.WAV",
+          "size": 223860,
+          "sha256": "377199ad8580bec2f452a0600d96ca92a0e05d648a7d51eb6ee3b197a808ac6a"
+        },
+        {
+          "path": "SJAGOED1.WAV",
+          "size": 215668,
+          "sha256": "3b02b54c18193c70f5dbe8d4287f422f7b518793456fd1e28c7115587781ee85"
+        },
+        {
+          "path": "SJAGOED2.WAV",
+          "size": 119412,
+          "sha256": "4548436621a49d9f72b154bc55e57fc95eff98dd59f4161251e666d1d5ab73f1"
+        },
+        {
+          "path": "SJAGOED3.WAV",
+          "size": 71156,
+          "sha256": "cb86b15ca22d3ffdf6bcb2bbc04446062ab9b33e415246bf9aaee1ca9a4d0820"
+        },
+        {
+          "path": "SJAINTRO.WAV",
+          "size": 490100,
+          "sha256": "bcce2857c7b2bce0b4c7c1d67e89be65054bcf4b29448b8e78836d77e3f2e075"
+        },
+        {
+          "path": "SJASCHA0.WAV",
+          "size": 155572,
+          "sha256": "c574a726fde32dbe731fa7d90a7f9849adf9cbeb0fcf57fbd96b21d9f0e31a8f"
+        },
+        {
+          "path": "SJASUN.WAV",
+          "size": 226676,
+          "sha256": "3b596370c4905c34c44cd767159e45741c6f5b010448d75528e4be374486cded"
+        },
+        {
+          "path": "SJONNIE.AVI",
+          "size": 741888,
+          "sha256": "d02ce32faaefeb6adcf38a634bb8ea0da46a6b89c0fb0e29211edc73d45eec97"
+        },
+        {
+          "path": "SMAKSIE.AVI",
+          "size": 696320,
+          "sha256": "846fab4da15c9adad01f5a94a83bf1bbb86f1935620618b3e0b28697aa075692"
+        },
+        {
+          "path": "SMAKSIE.BMP",
+          "size": 217054,
+          "sha256": "38fcfea4c59e8fa5cef3b0707198486d21e27a5d01ac2e12d317b14970e9f6a3"
+        },
+        {
+          "path": "SOUND.INI",
+          "size": 8623,
+          "sha256": "b80732a0789759ba406f81c9737c1f0d3a2c9cea4cbb84ebbe9c44e3869e503a"
+        },
+        {
+          "path": "SPEL.DAT",
+          "size": 1126400,
+          "sha256": "6c4a3a196fa8ee3d2a2bf7b437adbc9da5be3be0708eec15d0fce2d4eb99c939"
+        },
+        {
+          "path": "STARTRAD.WAV",
+          "size": 40540,
+          "sha256": "e3cd93d92ee8e66ca1ded1a28c038f6608a34e15c04f3781640e6cf020e66f63"
+        },
+        {
+          "path": "STATIC.INI",
+          "size": 13913,
+          "sha256": "5e3aeeb546c0f5c30b706e762a8e66b16e2dad13956ffcc00a8ff147d39b9eba"
+        },
+        {
+          "path": "STOPRAD.WAV",
+          "size": 9524,
+          "sha256": "cbc3868f767f4842136990879777f38e1268d291328cea46546dc211bc24da3e"
+        },
+        {
+          "path": "TRACK.BMP",
+          "size": 1440054,
+          "sha256": "3c7c8b840f6468842f6f0a3abdad3656a444a08210b659716343028e661ecee0"
+        },
+        {
+          "path": "TRACK0.BMP",
+          "size": 160856,
+          "sha256": "19c155f07f21fbc3fe9b8b19c24709c4b499a7a49384a9a7c43090a576f36435"
+        },
+        {
+          "path": "TRACK0_0.BMP",
+          "size": 160854,
+          "sha256": "5ab502694d1e3c8856751411cd123721b1b022a7b3c082c034c7c286d7cb7990"
+        },
+        {
+          "path": "TRACK0_1.BMP",
+          "size": 160854,
+          "sha256": "720ce6f181a6094e08910216cf8e64e38531b5a8f1dbfa26bf23348a41371748"
+        },
+        {
+          "path": "TRACK0_2.BMP",
+          "size": 160854,
+          "sha256": "903b713f05cbbf2c942da6d6f73de89e2c50d9b7dd68899f1a03eb4dd28a5604"
+        },
+        {
+          "path": "TRACK0_3.BMP",
+          "size": 160854,
+          "sha256": "eb7f4c771a06b5df56ea0d759730c316aab9bf63105df6f15b158ba642aa9dd4"
+        },
+        {
+          "path": "TRACK0R.BMP",
+          "size": 160856,
+          "sha256": "f2dbac9eb0b4b10622dd55a5276ba20904c6b0c0066839992acce538e03cac67"
+        },
+        {
+          "path": "TRACK1.BMP",
+          "size": 160856,
+          "sha256": "1586015e70a6535d295e7117b59c92a78327dd35c99dd3c6e8d8496e77d27437"
+        },
+        {
+          "path": "TRACK1_0.BMP",
+          "size": 160854,
+          "sha256": "f0b401037648405cb0ae0d7c486fc17d77e92ef39ff7d98cae7bd182d4355536"
+        },
+        {
+          "path": "TRACK1_1.BMP",
+          "size": 160854,
+          "sha256": "7354fc88b68101e0fe5166820260186f8c89375280fb4f3855b9855d3458fa69"
+        },
+        {
+          "path": "TRACK1_2.BMP",
+          "size": 160854,
+          "sha256": "b0b4304584bbcbb71dee05ae4db028c3d5a91860d1e921dbd4bc411f48f708ca"
+        },
+        {
+          "path": "TRACK1_3.BMP",
+          "size": 160854,
+          "sha256": "6c8b6a0d7c979c9647fdf00545892eb96f0f9cd700a0cd51d4e9a4e54dc6c7b4"
+        },
+        {
+          "path": "TRACK2.BMP",
+          "size": 160856,
+          "sha256": "d402006795663120f120eb8bc988d7913d6ca9981f76895de6f0e65658ff2c6e"
+        },
+        {
+          "path": "TRACK2_0.BMP",
+          "size": 160854,
+          "sha256": "d495ce159b83b299f8eff16d0e787fd4cc3e495a45c03beda95a30fc7767922e"
+        },
+        {
+          "path": "TRACK2_1.BMP",
+          "size": 160854,
+          "sha256": "6b4413f17e5b14246e20365dfe0549452e0f717b350eaed6844c57810e7c975a"
+        },
+        {
+          "path": "TRACK2_2.BMP",
+          "size": 160854,
+          "sha256": "50f6aa95b3a519e50761c0c655236e100164fb3f0a23446132f2e2e260bb2421"
+        },
+        {
+          "path": "TRACK2_3.BMP",
+          "size": 160854,
+          "sha256": "d76928b5ad05c084c60e39129c5455f9c1f20abd113e0a1aeec5f692af8d440b"
+        },
+        {
+          "path": "TRACK3.BMP",
+          "size": 160856,
+          "sha256": "21e56beb791ffb708d352ca7972870fcb56739d24787158daf4a21741e7c95fd"
+        },
+        {
+          "path": "TRACK3_0.BMP",
+          "size": 160854,
+          "sha256": "900448ca9fd100baac3f8b2e2a78308e43bfdb75736ef83935d54bcffbe8b2bd"
+        },
+        {
+          "path": "TRACK3_1.BMP",
+          "size": 160854,
+          "sha256": "f9bf126536bca61053c382bb6891e4ed0f415fc3618b985554f08e351d629b5f"
+        },
+        {
+          "path": "TRACK3_2.BMP",
+          "size": 160854,
+          "sha256": "658d5272a07a70badc65ce502e70d1f960281e75bf588a1bc35d5316368b05eb"
+        },
+        {
+          "path": "TRACK3_3.BMP",
+          "size": 160854,
+          "sha256": "127ef57f52d9906d3ef8ee91855fbce2e07dd964864e54730f7863c05640c7e8"
+        },
+        {
+          "path": "TRACK4.BMP",
+          "size": 160856,
+          "sha256": "0676a51287e2c3e1795f4ffa6a5a8a0909adce3f8f80f5c6258db6f228ca11ac"
+        },
+        {
+          "path": "TRACK4_0.BMP",
+          "size": 160854,
+          "sha256": "1aaad6fce914d85de7836362b1eacc062b3a285ab00b8528ff689b9e5c795448"
+        },
+        {
+          "path": "TRACK4_1.BMP",
+          "size": 160854,
+          "sha256": "492d0c8b265c8dd3ea486e5f060b820cedf3ffd6e9fcb0114458395493920ef8"
+        },
+        {
+          "path": "TRACK4_2.BMP",
+          "size": 160854,
+          "sha256": "9f0adade70e4d8c1f7c5995903a34ad8ea334f77f5066f94917003470f7386b5"
+        },
+        {
+          "path": "TRACK4_3.BMP",
+          "size": 160854,
+          "sha256": "7b4ea515d92fceb1e95f21dcc2e4b88a0101803529d83538cc85ec6dd88b7a39"
+        },
+        {
+          "path": "TRACK5.BMP",
+          "size": 160856,
+          "sha256": "407feb435e7dcb126092d5c584d1488480d1b68778fc3c2e28d3e78ef3a5e18c"
+        },
+        {
+          "path": "TRACK5_0.BMP",
+          "size": 160854,
+          "sha256": "b65b7cb54f120ca1a28949b53beddcfdf3019984989499f3c1fc1390076b9839"
+        },
+        {
+          "path": "TRACK5_1.BMP",
+          "size": 160854,
+          "sha256": "66a44db2f0cceb2ca5a57a0a703e9f87eba6922613e4efe90121958764925b8e"
+        },
+        {
+          "path": "TRACK5_2.BMP",
+          "size": 160854,
+          "sha256": "7ebe653a02ca4e94e49870fa8fb666b0a6f6e742aafdc802fb7345a7f277628e"
+        },
+        {
+          "path": "TRACK5_3.BMP",
+          "size": 160854,
+          "sha256": "3ea2a466445cc707b2a35f271998debedbf703aae8f1cc3ec731ab07a3057481"
+        },
+        {
+          "path": "TRACKINT.BMP",
+          "size": 1440054,
+          "sha256": "3d877a1f557f831378b215adc388b289716eae4c5f49019d2459d7c3eb0423df"
+        },
+        {
+          "path": "TRACKWIN.BMP",
+          "size": 1440054,
+          "sha256": "e1eeb61e4575033a7956425895ba66a4f5025ea45b405bf2ef7411426410b5bb"
+        },
+        {
+          "path": "TRAFFIC.INI",
+          "size": 1660,
+          "sha256": "82b368f462ca22be7ee7b1146984567aa0cd744f4c492207e9d614405164af0b"
+        },
+        {
+          "path": "VERSION.TXT",
+          "size": 120,
+          "sha256": "4b4e5b2e6d0d9b847de53aa541c64d45a494222a496b6afcc461bc362baafac4"
+        },
+        {
+          "path": "VRACER.EXE",
+          "size": 36864,
+          "sha256": "5acf7e2c1513134ea1969e84ce5c22b607d63f20999450ea699176ca2acb2203"
+        },
+        {
+          "path": "WHEEL.WAV",
+          "size": 1192,
+          "sha256": "eff8f5a74d7499b0991ff42e7963927ad37a17d63ef13ee784b849cae2808ada"
+        },
+        {
+          "path": "WHEELOFF.BMP",
+          "size": 1440054,
+          "sha256": "6e6e5e6cd827f8267f0f7d40656ab87a7dbe68d646553760551c3f8c88ad6e3d"
+        },
+        {
+          "path": "WIN_HIP.BMP",
+          "size": 428706,
+          "sha256": "173d39937f4db2de9a22c051f35045e4225cc8fa92622839b6f5c95e9857baa6"
+        },
+        {
+          "path": "WIN_JOH.BMP",
+          "size": 428706,
+          "sha256": "fbcacf01acb1281bf9215b1de45488336485b1db70392b906958d3ca47d0af62"
+        },
+        {
+          "path": "WIN_OUD.BMP",
+          "size": 428706,
+          "sha256": "a14dd3fb348a4d2f1bf0ebeefca4fd18b5365495c113659b9d750dcec65cd1f4"
+        },
+        {
+          "path": "WIN_SJA.BMP",
+          "size": 428706,
+          "sha256": "8d0b9a1e557fa52abfd1a9b3e4fd9b0ec13c635d17a2cc8e2ca68c1af90e8dcf"
+        },
+        {
+          "path": "WIN_SMA.BMP",
+          "size": 428706,
+          "sha256": "5e047c8366ac4b905d44dbec65d088ba863350b34dcd312b25782e3439639183"
+        },
+        {
+          "path": "WINRACE.BMP",
+          "size": 1440054,
+          "sha256": "57a37dc4c1c264b1fc2a5f4bcaaf5d7a64a474ce43598021a03d80002b590dba"
+        }
+      ],
+      "core_pins": {
+        "MENU.EXE": "bbd3b40f0a48630e30aa73456fa97dd95c3c0b7e424e98cb9efc6050acb5116b",
+        "SPEL.DAT": "6c4a3a196fa8ee3d2a2bf7b437adbc9da5be3be0708eec15d0fce2d4eb99c939",
+        "VRACER.EXE": "5acf7e2c1513134ea1969e84ce5c22b607d63f20999450ea699176ca2acb2203"
+      }
+    }
+  }
+}

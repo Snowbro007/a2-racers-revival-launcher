@@ -1,0 +1,5 @@
+# Keep version-pinned launcher source identical on Windows and in release archives.
+tools/later*.py text eol=lf
+tools/launcher_later_games.py text eol=lf
+tools/Start-LaterGame.ps1 text eol=lf
+assets/later-game-sources.json text eol=lf
