@@ -1,6 +1,6 @@
 param(
     [Parameter(Mandatory=$true)][ValidateSet('a2racer4','vakantieracer')][string]$Game,
-    [Alias('Profile')][ValidateSet('compat','hd1080')][string]$GraphicsProfile='hd1080',
+    [Alias('Profile')][ValidateSet('compat','hd1080','wide1080')][string]$GraphicsProfile='hd1080',
     [ValidatePattern('^[a-f0-9]{32}$')][string]$ControlToken,
     [string]$PythonPath,
     [switch]$UiResult,
@@ -36,7 +36,11 @@ function Write-LaterUiResult([string]$Status,[string]$Message) {
 try {
     $python=Resolve-LaterPython
     $pin=(Get-FileHash -LiteralPath $script -Algorithm SHA256).Hash.ToLowerInvariant()
-    if ($pin -ne 'fa4d42f703acf1da09eb6e0493aefae98aa8580b47fe1fa778b29ee77c252f1d') { throw 'De gecontroleerde baselinecode is gewijzigd.' }
+    if ($pin -ne '9e27dbb6a9e4e8e02631056610a8c7cb638a2012d004a5de9fb288e2203c8933') { throw 'De gecontroleerde baselinecode is gewijzigd.' }
+    $nativeScript=Join-Path $PSScriptRoot 'later_native.py'
+    if ((Get-FileHash -LiteralPath $nativeScript -Algorithm SHA256).Hash.ToLowerInvariant() -cne 'bda0dee39cf4ca1fe72f056c6f2338a5c91a02156e988c6dad0f4c25ac93eee4') { throw 'De gecontroleerde beeldcode is gewijzigd.' }
+    $wideScript=Join-Path $PSScriptRoot 'later_games_widescreen.py'
+    if ((Get-FileHash -LiteralPath $wideScript -Algorithm SHA256).Hash.ToLowerInvariant() -cne 'cd2efc12096e7c7478398c70997318f6826d383d775a6d299f783bdb5238647b') { throw 'De gecontroleerde beeldcode is gewijzigd.' }
     $controlScript=Join-Path $PSScriptRoot 'later_game_control.py'
     if ((Get-FileHash -LiteralPath $controlScript -Algorithm SHA256).Hash.ToLowerInvariant() -cne 'ae5886855f8e53e0f73ae4a28edf939e7ccc6c31916541996006953e79f8be78') { throw 'De gecontroleerde stopbediening is gewijzigd.' }
     $shutdownScript=Join-Path $PSScriptRoot 'later_mouse_shutdown.py'

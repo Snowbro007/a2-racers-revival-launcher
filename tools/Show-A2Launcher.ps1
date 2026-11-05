@@ -248,7 +248,7 @@ function Get-LaterSelection {
     $game = if ($ui.LaterGameChoice.SelectedItem) { [string]$ui.LaterGameChoice.SelectedItem.Tag } else { '' }
     $profile = if ($ui.LaterProfileChoice.SelectedItem) { [string]$ui.LaterProfileChoice.SelectedItem.Tag } else { '' }
     if ($game -notin @('a2racer4','vakantieracer')) { throw 'Kies Vakantieracer of De Politie Slaat Terug.' }
-    if ($profile -notin @('hd1080','compat')) { throw 'Kies een beeldoptie.' }
+    if ($profile -notin @('hd1080','compat','wide1080')) { throw 'Kies een beeldoptie.' }
     return @{game=$game; profile=$profile}
 }
 
@@ -257,13 +257,13 @@ function Update-LaterStatus {
     $profile = if ($ui.LaterProfileChoice.SelectedItem) { [string]$ui.LaterProfileChoice.SelectedItem.Tag } else { 'hd1080' }
     $state = Get-LaterGameState $game
     $ui.LaterGameOverview.Text = Get-LaterGameTitle $game
-    $ui.LaterProfileOverview.Text = if ($profile -eq 'hd1080') { Format-A2Resolution 1440 1080 '4:3' } else { Format-A2Resolution 640 480 '4:3' -Original }
+    $ui.LaterProfileOverview.Text = if ($profile -eq 'wide1080') { Format-A2Resolution 1920 1080 '16:9' } elseif ($profile -eq 'hd1080') { Format-A2Resolution 1440 1080 '4:3' } else { Format-A2Resolution 640 480 '4:3' -Original }
     $ui.LaterReadyOverview.Text = if (-not $script:laterCatalog) { 'Controleren…' } elseif ($state -and $state.ready) { 'Klaar' } else { 'Eigen game nodig' }
     $ui.LaterStatus.Text = if (-not $script:laterCatalog) { 'De gamebestanden worden gecontroleerd.' }
         elseif ($state -and $state.ready) { 'Je eigen gamebestanden zijn toegevoegd. Kies je resolutie en start de game.' }
         elseif ($state -and [string]$state.reason -match '^\[(WinError|Errno) [23]\]') { 'Nog geen eigen game toegevoegd. Kies je volledige gamemap of installatie-ZIP.' }
         elseif ($state) { [string]$state.reason } else { 'Deze game staat niet in de catalogus.' }
-    $note = if ($profile -eq 'hd1080') { 'Bevestigde HD-basis in de oorspronkelijke 4:3-verhouding, schermvullend weergegeven.' } else { 'Bevestigde lage resolutie als terugvaloptie.' }
+    $note = if ($profile -eq 'wide1080') { 'Bevestigd breedbeeld met extra zicht links en rechts en een HUD met behouden verhoudingen.' } elseif ($profile -eq 'hd1080') { 'Bevestigde HD-basis in de oorspronkelijke 4:3-verhouding, schermvullend weergegeven.' } else { 'Bevestigde lage resolutie als terugvaloptie.' }
     if ($script:laterCatalog) {
         $entry = @($script:laterCatalog.profiles | Where-Object { $_.id -eq $profile }) | Select-Object -First 1
         if ($entry -and $entry.description) { $note = [string]$entry.description }
@@ -1277,7 +1277,7 @@ try {
     $ui.IIIProfileChoice.SelectedIndex = 0
     Add-Choice $ui.LaterGameChoice 'De Politie Slaat Terug (IV)' 'a2racer4'; Add-Choice $ui.LaterGameChoice 'Vakantieracer' 'vakantieracer'
     $ui.LaterGameChoice.SelectedIndex = 0
-    Add-Choice $ui.LaterProfileChoice (Format-A2Resolution 1440 1080 '4:3' -Status aanbevolen) 'hd1080'; Add-Choice $ui.LaterProfileChoice (Format-A2Resolution 640 480 '4:3' -Original) 'compat'
+    Add-Choice $ui.LaterProfileChoice (Format-A2Resolution 1440 1080 '4:3' -Status aanbevolen) 'hd1080'; Add-Choice $ui.LaterProfileChoice (Format-A2Resolution 1920 1080 '16:9') 'wide1080'; Add-Choice $ui.LaterProfileChoice (Format-A2Resolution 640 480 '4:3' -Original) 'compat'
     foreach ($stage in @(@('GameOneStage','a2racer1'),@('GameTwoStage','a2racer2'),@('GameThreeStage','a2racer3'),@('GameFourStage','a2racer4'),@('GameFiveStage','vakantieracer'))) { $ui[$stage[0]].Text = Get-A2GameStage $stage[1] }
     $ui.LaterProfileChoice.SelectedIndex = 0
     if ($CheckOnly -or $PreviewPath) {

@@ -49,7 +49,7 @@ $script:PythonPath='C:\synthetic\python.exe';$script:PowerShellPath='C:\syntheti
 $script:catalog='{"games":{"a2racer1":{"ready":false}},"iii_preparation":{"tours":{}}}'|ConvertFrom-Json
 Add-Choice $ui.GraphicsChoice 'Original' 'accelerated-640';$ui.GraphicsChoice.SelectedIndex=0
 Add-Choice $ui.LaterGameChoice 'Vakantieracer' 'vakantieracer';Add-Choice $ui.LaterGameChoice 'IV' 'a2racer4';$ui.LaterGameChoice.SelectedIndex=0
-Add-Choice $ui.LaterProfileChoice 'HD' 'hd1080';Add-Choice $ui.LaterProfileChoice 'Compat' 'compat';$ui.LaterProfileChoice.SelectedIndex=0
+Add-Choice $ui.LaterProfileChoice 'HD' 'hd1080';Add-Choice $ui.LaterProfileChoice 'Wide' 'wide1080';Add-Choice $ui.LaterProfileChoice 'Compat' 'compat';$ui.LaterProfileChoice.SelectedIndex=0
 $ui.Pages.SelectedIndex=4
 
 # 1. Before the catalog and without own files: no start.
@@ -71,19 +71,21 @@ Update-LaterStatus;Update-Buttons
 if(-not $ui.PlayButton.IsEnabled -or [string]$ui.PlayButton.Content -ne 'Speel De Politie Slaat Terug'){throw 'Ready game cannot start'}
 if($ui.GameFourAvailability.Text -ne 'Klaar om te spelen' -or $ui.GameFiveAvailability.Text -ne 'Eigen game nodig'){throw 'Library cards not updated per game'}
 if([string]$ui.GameFour.BorderBrush -ne '#FFFFDD4A' -or [string]$ui.GameFive.BorderBrush -eq '#FFFFDD4A'){throw 'Selected card not highlighted'}
-Select-Choice $ui.LaterProfileChoice 'compat'
+Select-Choice $ui.LaterProfileChoice 'wide1080'
+Update-LaterStatus
+if($ui.LaterProfileOverview.Text -notlike '*1920*1080*16:9*'){throw 'Wide resolution not displayed'}
 Start-LaterGame
 if($script:operations.Count -ne 1){throw 'Prepare not queued once'}
 $kind,$arguments=$script:operations[0]
 $line=$arguments -join ' '
-if($kind -ne 'later-prepare' -or $line -notlike '*launcher_later_games.py prepare --game a2racer4 --profile compat --token *'){throw ('Wrong prepare call: '+$line)}
+if($kind -ne 'later-prepare' -or $line -notlike '*launcher_later_games.py prepare --game a2racer4 --profile wide1080 --token *'){throw ('Wrong prepare call: '+$line)}
 if($script:laterToken -notmatch '^[a-f0-9]{32}$' -or $arguments[-1] -cne $script:laterToken){throw 'Token missing'}
 
 # 3. Only our own start script with the planned token runs; anything else is refused.
 $script:operation=$null
 $startScript=[IO.Path]::GetFullPath((Join-Path $Root 'tools/Start-LaterGame.ps1'))
 $hash=(Get-FileHash -LiteralPath $startScript -Algorithm SHA256).Hash.ToLowerInvariant()
-$good=[pscustomobject]@{kind='later-game-launch-plan';game='a2racer4';profile='compat';control_token=$script:laterToken;start_script=$startScript;start_script_sha256=$hash}
+$good=[pscustomobject]@{kind='later-game-launch-plan';game='a2racer4';profile='wide1080';control_token=$script:laterToken;start_script=$startScript;start_script_sha256=$hash}
 foreach($change in @(@{control_token='b'*32},@{game='vakantieracer'},@{profile='hd1080'},@{start_script='C:\Windows\System32\cmd.exe'},@{start_script_sha256='0'*64})){
     $plan=$good.PSObject.Copy();foreach($key in $change.Keys){$plan.$key=$change[$key]}
     $refused=$false;try{Start-LaterSession $plan}catch{$refused=$true}
@@ -93,7 +95,7 @@ Start-LaterSession $good
 if($script:launched.Count -ne 1){throw 'Session not started once'}
 $exe,$arguments=$script:launched[0]
 if($exe -ne 'C:\synthetic\pwsh.exe'){throw 'Wrong PowerShell'}
-$expected=@('-File',$startScript,'-Game','a2racer4','-Profile','compat','-ControlToken',$script:laterToken,'-PythonPath','C:\synthetic\python.exe','-UiResult') -join ' '
+$expected=@('-File',$startScript,'-Game','a2racer4','-Profile','wide1080','-ControlToken',$script:laterToken,'-PythonPath','C:\synthetic\python.exe','-UiResult') -join ' '
 if(($arguments -join ' ') -notlike ('*'+$expected)){throw ('Wrong session arguments: '+($arguments -join ' '))}
 if($script:worker.kind -ne 'later'){throw 'Worker kind missing'}
 
@@ -136,7 +138,7 @@ class LaterGamesUiTests(unittest.TestCase):
         from tools.portable_launcher import app_files
         files = set(app_files(ROOT))
         self.assertTrue({'tools/launcher_later_games.py', 'tools/Start-LaterGame.ps1',
-                         'tools/Show-A2Launcher.ps1', 'tools/launcher_window.xaml'} <= files)
+                         'tools/Show-A2Launcher.ps1', 'tools/launcher_window.xaml', 'tools/later_games_widescreen.py'} <= files)
 
 
 if __name__ == '__main__':

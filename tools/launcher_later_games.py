@@ -24,7 +24,7 @@ from tools import later_game_installation as installation
 from tools.trial_manifest import validate_ancestors
 
 GAMES = {'a2racer4': 'De Politie Slaat Terug', 'vakantieracer': 'Vakantieracer'}
-PROFILES = ('compat', 'hd1080')
+PROFILES = ('compat', 'hd1080', 'wide1080')
 START_SCRIPT = 'tools/Start-LaterGame.ps1'
 STOP_BYTES = b'stop\n'
 
@@ -83,9 +83,11 @@ def catalog(root):
                       'default_profile': 'hd1080'})
     return {'schema': 1, 'kind': 'later-game-catalog', 'games': games,
             'profiles': [
-                {'id': 'hd1080', 'label': 'HD 1080p · aanbevolen', 'confirmed_by_user': True,
+                {'id': 'wide1080', 'label': '1920 × 1080 · 16:9', 'confirmed_by_user': True,
+                 'description': 'Bevestigd breedbeeld met extra zicht links en rechts en een HUD met behouden verhoudingen.'},
+                {'id': 'hd1080', 'label': '1440 × 1080 · 4:3 · aanbevolen', 'confirmed_by_user': True,
                  'description': 'Bevestigde HD-basis met de oorspronkelijke 4:3-verhouding; intern 1440 × 1080, schermvullend weergegeven.'},
-                {'id': 'compat', 'label': 'Origineel 640 × 480', 'confirmed_by_user': True,
+                {'id': 'compat', 'label': 'Origineel · 640 × 480 · 4:3', 'confirmed_by_user': True,
                  'description': 'Bevestigde lage-resolutiebasis als terugvaloptie.'}],
             'defaults': {game: 'hd1080' for game in GAMES},
             'game_started': False}

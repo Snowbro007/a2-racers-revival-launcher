@@ -48,7 +48,7 @@ class SyntheticFixture:
                          'dgVoodoo.conf': b'synthetic 4:3 race config'}
         self.installation = self.start_patch(patch.object(runtime.installation, 'check', side_effect=self.installed))
         self.start_patch(patch.object(runtime, 'component_plan', side_effect=lambda *args: dict(self.wrappers)))
-        self.patcher = self.start_patch(patch.object(runtime, 'patch_binary', side_effect=self.patch_binary))
+        self.patcher = self.start_patch(patch.object(runtime.native, 'patch_binary', side_effect=self.patch_binary))
         self.start_patch(patch.dict(runtime.WRAPPER_PINS, {
             'cnc_ddraw': {'sha256': runtime.sha(self.wrappers['DDraw.dll'])},
             'dg_ddraw': {'sha256': runtime.sha(self.wrappers['profiles/race/DDraw.dll'])}
