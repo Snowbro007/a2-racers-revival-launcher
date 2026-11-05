@@ -17,7 +17,6 @@ from pathlib import Path, PurePosixPath
 import re
 import shutil
 import stat
-import subprocess
 import sys
 import time
 import urllib.parse
@@ -614,11 +613,16 @@ def take_notice(root: Path) -> dict:
     return {'state': 'notice', 'outcome': value['state'], 'message': str(value.get('message', ''))[:500]}
 
 
-def apply_portable(root: Path, receipt: Path, wait_pids=(), waiter=wait_for_exit) -> dict:
+def apply_portable(root: Path, receipt: Path, wait_pids=(), waiter=None) -> dict:
     """Replace the app files of a closed portable launcher; restore everything on failure."""
     if install_kind(root) != 'portable':
         raise ValueError('Alleen een uitgepakte launcher kan zichzelf bijwerken.')
-    waiter(wait_pids)
+    try:
+        (waiter or wait_for_exit)(wait_pids)
+    except LauncherStillOpen:
+        write_notice(root, {'state': 'failed', 'message': 'Update niet uitgevoerd: de launcher sloot niet op tijd. '
+                            'Er is niets veranderd. Kies onder Support opnieuw Nu bijwerken.'})
+        raise
     try:
         state = verify_portable_download(root, receipt)
         folder = Path(state['receipt']).parent
@@ -643,8 +647,9 @@ def apply_portable(root: Path, receipt: Path, wait_pids=(), waiter=wait_for_exit
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(source, target)
     try:
-        for name in new_rows:
-            replace_file(staged / name, root / name)
+        for name, row in new_rows.items():
+            if not same_file(root / name, row):  # Leave unchanged files (like Launcher.cmd) alone.
+                replace_file(staged / name, root / name)
         for name in obsolete:
             path = checked_path(root / name)
             if path.is_file():
@@ -684,11 +689,24 @@ def apply_portable(root: Path, receipt: Path, wait_pids=(), waiter=wait_for_exit
             'message': 'Bijgewerkt van ' + previous + ' naar ' + version + '.'}
 
 
+def same_file(path: Path, row: dict) -> bool:
+    path = checked_path(path)
+    if not path.is_file() or path.stat().st_size != row['size']:
+        return False
+    with path.open('rb') as stream:
+        return file_sha256(stream) == row['sha256']
+
+
 def restart_launcher(root: Path) -> None:
+    """Open Launcher.cmd like a double-click.
+
+    The Windows shell quotes the path itself, so folder names with &, ( ) or
+    spaces work. A hand-built `cmd /c` line would split on such characters.
+    """
     script = checked_path(root / 'Launcher.cmd')
-    shell = Path(os.environ.get('SystemRoot', r'C:\Windows')) / 'System32' / 'cmd.exe'
-    subprocess.Popen([str(shell), '/c', str(script)], cwd=root,
-                     creationflags=getattr(subprocess, 'CREATE_NEW_CONSOLE', 0), close_fds=True)
+    if os.name != 'nt':
+        raise OSError('Herstarten kan alleen op Windows.')
+    os.startfile(str(script), cwd=str(root))
 
 
 def main() -> int:

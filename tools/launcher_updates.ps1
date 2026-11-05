@@ -76,13 +76,22 @@ function Show-LauncherUpdateNotice([string]$Text, [bool]$Failed) {
     $null = [Windows.MessageBox]::Show($script:launcherUpdates.window, $Text, 'A2 Racers Revival', 'OK', $icon)
 }
 
+function Test-LauncherBatchHost([string]$CommandLine) {
+    # Only a cmd that was started just to run Launcher.cmd (double-click or the
+    # updater restart: cmd /c ...Launcher.cmd) closes after the launcher. An
+    # interactive cmd (no /c, or /k) stays open, so the updater must not wait on it.
+    if ([string]::IsNullOrWhiteSpace($CommandLine)) { return $false }
+    return [bool]($CommandLine -match '(?i)(^|\s)/c(\s|"|$)' -and $CommandLine -notmatch '(?i)(^|\s)/k(\s|"|$)' -and
+        $CommandLine -match '(?i)launcher\.cmd')
+}
+
 function Get-LauncherParentShell {
-    # Launcher.cmd waits for this PowerShell; the updater must wait for both
-    # before it replaces Launcher.cmd itself.
+    # Launcher.cmd waits for this PowerShell; the updater waits for both before
+    # it replaces Launcher.cmd itself, unless the cmd window stays open anyway.
     try {
         $parentId = [int](Get-CimInstance Win32_Process -Filter ('ProcessId=' + $PID) -ErrorAction Stop).ParentProcessId
-        $parent = Get-Process -Id $parentId -ErrorAction Stop
-        if ($parent.ProcessName -eq 'cmd') { return $parentId }
+        $parent = Get-CimInstance Win32_Process -Filter ('ProcessId=' + $parentId) -ErrorAction Stop
+        if ($parent.Name -eq 'cmd.exe' -and (Test-LauncherBatchHost ([string]$parent.CommandLine))) { return $parentId }
     } catch { }
     return $null
 }

@@ -1,4 +1,5 @@
 """Offline update tests with text-only MSI-shaped bytes; never run installers."""
+import contextlib
 import copy
 import hashlib
 import io
@@ -7,6 +8,7 @@ import os
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 from urllib.request import Request
 import zipfile
 
@@ -372,6 +374,48 @@ class PortableUpdateTests(unittest.TestCase):
             self.assertEqual((self.root / name).read_bytes(), data, name)
         self.assertEqual(update.take_notice(self.root)['outcome'], 'failed')
         self.assert_user_data_kept()
+
+    def test_launcher_that_stays_open_leaves_a_notice_and_is_not_restarted(self):
+        result = self.download()
+        def still_open(pids):
+            raise update.LauncherStillOpen('synthetic: launcher did not close')
+        with self.assertRaises(update.LauncherStillOpen):
+            update.apply_portable(self.root, Path(result['receipt']), (1,), waiter=still_open)
+        notice = update.take_notice(self.root)
+        self.assertEqual(notice['outcome'], 'failed')
+        self.assertIn('niet op tijd', notice['message'])
+        argv = ['launcher_updates.py', '--root', str(self.root), 'apply', '--receipt', result['receipt'],
+                '--restart', '--wait', '1']
+        with patch.object(update, 'wait_for_exit', still_open), patch.object(update, 'restart_launcher') as restart, \
+                patch('sys.argv', argv), contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(update.main(), 1)
+        restart.assert_not_called()
+        for name, data in self.old_files.items():
+            self.assertEqual((self.root / name).read_bytes(), data, name)
+
+    def test_unchanged_files_are_not_rewritten(self):
+        self.new_files['Launcher.cmd'] = self.old_files['Launcher.cmd']
+        result = self.download()
+        same = [name for name in self.old_files if self.new_files.get(name) == self.old_files[name]]
+        self.assertEqual(same, ['Launcher.cmd'])
+        written = []
+        original = update.replace_file
+        def tracking(source, target):
+            written.append(Path(target).relative_to(self.root).as_posix())
+            return original(source, target)
+        with patch.object(update, 'replace_file', tracking):
+            update.apply_portable(self.root, Path(result['receipt']), waiter=lambda pids: None)
+        self.assertFalse(set(same) & set(written), written)
+        for name, data in self.new_files.items():
+            self.assertEqual((self.root / name).read_bytes(), data, name)
+
+    def test_restart_opens_launcher_through_the_shell_for_any_folder_name(self):
+        folder = self.root / 'A2&Revival (kopie)'
+        folder.mkdir()
+        (folder / 'Launcher.cmd').write_bytes(b'@echo off\r\n')
+        with patch.object(update.os, 'startfile', create=True) as start, patch.object(update.os, 'name', 'nt'):
+            update.restart_launcher(folder)
+        start.assert_called_once_with(str(folder / 'Launcher.cmd'), cwd=str(folder))
 
     @unittest.skipUnless(os.name == 'nt', 'Windows process handles')
     def test_wait_for_exit_waits_for_real_process_and_refuses_one_that_stays_open(self):

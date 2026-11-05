@@ -132,6 +132,13 @@ foreach($part in @('apply','--restart','--receipt C:\synthetic\download.json',"-
     if($line -notlike "*$part*"){throw ('Missing updater argument: '+$part+' in '+$line)}
 }
 if($exe -ne 'C:\synthetic\python.exe'){throw 'Wrong runtime'}
+# Only a cmd started for Launcher.cmd closes with the launcher; never wait on an interactive one.
+foreach($line in @('C:\WINDOWS\system32\cmd.exe /c ""Y:\A2&Revival\Launcher.cmd" "','cmd.exe /d /s /c "Y:\A2 Revival\Launcher.cmd"')){
+    if(-not (Test-LauncherBatchHost $line)){throw ('Batch host not recognised: '+$line)}
+}
+foreach($line in @('"C:\WINDOWS\system32\cmd.exe"','cmd.exe /k Y:\A2\Launcher.cmd','cmd /c other.cmd','',$null)){
+    if(Test-LauncherBatchHost $line){throw ('Interactive or other cmd accepted: '+$line)}
+}
 'Portable start: OK; no updater, network or game executed'
 '''
 
