@@ -1,16 +1,16 @@
 # A2 Racers Revival
 
-Een fanlauncher om A2 Racer I en II weer te spelen op Windows 11, met wat extra beeld- en spelinstellingen. Gemaakt met hulp van LLM’s.
+Een fanlauncher om A2 Racer I en II, De Politie Slaat Terug en Vakantieracer weer te spelen op Windows 11, met wat extra beeld- en spelinstellingen. Gemaakt met hulp van LLM’s.
 
-**[Download beta 11 voor Windows 11 (.zip)](https://github.com/Snowbro007/a2-racers-revival-launcher/releases/download/v0.1.0-beta.11/A2-Racers-Revival-0.1.0-beta.11-Windows-x64.zip)**
+**[Download beta 12 voor Windows 11 (.zip)](https://github.com/Snowbro007/a2-racers-revival-launcher/releases/download/v0.1.0-beta.12/A2-Racers-Revival-0.1.0-beta.12-Windows-x64.zip)**
 
-Games zitten er niet bij: je hebt je eigen volledige ondersteunde Nederlandse gamebestanden nodig. Deel III is in ontwikkeling: Tour 1 heeft een bewaakte, ongeteste start via het originele menu; Tour 2 blijft geblokkeerd wegens muis- en stabiliteitsproblemen.
+Games zitten er niet bij: je hebt je eigen volledige ondersteunde Nederlandse gamebestanden nodig. Deel III is in ontwikkeling: Tour 1 heeft een bewaakte, ongeteste start via het originele menu; Tour 2 blijft geblokkeerd wegens muis- en stabiliteitsproblemen. De Politie Slaat Terug en Vakantieracer zijn nieuw in beta 12: de HD-basis is speelgetest, de start via de launcher nog niet.
 
 ### Aan de slag
 
 1. Pak de ZIP helemaal uit via **Alles uitpakken**.
 2. Open **Launcher.cmd** in de uitgepakte map.
-3. Kies deel I of II en voeg je eigen gamemap of ondersteunde ZIP toe.
+3. Kies je game en voeg je eigen gamemap of ondersteunde ZIP toe.
 4. Kies **Aanbevolen → Spelen** zodra je game klaarstaat.
 
 Gebruik de download hierboven; **Code → Download ZIP** is de broncode. Python hoef je niet zelf te installeren. De eerste start haalt circa **11,4 MB** aan launcherbasis op. Overige hulponderdelen volgen wanneer je een game toevoegt of voorbereidt. De grote introspeler van **109,5 MiB** wordt bij deel II overgeslagen en alleen voor deel I met intro opgehaald. Onderbroken downloads kunnen bij een nieuwe poging verdergaan als de server hervatten ondersteunt. Daarna kun je offline spelen.
@@ -19,7 +19,7 @@ Gebruik de download hierboven; **Code → Download ZIP** is de broncode. Python 
 
 Je originele gamemap of ZIP mag blijven staan waar hij staat. Met **Gamebestandenmap openen** kun je ook een plek bij de launcher maken: `Gamebestanden/A2 Racer I/` of `Gamebestanden/A2 Racer II/`. Selecteer je bron daarna in de launcher; neerzetten alleen importeert niets. Voor deel II is de volledige gamemap met `DATA` nodig.
 
-De launcher maakt een eigen kopie en behoudt je bron. Zet geen games in `tools` of `assets`. Vanaf de versie na beta 11 vraagt de launcher bij een nieuwe versie of je wilt bijwerken, en werkt hij zichzelf daarna bij. Je map **local/** met instellingen en voortgang blijft daarbij staan. Heb je beta 11 of ouder? Download de nieuwe versie dan één keer zelf en zet je map **local/** en je eigen gamebronnen erin terug. De losse helper om een snelkoppeling te maken is vervallen.
+De launcher maakt een eigen kopie en behoudt je bron. Zet geen games in `tools` of `assets`. Vanaf beta 12 vraagt de launcher bij een nieuwe versie of je wilt bijwerken, en werkt hij zichzelf daarna bij. Je map **local/** met instellingen en voortgang blijft daarbij staan. Heb je beta 11 of ouder? Download de nieuwe versie dan één keer zelf en zet je map **local/** en je eigen gamebronnen erin terug. De losse helper om een snelkoppeling te maken is vervallen.
 
 Voor deel II kun je de volledige `A2-Racer-II_Win_NL.zip` kiezen, zonder zelf BIN/CUE uit te pakken of te mounten. Ook anders verpakte ZIP’s worden herkend wanneer het cd-image exact overeenkomt met de ondersteunde Nederlandse v1.01-versie. NRG-images en andere versies worden niet ondersteund.
 
@@ -33,4 +33,4 @@ Heb je de game nog niet, gebruik dan een rechtmatig verkregen eigen cd, installa
 
 Dit is een niet-ondertekende, draagbare testbeta; er is geen nieuwe MSI-installer of antivirusbeoordeling vrijgegeven. Windows of antivirus kan waarschuwen of blokkeren en er zijn eerdere antivirusmeldingen bekend. Zet je beveiliging niet uit bij een blokkade. Meld versie, foutmelding en eventuele detectienaam via [GitHub Issues](https://github.com/Snowbro007/a2-racers-revival-launcher/issues) of [HeySnowdude@pm.me](mailto:HeySnowdude@pm.me).
 
-[Release en SHA-256](https://github.com/Snowbro007/a2-racers-revival-launcher/releases/tag/v0.1.0-beta.11). Onofficieel fanproject, zonder steun van de rechthebbenden. Games en merken blijven van hen. [MIT](https://github.com/Snowbro007/a2-racers-revival-launcher/blob/main/LICENSE) geldt voor eigen code; zie [overige licenties](https://github.com/Snowbro007/a2-racers-revival-launcher/blob/main/THIRD-PARTY-NOTICES.md). Beta zonder garantie.
+[Release en SHA-256](https://github.com/Snowbro007/a2-racers-revival-launcher/releases/tag/v0.1.0-beta.12). Onofficieel fanproject, zonder steun van de rechthebbenden. Games en merken blijven van hen. [MIT](https://github.com/Snowbro007/a2-racers-revival-launcher/blob/main/LICENSE) geldt voor eigen code; zie [overige licenties](https://github.com/Snowbro007/a2-racers-revival-launcher/blob/main/THIRD-PARTY-NOTICES.md). Beta zonder garantie.

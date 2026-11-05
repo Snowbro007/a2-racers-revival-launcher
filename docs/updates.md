@@ -14,7 +14,7 @@ De MSI behoudt de installatiemap en beheert alleen programmabestanden. Lokale ga
 
 ## Draagbare launcher werkt zichzelf bij
 
-Vanaf de versie na beta 11 kan de uitgepakte ZIP-launcher zichzelf bijwerken. Beta 11 en ouder hebben die functie nog niet: download de nieuwe ZIP daar één keer zelf en zet je map `local/` erin terug.
+Vanaf beta 12 kan de uitgepakte ZIP-launcher zichzelf bijwerken. Beta 11 en ouder hebben die functie nog niet: download de nieuwe ZIP daar één keer zelf en zet je map `local/` erin terug.
 
 1. Bij het starten controleert de launcher GitHub op een nieuwere gepubliceerde release met de launcher-ZIP en het bijbehorende `.sha256`-bestand. Concepten worden overgeslagen.
 2. Is er een nieuwere versie, dan vraagt de launcher één keer per sessie of je wilt bijwerken. Kies je **Nee**, dan staat de update klaar onder **Support**.

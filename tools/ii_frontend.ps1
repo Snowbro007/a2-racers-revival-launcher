@@ -722,8 +722,8 @@ public sealed class AtlasIIFakeSession : IDisposable {
         $stream=[IO.File]::Create($RenderPath);try{$encoder.Save($stream)}finally{$stream.Dispose()}
         @{rendered=$RenderPath;game_started=$false;window_shown=$false}|ConvertTo-Json
     }elseif($UiCheck){
-        $script:Controls.PlayerName.Text='Fixture Robin';$script:Controls.SaveName.RaiseEvent([Windows.RoutedEventArgs]::new([Windows.Controls.Button]::ClickEvent))
-        if((Current-Profile).name -cne 'Fixture Robin'){throw 'Naamknop slaagt niet.'}
+        $script:Controls.PlayerName.Text='Fixture Speler';$script:Controls.SaveName.RaiseEvent([Windows.RoutedEventArgs]::new([Windows.Controls.Button]::ClickEvent))
+        if((Current-Profile).name -cne 'Fixture Speler'){throw 'Naamknop slaagt niet.'}
         if($script:Controls.TrackChoice.Items.Count -ne 1 -or $script:Model.track -ne 0){throw 'Nieuwe speler kan vergrendelde etappes kiezen.'}
         foreach($page in @('Garage','Cars','Controls','Options','Records','Players')){Show-Page $page}
         Show-Page 'Players';$script:NewName.Text='Tweede speler';Invoke-Action 'new-player'
