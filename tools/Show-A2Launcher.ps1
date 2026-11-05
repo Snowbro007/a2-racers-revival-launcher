@@ -1,6 +1,6 @@
 ﻿#Requires -Version 5.1
 param([string]$PythonPath, [string]$PowerShellPath, [switch]$CheckOnly, [string]$PreviewPath,
-      [ValidateSet('play','options','logs','iii')][string]$PreviewPage = 'play',
+      [ValidateSet('play','options','logs','iii','later')][string]$PreviewPage = 'play',
       [ValidateSet('a2racer1','a2racer2')][string]$PreviewGame)
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
@@ -16,6 +16,8 @@ $script:gameComponentsVerified = $false; $script:mediaComponentsVerified = $fals
 $script:installationScanAttempted = $false
 $script:installationScanNote = $null
 $script:cheatControls = @{}
+# IV and Vakantieracer: page 4, own catalog/bridge (tools/launcher_later_games.py).
+$script:laterCatalog = $null; $script:laterToken = $null; $script:laterSelection = $null
 $script:developmentRuntimes = [bool](($PythonPath -and $PowerShellPath) -or
     (Test-Path -LiteralPath (Join-Path $workspacePath 'local\launcher\runtimes.json')))
 
@@ -100,10 +102,10 @@ function Get-IIChoiceSupport([string]$Resolution,[string]$Hud) {
 }
 
 function Update-Buttons {
-    $isIIIPage = $ui.Pages.SelectedIndex -eq 3
+    $isIIIPage = $ui.Pages.SelectedIndex -in @(3,4)
     $ui.OpenGameLibrary.Visibility = if ($isIIIPage) { 'Collapsed' } else { 'Visible' }
     for ($pageIndex = 0; $pageIndex -lt $ui.Pages.Items.Count; $pageIndex++) {
-        $visible = if ($pageIndex -eq 3) { $isIIIPage } else { -not $isIIIPage }
+        $visible = if ($pageIndex -in @(3,4)) { $pageIndex -eq $ui.Pages.SelectedIndex } else { -not $isIIIPage }
         $ui.Pages.Items[$pageIndex].Visibility = if ($visible) { 'Visible' } else { 'Collapsed' }
     }
     $idle = -not $script:operation
@@ -229,6 +231,74 @@ function Update-Buttons {
             else { Set-Status 'Beeldvariant niet beschikbaar' $ui.IIIProfileNote.Text }
         }
     } else { $ui.GameThree.BorderBrush = '#356E95' }
+    Update-LaterButtons $idle $running
+}
+
+function Get-LaterGameTitle([string]$Game) {
+    if ($Game -eq 'a2racer4') { return 'De Politie Slaat Terug' }
+    return 'Vakantieracer'
+}
+
+function Get-LaterGameState([string]$Game) {
+    if (-not $script:laterCatalog) { return $null }
+    return @($script:laterCatalog.games | Where-Object { $_.id -eq $Game }) | Select-Object -First 1
+}
+
+function Get-LaterSelection {
+    $game = if ($ui.LaterGameChoice.SelectedItem) { [string]$ui.LaterGameChoice.SelectedItem.Tag } else { '' }
+    $profile = if ($ui.LaterProfileChoice.SelectedItem) { [string]$ui.LaterProfileChoice.SelectedItem.Tag } else { '' }
+    if ($game -notin @('a2racer4','vakantieracer')) { throw 'Kies Vakantieracer of De Politie Slaat Terug.' }
+    if ($profile -notin @('hd1080','compat')) { throw 'Kies een beeldoptie.' }
+    return @{game=$game; profile=$profile}
+}
+
+function Update-LaterStatus {
+    $game = if ($ui.LaterGameChoice.SelectedItem) { [string]$ui.LaterGameChoice.SelectedItem.Tag } else { 'vakantieracer' }
+    $profile = if ($ui.LaterProfileChoice.SelectedItem) { [string]$ui.LaterProfileChoice.SelectedItem.Tag } else { 'hd1080' }
+    $state = Get-LaterGameState $game
+    $ui.LaterGameOverview.Text = Get-LaterGameTitle $game
+    $ui.LaterProfileOverview.Text = if ($profile -eq 'hd1080') { '1440 × 1080' } else { '640 × 480' }
+    $ui.LaterReadyOverview.Text = if (-not $script:laterCatalog) { 'Controleren…' } elseif ($state -and $state.ready) { 'Klaar' } else { 'Eigen game nodig' }
+    $ui.LaterStatus.Text = if (-not $script:laterCatalog) { 'De gamebestanden worden gecontroleerd.' }
+        elseif ($state -and $state.ready) { 'Je eigen gamebestanden zijn toegevoegd. Kies je beeldoptie en start de game.' }
+        elseif ($state -and [string]$state.reason -match '^\[(WinError|Errno) [23]\]') { 'Nog geen eigen game toegevoegd. Kies je volledige gamemap of installatie-ZIP.' }
+        elseif ($state) { [string]$state.reason } else { 'Deze game staat niet in de catalogus.' }
+    $note = if ($profile -eq 'hd1080') { 'Bevestigde HD-basis in de oorspronkelijke 4:3-verhouding, schermvullend weergegeven.' } else { 'Bevestigde lage resolutie als terugvaloptie.' }
+    if ($script:laterCatalog) {
+        $entry = @($script:laterCatalog.profiles | Where-Object { $_.id -eq $profile }) | Select-Object -First 1
+        if ($entry -and $entry.description) { $note = [string]$entry.description }
+    }
+    $ui.LaterProfileNote.Text = $note
+    $ui.GameFourAvailability.Text = if (-not $script:laterCatalog) { 'Wordt gecontroleerd' }
+        elseif (@($script:laterCatalog.games | Where-Object { $_.ready }).Count) { 'Klaar om te spelen' } else { 'Eigen game nodig' }
+}
+
+function Update-LaterButtons($Idle, $Running) {
+    $laterRunning = [bool]($Running -and $script:worker.ContainsKey('kind') -and $script:worker.kind -eq 'later')
+    $ui.GameFour.IsEnabled = [bool]($Idle -and $script:initialized)
+    foreach ($name in @('LaterGameChoice','LaterProfileChoice','LaterChooseFolder','LaterChooseArchive')) {
+        $ui[$name].IsEnabled = [bool]($Idle -and -not $Running -and $script:initialized)
+    }
+    $ui.LaterStop.Visibility = if ($laterRunning) { 'Visible' } else { 'Collapsed' }
+    $ui.LaterStop.IsEnabled = [bool]($Idle -and $laterRunning -and $script:laterToken)
+    if ($ui.Pages.SelectedIndex -ne 4) { $ui.GameFour.BorderBrush = '#356E95'; return }
+    $game = if ($ui.LaterGameChoice.SelectedItem) { [string]$ui.LaterGameChoice.SelectedItem.Tag } else { 'vakantieracer' }
+    $state = Get-LaterGameState $game
+    $ready = [bool]($state -and $state.ready)
+    $title = Get-LaterGameTitle $game
+    $ui.PlayButton.IsEnabled = [bool]($Idle -and -not $Running -and $ready)
+    $ui.PlayButton.Content = if ($laterRunning) { 'Game draait' } elseif ($ready) { 'Speel ' + $title } else { 'Eigen game nodig' }
+    $ui.PlayNote.Text = 'Origineel menu · eigen lokale speelkopie. Sluit de game via het menu of met Game stoppen.'
+    $ui.GameTitle.Text = $title
+    $ui.GameSubtitle.Text = if ($game -eq 'a2racer4') { 'A2 Racer IV · bevestigde HD-basis' } else { 'A2 Vakantieracer · bevestigde HD-basis' }
+    $ui.GameFour.BorderBrush = '#FFDD4A'
+    $ui.GameOne.BorderBrush = '#356E95'; $ui.GameTwo.BorderBrush = '#356E95'; $ui.GameThree.BorderBrush = '#356E95'
+    $ui.GameOneSelected.Visibility = 'Collapsed'; $ui.GameTwoSelected.Visibility = 'Collapsed'
+    $keep = @('Start onderbroken','Kon niet doorgaan','Latere game kon niet doorgaan','Game afgesloten','Game gestopt','Gamebestanden toegevoegd','Game gestart','Stoppen gevraagd')
+    if (-not $Running -and -not $script:operation -and $script:laterCatalog -and $ui.StatusTitle.Text -notin $keep) {
+        if ($ready) { Set-Status ($title + ' is klaar') 'Kies je beeldoptie en klik op Speel.' }
+        else { Set-Status 'Eigen game nodig' 'Kies je volledige eigen gamemap of installatie-ZIP.' }
+    }
 }
 
 function Update-IIIStatus {
@@ -792,6 +862,64 @@ function Start-IIIGame {
     } catch { Set-Status 'Deel III kon niet starten' $_.Exception.Message }
 }
 
+function Start-LaterModel([string]$Kind, [string[]]$Arguments) {
+    # Preparing a play copy needs the display wrappers from the game components;
+    # catalog, import, plan and stop only need Python.
+    if ($Kind -eq 'later-prepare' -and (Start-GameComponentPreparation $Kind $Arguments)) { return }
+    Start-Operation $Kind $script:PythonPath (@('-X','utf8','-B', (Join-Path $workspacePath 'tools\launcher_later_games.py')) + $Arguments)
+}
+
+function Test-OtherGameRunning {
+    foreach ($relative in @('local/experiments','local/ii-parallel','local/iii-play','local/iii-trials','local/iii-mouse','local/iii-research')) {
+        if (@(Get-LauncherProcesses (Join-Path $workspacePath $relative)).Count) { return $true }
+    }
+    return $false
+}
+
+function Start-LaterGame {
+    if ($script:operation -or ($script:worker -and -not $script:worker.process.HasExited)) { return }
+    try {
+        if (-not (Load-Runtimes)) { throw 'Python-runtime ontbreekt.' }
+        if (Test-OtherGameRunning) { throw 'Sluit de eerdere game eerst normaal af.' }
+        $script:laterSelection = Get-LaterSelection
+        $script:laterToken = [Guid]::NewGuid().ToString('N')
+        Set-Status 'Game voorbereiden' 'Je eigen gamebestanden worden gecontroleerd en de speelkopie wordt klaargezet.'
+        Start-LaterModel 'later-prepare' @('prepare','--game',$script:laterSelection.game,'--profile',$script:laterSelection.profile,'--token',$script:laterToken)
+    } catch { $script:laterToken = $null; Set-Status 'Latere game kon niet doorgaan' $_.Exception.Message }
+}
+
+function Start-LaterSession($Plan) {
+    # Only our own fixed start script, with the closed argument list from the plan.
+    $selection = $script:laterSelection
+    if (-not $selection -or $Plan.kind -ne 'later-game-launch-plan' -or $Plan.control_token -cne $script:laterToken -or
+            $Plan.game -ne $selection.game -or $Plan.profile -ne $selection.profile) { throw 'Het startplan hoort niet bij deze keuze.' }
+    $startScript = [IO.Path]::GetFullPath((Join-Path $workspacePath 'tools\Start-LaterGame.ps1'))
+    if (-not [string]::Equals([IO.Path]::GetFullPath([string]$Plan.start_script), $startScript, [StringComparison]::OrdinalIgnoreCase)) { throw 'Onbekend startscript.' }
+    Assert-LauncherPath $startScript
+    if ((Get-FileHash -LiteralPath $startScript -Algorithm SHA256).Hash.ToLowerInvariant() -cne [string]$Plan.start_script_sha256) { throw 'Het startscript is gewijzigd.' }
+    if (-not (Load-Runtimes -RequireGameRuntime)) { throw 'Spelonderdelen ontbreken; je game is niet gestart.' }
+    if (Test-OtherGameRunning) { throw 'Sluit de eerdere game eerst normaal af.' }
+    $script:sessionName = $null
+    $script:worker = New-LauncherProcess $script:PowerShellPath @('-NoLogo','-NoProfile','-STA','-ExecutionPolicy','Bypass','-File',$startScript,
+        '-Game',$selection.game,'-Profile',$selection.profile,'-ControlToken',$script:laterToken,'-PythonPath',$script:PythonPath,'-UiResult')
+    $script:worker.kind = 'later'
+    Set-Status 'Game gestart' ((Get-LaterGameTitle $selection.game) + ' start met het originele menu. Sluit de game via het menu.')
+}
+
+function Complete-LaterSession($Completed) {
+    $script:laterToken = $null
+    $text = [string]$Completed.output.GetAwaiter().GetResult()
+    $errorText = [string]$Completed.error.GetAwaiter().GetResult()
+    $line = @($text -split "`r?`n" | Where-Object { $_.Trim().StartsWith('{') }) | Select-Object -Last 1
+    $value = $null
+    if ($line) { try { $value = $line | ConvertFrom-Json } catch { $value = $null } }
+    if ($value -and $Completed.process.ExitCode -eq 0 -and $value.status -eq 'closed') { Set-Status 'Game afgesloten' 'Je gamesessie is netjes afgesloten.'; return }
+    if ($value -and $Completed.process.ExitCode -eq 0 -and $value.status -eq 'stopped') { Set-Status 'Game gestopt' ([string]$value.message); return }
+    $detail = if ($value -and $value.message) { [string]$value.message } elseif (-not [string]::IsNullOrWhiteSpace($errorText)) { $errorText } else { 'De game stopte zonder foutdetails.' }
+    $ui.LogText.Text = $detail
+    Set-Status 'Start onderbroken' $detail.Substring(0, [Math]::Min($detail.Length, 1600))
+}
+
 function Open-Devtools {
     try {
         if (-not (Load-Runtimes -RequireGameRuntime)) { throw 'Runtimes voor de devtools ontbreken. Voeg eerst je eigen game toe om de spelonderdelen voor te bereiden.' }
@@ -992,6 +1120,10 @@ function Poll-Launcher {
             $pending = $script:operation; $script:operation = $null
             $output = $pending.output.GetAwaiter().GetResult(); $errorText = $pending.error.GetAwaiter().GetResult()
             $code = $pending.process.ExitCode; $pending.process.Dispose()
+            if ($code -ne 0 -and $pending.kind -like 'later-*') {
+                $detail = ConvertTo-LauncherPlainText ([string]$errorText)
+                throw $(if ($detail) { $detail -replace '^Latere game:\s*', '' } else { 'Het achtergrondproces gaf geen foutdetails terug.' })
+            }
             if ($code -ne 0) {
                 # Write-Host from the PowerShell bootstrap arrives on stdout.
                 # Preserve both streams, including errors after progress lines.
@@ -1008,7 +1140,7 @@ function Poll-Launcher {
                 if (-not $next) { throw 'Er staat geen gameactie klaar na de voorbereiding.' }
                 if ($next.media) { $script:mediaComponentsVerified = $true }
                 Set-Status 'Gekozen game verwerken' 'De spelonderdelen staan klaar. Nu worden uitsluitend de door jou gekozen gamebestanden gecontroleerd.'
-                Start-Model $next.kind $next.arguments
+                if ($next.kind -like 'later-*') { Start-LaterModel $next.kind $next.arguments } else { Start-Model $next.kind $next.arguments }
                 return
             }
             if ($pending.kind -eq 'initialize') { $script:releaseInitialized = $true; Start-InitialCheck; return }
@@ -1020,9 +1152,25 @@ function Poll-Launcher {
                     if (-not $script:settings) { $script:settings = $result.settings; $script:game = $result.settings.selected_game }
                     Select-Game $script:game
                     if (-not $script:sessionName -and $result.latest_session) { Restore-Session $result.latest_session }
+                    if (-not $script:laterCatalog -and -not $script:operation) { Start-LaterModel 'later-catalog' @('catalog') }
                     # Searching registered Windows installations is explicit:
                     # a fresh launcher can open even when the user owns no game yet.
                 }
+                'later-catalog' {
+                    if ($result.kind -ne 'later-game-catalog') { throw 'Onbekende catalogus voor IV en Vakantieracer.' }
+                    $script:laterCatalog = $result; Update-LaterStatus
+                }
+                'later-import' {
+                    Set-Status 'Gamebestanden toegevoegd' ([string]$result.message)
+                    Start-LaterModel 'later-catalog' @('catalog')
+                }
+                'later-prepare' {
+                    if ($result.ready -ne $true -or $result.game -ne $script:laterSelection.game) { throw 'De voorbereiding gaf geen geldige speelkopie terug.' }
+                    Set-Status 'Game starten' 'De speelkopie staat klaar.'
+                    Start-LaterModel 'later-plan' @('plan','--game',$script:laterSelection.game,'--profile',$script:laterSelection.profile,'--token',$script:laterToken)
+                }
+                'later-plan' { Start-LaterSession $result }
+                'later-stop' { Set-Status 'Stoppen gevraagd' 'De game wordt netjes afgesloten.' }
                 'detect' { Show-Installations $result }
                 'library-folder' { Open-GameLibraryResult $result }
                 'save' { $script:settings = $result; Set-Status 'Opties opgeslagen' 'Deze keuzes gelden bij je volgende start.' }
@@ -1038,7 +1186,9 @@ function Poll-Launcher {
             Read-Session
             if ($script:worker.process.HasExited) {
                 $completed = $script:worker; $script:worker = $null
-                if ($completed.process.ExitCode -ne 0) {
+                if ($completed.ContainsKey('kind') -and $completed.kind -eq 'later') {
+                    Complete-LaterSession $completed
+                } elseif ($completed.process.ExitCode -ne 0) {
                     if ($completed.ContainsKey('kind') -and $completed.kind -eq 'iii') {
                         $detail = $completed.error.GetAwaiter().GetResult()
                         $ui.LogText.Text = $detail
@@ -1052,6 +1202,16 @@ function Poll-Launcher {
     } catch {
         if ($pending -and $pending.kind -eq 'game-components') { $script:afterComponents = $null; $script:gameComponentsVerified = $false }
         $title = if ($pending -and $pending.kind -eq 'iii-import') { 'Deel III kon niet koppelen' } else { 'Kon niet doorgaan' }
+        if ($pending -and $pending.kind -like 'later-*') {
+            $title = 'Latere game kon niet doorgaan'
+            if ($pending.kind -in @('later-prepare','later-plan')) { $script:laterToken = $null }
+        }
+        if ($pending -and $pending.kind -eq 'game-components' -and (Test-Path Variable:script:laterToken)) { $script:laterToken = $null }
+        if ($pending -and $pending.kind -eq 'later-catalog') {
+            # A background catalog check must not hide the status of part I or II.
+            $ui.GameFourAvailability.Text = 'Niet beschikbaar'; $ui.LaterStatus.Text = $_.Exception.Message
+            if ($ui.Pages.SelectedIndex -ne 4) { Update-Buttons; return }
+        }
         Set-Status $title $_.Exception.Message; Update-Buttons
     }
 }
@@ -1068,6 +1228,11 @@ try {
             'OriginalProfile','MaxProfile','SaveOptions','ResetOptions','OpenLogs','OpenDevtools','RefreshState','LogText','StatusTitle','StatusMessage','SupportDetails','PlayButton','LauncherVersion','CheckUpdates',
             'InstallationPanel','InstallationTitle','InstallationChoice','InstallationNote','InstallationFoundSection','InstallationSourceChoices','InstallationFolderHint','DetectInstallations','ChooseInstallation','LinkInstallation','GetGame','PrepareGame',
             'GameLibraryPanel','GameLibraryHelp','GameLibraryInputPath','GameLibraryStorage','OpenGameLibrary')) {
+        $ui[$name] = $window.FindName($name)
+        if (-not $ui[$name]) { throw ('Ontbrekend launcherelement: ' + $name) }
+    }
+    foreach ($name in @('GameFour','GameFourAvailability','LaterGameChoice','LaterProfileChoice','LaterProfileNote','LaterChooseFolder','LaterChooseArchive',
+            'LaterStatus','LaterStop','LaterGameOverview','LaterProfileOverview','LaterReadyOverview','LaterStartScroll')) {
         $ui[$name] = $window.FindName($name)
         if (-not $ui[$name]) { throw ('Ontbrekend launcherelement: ' + $name) }
     }
@@ -1100,6 +1265,10 @@ try {
     Add-Choice $ui.IIIProfileChoice '1080p · horizon en wolken uit · untested' 'fullhd-skyoff'
     Add-Choice $ui.IIIProfileChoice 'Origineel · unstable' 'original'
     $ui.IIIProfileChoice.SelectedIndex = 0
+    Add-Choice $ui.LaterGameChoice 'Vakantieracer' 'vakantieracer'; Add-Choice $ui.LaterGameChoice 'De Politie Slaat Terug (IV)' 'a2racer4'
+    $ui.LaterGameChoice.SelectedIndex = 0
+    Add-Choice $ui.LaterProfileChoice 'HD 1080p · aanbevolen' 'hd1080'; Add-Choice $ui.LaterProfileChoice 'Origineel 640 × 480' 'compat'
+    $ui.LaterProfileChoice.SelectedIndex = 0
     if ($CheckOnly -or $PreviewPath) {
         if (-not $script:developmentRuntimes) {
             & (Join-Path $PSScriptRoot 'Start-A2Portable.ps1') -CheckOnly
@@ -1115,8 +1284,16 @@ try {
         Select-Game $script:settings.selected_game
         if ($PreviewPath) {
             if ($PreviewGame) { Select-Game $PreviewGame }
-            $ui.Pages.SelectedIndex = @{ play=0; options=1; logs=2; iii=3 }[$PreviewPage]
-            Update-IIIStatus; Update-Buttons
+            if ($PreviewPage -eq 'later') {
+                $laterProbe = New-LauncherProcess $script:PythonPath @('-X','utf8','-B',(Join-Path $workspacePath 'tools\launcher_later_games.py'),'catalog')
+                $laterProbe.process.WaitForExit()
+                $laterJson = $laterProbe.output.GetAwaiter().GetResult(); $laterError = $laterProbe.error.GetAwaiter().GetResult()
+                if ($laterProbe.process.ExitCode -ne 0) { throw $laterError }
+                $laterProbe.process.Dispose()
+                $script:laterCatalog = $laterJson | ConvertFrom-Json
+            }
+            $ui.Pages.SelectedIndex = @{ play=0; options=1; logs=2; iii=3; later=4 }[$PreviewPage]
+            Update-IIIStatus; Update-LaterStatus; Update-Buttons
             $localPrefix = [IO.Path]::GetFullPath((Join-Path $workspacePath 'local')).TrimEnd('\') + '\'
             if (-not [IO.Path]::GetFullPath($PreviewPath).StartsWith($localPrefix, [StringComparison]::OrdinalIgnoreCase)) { throw 'Preview moet onder local/ worden opgeslagen.' }
             Assert-LauncherPath $PreviewPath
@@ -1164,10 +1341,46 @@ try {
         })
     }
     $ui.GameThree.Add_Click({ $ui.Pages.SelectedIndex = 3; Update-IIIStatus; Update-Buttons })
+    $ui.GameFour.Add_Click({
+        $ui.Pages.SelectedIndex = 4; $ui.LaterStartScroll.ScrollToTop(); Update-LaterStatus; Update-Buttons
+        if (-not $script:operation -and -not ($script:worker -and -not $script:worker.process.HasExited) -and (Load-Runtimes)) { Start-LaterModel 'later-catalog' @('catalog') }
+    })
+    foreach ($name in @('LaterGameChoice','LaterProfileChoice')) {
+        $ui[$name].Add_SelectionChanged({ if ($script:initialized) { Update-LaterStatus; Update-Buttons } })
+    }
+    $ui.LaterChooseFolder.Add_Click({
+        try {
+            $game = (Get-LaterSelection).game
+            Add-Type -AssemblyName System.Windows.Forms
+            $dialog = New-Object Windows.Forms.FolderBrowserDialog
+            $dialog.Description = 'Kies je volledige eigen ' + (Get-LaterGameTitle $game) + '-gamemap. De bron blijft intact.'
+            $dialog.ShowNewFolderButton = $false
+            try {
+                if ($dialog.ShowDialog() -eq [Windows.Forms.DialogResult]::OK) {
+                    Set-Status 'Gamebestanden toevoegen' 'De gekozen map wordt gecontroleerd en naar een eigen kopie gezet.'
+                    Start-LaterModel 'later-import' @('import-installation','--folder',$dialog.SelectedPath,'--game',$game)
+                }
+            } finally { $dialog.Dispose() }
+        } catch { Set-Status 'Latere game kon niet doorgaan' $_.Exception.Message }
+    })
+    $ui.LaterChooseArchive.Add_Click({
+        try {
+            $game = (Get-LaterSelection).game
+            $dialog = New-Object Microsoft.Win32.OpenFileDialog
+            $dialog.Title = 'Kies de installatie-ZIP van je eigen ' + (Get-LaterGameTitle $game); $dialog.Filter = 'Gamearchief (*.zip)|*.zip'
+            if ($dialog.ShowDialog($window)) {
+                Set-Status 'Gamebestanden toevoegen' 'Je ZIP wordt gecontroleerd en lokaal geïmporteerd.'
+                Start-LaterModel 'later-import' @('import-game','--archive',$dialog.FileName,'--game',$game)
+            }
+        } catch { Set-Status 'Latere game kon niet doorgaan' $_.Exception.Message }
+    })
+    $ui.LaterStop.Add_Click({
+        if ($script:laterToken -and -not $script:operation) { Start-LaterModel 'later-stop' @('stop','--token',$script:laterToken) }
+    })
     $ui.Pages.Add_SelectionChanged({
         if ($_.OriginalSource -eq $ui.Pages -and $script:initialized) {
-            if ($ui.Pages.SelectedIndex -ne 3) { Select-Game $script:game }
-            Update-IIIStatus; Update-Buttons
+            if ($ui.Pages.SelectedIndex -notin @(3,4)) { Select-Game $script:game }
+            Update-IIIStatus; Update-LaterStatus; Update-Buttons
         }
     })
     $ui.GameOne.Add_Click({ $ui.Pages.SelectedIndex = 0; Select-Game 'a2racer1' }); $ui.GameTwo.Add_Click({ $ui.Pages.SelectedIndex = 0; Select-Game 'a2racer2' })
@@ -1187,7 +1400,7 @@ try {
     $ui.RecommendedOptions.Add_Click({ Use-RecommendedOptions })
     $ui.OriginalProfile.Add_Click({ Use-GameProfile 'original' })
     $ui.MaxProfile.Add_Click({ Use-GameProfile 'max' })
-    $ui.PlayButton.Add_Click({ if ($ui.Pages.SelectedIndex -eq 3) { Start-IIIGame } else { Start-Model 'start' (Preference-Arguments 'create-session') } })
+    $ui.PlayButton.Add_Click({ if ($ui.Pages.SelectedIndex -eq 3) { Start-IIIGame } elseif ($ui.Pages.SelectedIndex -eq 4) { Start-LaterGame } else { Start-Model 'start' (Preference-Arguments 'create-session') } })
     $ui.RefreshState.Add_Click({ Start-Model 'snapshot' @('snapshot') })
     $ui.OpenDevtools.Add_Click({ Open-Devtools })
     $ui.OpenGameLibrary.Add_Click({ Start-Model 'library-folder' @('game-library-folder','--game',$script:game) })
