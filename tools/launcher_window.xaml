@@ -249,6 +249,17 @@
               </Grid>
             </Border>
           </Button>
+          <Button x:Name="GameFour" Grid.Row="4" Style="{StaticResource RoadSignButton}" BorderBrush="#356E95" Margin="0,12,0,0" MinHeight="96" VerticalAlignment="Top" AutomationProperties.Name="De Politie Slaat Terug en Vakantieracer selecteren">
+            <Border BorderBrush="#AFCDE7" BorderThickness="1" CornerRadius="2" Padding="12,9">
+              <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="45"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                <TextBlock Text="IV" FontFamily="Bahnschrift" FontWeight="Bold" FontSize="32" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                  <TextBlock Text="IV · Vakantieracer" FontFamily="Bahnschrift" FontWeight="SemiBold" FontSize="19" TextWrapping="Wrap"/>
+                  <TextBlock x:Name="GameFourAvailability" Text="Wordt gecontroleerd" FontSize="12" Foreground="#D3E5FA" Margin="0,4,0,0" TextWrapping="Wrap"/>
+                </StackPanel>
+              </Grid>
+            </Border>
+          </Button>
           <Border Grid.Row="5" Background="#C9152334" BorderBrush="#33465B" BorderThickness="1" CornerRadius="6" Padding="14,12" Margin="0,15,0,0"><StackPanel>
             <TextBlock Text="Kies je game" Foreground="#D7E2F2" FontWeight="SemiBold" FontSize="12"/>
             <TextBlock Text="Elke game heeft eigen instellingen." TextWrapping="Wrap" Foreground="#A6B8CE" FontSize="11" LineHeight="17" Margin="0,5,0,0"/>
@@ -499,6 +510,35 @@
                   <TextBlock x:Name="IIIStatus" FontSize="13" TextWrapping="Wrap"/>
                   <TextBlock Text="Menu, bediening, audio, Alt+Tab en voortgang moeten nog worden getest. Debug en tweak mode blijven uit." Style="{StaticResource OptionNote}"/>
                 </StackPanel></Border></Expander>
+              </StackPanel></ScrollViewer></TabItem>
+              <TabItem Header="Spelen" Visibility="Collapsed"><ScrollViewer x:Name="LaterStartScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><StackPanel Margin="0,1,8,0">
+                <TextBlock Text="Bevestigde HD-basis: origineel menu, je eigen gamebestanden en een aparte lokale speelkopie. Je bron blijft intact." TextWrapping="Wrap" Foreground="#A6B8CE" FontSize="12" LineHeight="18" Margin="0,0,0,8"/>
+                <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="12"/><ColumnDefinition Width="*"/><ColumnDefinition Width="12"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                  <Border Style="{StaticResource OverviewCard}"><StackPanel><TextBlock Text="GAME" Style="{StaticResource OverviewLabel}"/><TextBlock x:Name="LaterGameOverview" Text="Vakantieracer" Style="{StaticResource OverviewValue}"/></StackPanel></Border>
+                  <Border Grid.Column="2" Style="{StaticResource OverviewCard}"><StackPanel><TextBlock Text="BEELD" Style="{StaticResource OverviewLabel}"/><TextBlock x:Name="LaterProfileOverview" Text="1440 × 1080" Style="{StaticResource OverviewValue}"/></StackPanel></Border>
+                  <Border Grid.Column="4" Style="{StaticResource OverviewCard}"><StackPanel><TextBlock Text="GAMEBESTANDEN" Style="{StaticResource OverviewLabel}"/><TextBlock x:Name="LaterReadyOverview" Text="Controleren…" Style="{StaticResource OverviewValue}"/></StackPanel></Border>
+                </Grid>
+                <Border Style="{StaticResource SettingsCard}" Margin="0,10,0,0"><StackPanel>
+                  <TextBlock Text="Instellingen" Style="{StaticResource SettingsHeading}"/>
+                  <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="16"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                  <StackPanel>
+                  <TextBlock Text="Game" Style="{StaticResource OptionLabel}"/>
+                  <ComboBox x:Name="LaterGameChoice" AutomationProperties.Name="Latere game kiezen"/>
+                  <WrapPanel Margin="0,8,0,4">
+                    <Button x:Name="LaterChooseFolder" Content="Gamemap kiezen" Margin="0,0,8,0" AutomationProperties.Name="Eigen gamemap kiezen"/>
+                    <Button x:Name="LaterChooseArchive" Content="ZIP kiezen" AutomationProperties.Name="Eigen installatie-ZIP kiezen"/>
+                  </WrapPanel>
+                  <TextBlock Text="Je volledige eigen Nederlandse gamemap of installatie-ZIP. De launcher downloadt geen games." Style="{StaticResource OptionNote}"/>
+                  </StackPanel><StackPanel Grid.Column="2">
+                  <TextBlock Text="Beeld" Style="{StaticResource OptionLabel}"/>
+                  <ComboBox x:Name="LaterProfileChoice" AutomationProperties.Name="Beeldoptie kiezen"/>
+                  <TextBlock x:Name="LaterProfileNote" Style="{StaticResource OptionNote}"/>
+                  </StackPanel></Grid>
+                </StackPanel></Border>
+                <Border Style="{StaticResource SettingsCard}"><StackPanel>
+                  <TextBlock x:Name="LaterStatus" Text="De gamebestanden worden gecontroleerd." FontSize="13" TextWrapping="Wrap"/>
+                  <Button x:Name="LaterStop" Content="Game stoppen" Visibility="Collapsed" HorizontalAlignment="Left" Margin="0,10,0,0" AutomationProperties.Name="Lopende game netjes stoppen"/>
+                </StackPanel></Border>
               </StackPanel></ScrollViewer></TabItem>
             </TabControl>
             <Border Grid.Row="2" BorderBrush="#33465B" BorderThickness="0,1,0,0" Margin="0,12,0,0" Padding="0,12,0,0">
