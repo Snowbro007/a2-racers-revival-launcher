@@ -19,7 +19,7 @@ Gebruik de download hierboven; **Code → Download ZIP** is de broncode. Python 
 
 Je originele gamemap of ZIP mag blijven staan waar hij staat. Met **Gamebestandenmap openen** kun je ook een plek bij de launcher maken: `Gamebestanden/A2 Racer I/` of `Gamebestanden/A2 Racer II/`. Selecteer je bron daarna in de launcher; neerzetten alleen importeert niets. Voor deel II is de volledige gamemap met `DATA` nodig.
 
-De launcher maakt een eigen kopie en behoudt je bron. Zet geen games in `tools` of `assets`. Bewaar bij een portable update je map **local/** met instellingen en voortgang, plus je eigen gamebronnen. De losse helper om een snelkoppeling te maken is vervallen.
+De launcher maakt een eigen kopie en behoudt je bron. Zet geen games in `tools` of `assets`. Vanaf de versie na beta 11 vraagt de launcher bij een nieuwe versie of je wilt bijwerken, en werkt hij zichzelf daarna bij. Je map **local/** met instellingen en voortgang blijft daarbij staan. Heb je beta 11 of ouder? Download de nieuwe versie dan één keer zelf en zet je map **local/** en je eigen gamebronnen erin terug. De losse helper om een snelkoppeling te maken is vervallen.
 
 Voor deel II kun je de volledige `A2-Racer-II_Win_NL.zip` kiezen, zonder zelf BIN/CUE uit te pakken of te mounten. Ook anders verpakte ZIP’s worden herkend wanneer het cd-image exact overeenkomt met de ondersteunde Nederlandse v1.01-versie. NRG-images en andere versies worden niet ondersteund.
 

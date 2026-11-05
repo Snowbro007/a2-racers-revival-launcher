@@ -6,7 +6,8 @@ function Initialize-LauncherUpdates($Window, $Controls, [string]$Root, [scriptbl
     }
     $script:launcherUpdates = @{
         window=$Window; ui=$Controls; root=$Root; runtime=$Runtime; busy=$Busy;
-        process=$null; action=$null; initialized=$false; binding=$false; offer=$null; receipt=$null
+        process=$null; action=$null; initialized=$false; binding=$false; offer=$null; receipt=$null;
+        autoApply=$false; prompted=$false; receiptKind=$null
     }
     $version = Join-Path $Root 'VERSION.txt'
     if (Test-Path -LiteralPath $version -PathType Leaf) {
@@ -65,6 +66,57 @@ function Start-LauncherUpdateTask([string]$Action, [string[]]$Arguments) {
     } catch { $state.ui.UpdateMessage.Text = 'Updatecontrole niet beschikbaar. Je kunt gewoon blijven spelen.' }
 }
 
+function Confirm-LauncherUpdate([string]$Text) {
+    $answer = [Windows.MessageBox]::Show($script:launcherUpdates.window, $Text, 'A2 Racers Revival bijwerken', 'YesNo', 'Question')
+    return ($answer -eq [Windows.MessageBoxResult]::Yes)
+}
+
+function Show-LauncherUpdateNotice([string]$Text, [bool]$Failed) {
+    $icon = if ($Failed) {'Warning'} else {'Information'}
+    $null = [Windows.MessageBox]::Show($script:launcherUpdates.window, $Text, 'A2 Racers Revival', 'OK', $icon)
+}
+
+function Test-LauncherBatchHost([string]$CommandLine) {
+    # Only a cmd that was started just to run Launcher.cmd (double-click or the
+    # updater restart: cmd /c ...Launcher.cmd) closes after the launcher. An
+    # interactive cmd (no /c, or /k) stays open, so the updater must not wait on it.
+    if ([string]::IsNullOrWhiteSpace($CommandLine)) { return $false }
+    return [bool]($CommandLine -match '(?i)(^|\s)/c(\s|"|$)' -and $CommandLine -notmatch '(?i)(^|\s)/k(\s|"|$)' -and
+        $CommandLine -match '(?i)launcher\.cmd')
+}
+
+function Get-LauncherParentShell {
+    # Launcher.cmd waits for this PowerShell; the updater waits for both before
+    # it replaces Launcher.cmd itself, unless the cmd window stays open anyway.
+    try {
+        $parentId = [int](Get-CimInstance Win32_Process -Filter ('ProcessId=' + $PID) -ErrorAction Stop).ParentProcessId
+        $parent = Get-CimInstance Win32_Process -Filter ('ProcessId=' + $parentId) -ErrorAction Stop
+        if ($parent.Name -eq 'cmd.exe' -and (Test-LauncherBatchHost ([string]$parent.CommandLine))) { return $parentId }
+    } catch { }
+    return $null
+}
+
+function Start-PortableLauncherUpdate($Result) {
+    $state = $script:launcherUpdates
+    if (& $state.busy) { $state.ui.UpdateMessage.Text = 'Sluit eerst je game of voorbereiding; daarna kun je bijwerken.'; $state.autoApply = $false; return }
+    if (-not $state.autoApply) {
+        $text = 'Nu bijwerken naar versie ' + $Result.version + "?`n`nDe launcher sluit even en start daarna vanzelf opnieuw. Je saves, instellingen en games blijven staan."
+        if (-not (Confirm-LauncherUpdate $text)) { $state.ui.UpdateMessage.Text = 'Update staat klaar. Klik later op Nu bijwerken.'; return }
+    }
+    $state.autoApply = $false
+    if (& $state.busy) { $state.ui.UpdateMessage.Text = 'Er is net een game of voorbereiding gestart; de update wacht.'; return }
+    $runtime = & $state.runtime
+    $scriptPath = Join-Path (Join-Path $state.root 'tools') 'launcher_updates.py'
+    Assert-LauncherPath $scriptPath
+    $arguments = @('-B', $scriptPath, '--root', $state.root, 'apply', '--receipt', [string]$Result.receipt, '--restart', '--wait', [string]$PID)
+    $shell = Get-LauncherParentShell
+    if ($shell) { $arguments += @('--wait', [string]$shell) }
+    # The updater waits until this launcher has closed, replaces only listed
+    # app files, restores them on any failure and then reopens Launcher.cmd.
+    $null = New-LauncherProcess $runtime $arguments -Detached
+    $state.window.Close()
+}
+
 function Open-VerifiedLauncherUpdate($Result) {
     $state = $script:launcherUpdates
     if (& $state.busy) { $state.ui.UpdateMessage.Text = 'Sluit eerst je game of voorbereiding voordat je de update installeert.'; return }
@@ -91,25 +143,40 @@ function Open-VerifiedLauncherUpdate($Result) {
     } finally { $file.Dispose() }
 }
 
+function Get-LauncherUpdateValue($Object, [string]$Name) {
+    # Older backends and MSI offers have no 'kind'; StrictMode forbids missing properties.
+    if ($null -eq $Object) { return $null }
+    $property = $Object.PSObject.Properties[$Name]
+    if ($property) { return $property.Value }
+    return $null
+}
+
 function Poll-LauncherUpdates {
     $state = $script:launcherUpdates
     if (-not $state.initialized -and -not $state.process) {
         $runtime = & $state.runtime
-        if ($runtime) { $state.initialized = $true; Start-LauncherUpdateTask 'settings' @('settings') }
+        # First show the outcome of a portable update that just ran, then settings.
+        if ($runtime) { $state.initialized = $true; Start-LauncherUpdateTask 'notice' @('notice') }
     }
     $task = $state.process
     if ($task -and $task.process.HasExited) {
         $state.process = $null
+        $action = $state.action
         try {
             $text = $task.output.GetAwaiter().GetResult()
             $result = $text | ConvertFrom-Json
             if ($task.process.ExitCode -ne 0 -or $result.state -eq 'error') { throw [string]$result.message }
-            if ($result.state -eq 'settings') {
+            if ($result.state -in @('notice','none')) {
+                if ($result.state -eq 'notice') {
+                    $state.ui.UpdateMessage.Text = [string]$result.message
+                    Show-LauncherUpdateNotice ([string]$result.message) ([string]$result.outcome -eq 'failed')
+                }
+            } elseif ($result.state -eq 'settings') {
                 $state.binding = $true
                 try { $state.ui.AutomaticUpdates.IsChecked = [bool]$result.automatic_check }
                 finally { $state.binding = $false }
                 $state.ui.UpdateMessage.Text = if ($result.automatic_check) {'Automatische controle staat aan.'} else {'Automatische controle staat uit. Handmatig controleren kan altijd.'}
-                if ($state.action -in @('settings','settings-save') -and $result.automatic_check) { Start-LauncherUpdateTask 'check' @('check','--automatic') }
+                if ($action -in @('settings','settings-save') -and $result.automatic_check) { Start-LauncherUpdateTask 'auto-check' @('check','--automatic') }
             } else {
                 $state.ui.UpdateMessage.Text = [string]$result.message
                 if ($result.state -eq 'available') {
@@ -118,10 +185,27 @@ function Poll-LauncherUpdates {
                     $state.offer = $result.offer
                     $state.ui.DownloadUpdate.Content = 'Download ' + $result.offer.version
                     $state.ui.DownloadUpdate.Visibility = 'Visible'
+                    $portable = (Get-LauncherUpdateValue $result.offer 'kind') -eq 'portable'
+                    if ($portable -and $action -eq 'auto-check' -and -not $state.prompted) {
+                        # Ask once per launcher session; 'Nee' keeps the buttons on Support.
+                        $state.prompted = $true
+                        $current = [string](Get-LauncherUpdateValue $result 'current_version')
+                        $question = 'Er is een nieuwe versie van A2 Racers Revival: ' + $result.offer.version +
+                            $(if ($current) { ' (jij hebt ' + $current + ').' } else { '.' }) +
+                            "`n`nNu bijwerken? De launcher downloadt en controleert de update, sluit even en start daarna vanzelf opnieuw. Je saves, instellingen en games blijven staan."
+                        if (Confirm-LauncherUpdate $question) {
+                            $state.autoApply = $true
+                            Start-LauncherUpdateTask 'download' @('download','--version',[string]$result.offer.version)
+                        } else { $state.ui.UpdateMessage.Text = 'Versie ' + $result.offer.version + ' is beschikbaar. Bijwerken kan via Support.' }
+                    }
                 } elseif ($result.state -eq 'downloaded') {
                     $state.receipt = [string]$result.receipt
+                    $state.receiptKind = Get-LauncherUpdateValue $result 'kind'
+                    $state.ui.InstallUpdate.Content = if ($state.receiptKind -eq 'portable') {'Nu bijwerken'} else {'Update installeren'}
                     $state.ui.InstallUpdate.Visibility = 'Visible'
-                    if ($state.action -eq 'verify') { Open-VerifiedLauncherUpdate $result }
+                    if ($state.receiptKind -eq 'portable') {
+                        if ($state.autoApply -or $action -eq 'verify') { Start-PortableLauncherUpdate $result }
+                    } elseif ($action -eq 'verify') { Open-VerifiedLauncherUpdate $result }
                 } elseif ($result.state -eq 'current') {
                     $state.offer = $null
                     $state.receipt = $null
@@ -129,8 +213,13 @@ function Poll-LauncherUpdates {
                     $state.ui.InstallUpdate.Visibility = 'Collapsed'
                 }
             }
-        } catch { $state.ui.UpdateMessage.Text = 'Update niet uitgevoerd: ' + $_.Exception.Message }
+        } catch {
+            $state.autoApply = $false
+            $state.ui.UpdateMessage.Text = 'Update niet uitgevoerd: ' + $_.Exception.Message
+        }
         finally { $task.process.Dispose() }
+        # A missing or unreadable notice never blocks the normal settings/check route.
+        if ($action -eq 'notice' -and -not $state.process) { Start-LauncherUpdateTask 'settings' @('settings') }
     }
     $idle = -not $state.process
     $state.ui.CheckUpdates.IsEnabled = $idle
