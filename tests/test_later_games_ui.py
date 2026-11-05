@@ -69,7 +69,8 @@ if(-not $ui.LaterChooseFolder.IsEnabled -or -not $ui.LaterChooseArchive.IsEnable
 $script:laterCatalog.games[0].ready=$true
 Update-LaterStatus;Update-Buttons
 if(-not $ui.PlayButton.IsEnabled -or [string]$ui.PlayButton.Content -ne 'Speel De Politie Slaat Terug'){throw 'Ready game cannot start'}
-if($ui.GameFourAvailability.Text -ne 'Klaar om te spelen'){throw 'Library card not updated'}
+if($ui.GameFourAvailability.Text -ne 'Klaar om te spelen' -or $ui.GameFiveAvailability.Text -ne 'Eigen game nodig'){throw 'Library cards not updated per game'}
+if([string]$ui.GameFour.BorderBrush -ne '#FFFFDD4A' -or [string]$ui.GameFive.BorderBrush -eq '#FFFFDD4A'){throw 'Selected card not highlighted'}
 Select-Choice $ui.LaterProfileChoice 'compat'
 Start-LaterGame
 if($script:operations.Count -ne 1){throw 'Prepare not queued once'}

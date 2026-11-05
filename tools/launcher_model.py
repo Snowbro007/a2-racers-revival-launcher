@@ -24,6 +24,7 @@ from tools import ii_launcher_graphics
 from tools import ii_vector_car
 from tools import launcher_cheats
 from tools import game_library
+from tools.display_labels import resolution_label
 
 # Version-1 presets are migration data only; new choices are independent.
 LEGACY_GRAPHICS = {
@@ -44,15 +45,15 @@ GRAPHICS = {
     "accelerated-640": {"label": "3D Accelerator · aanbevolen", "description": "3D-weergave met hogere resoluties en extra zichtafstand. In de game heet deze stand 3D Accelerator."},
 }
 DISPLAY_PROFILES = {
-    "original": {"label": "Originele resolutie · 4:3", "description": "Behoudt de oorspronkelijke beeldinstellingen.", "native_graphics": None, "camera_profile": "original"},
-    "borderless-4-3": {"label": "640 × 480 · 4:3 opschalen", "description": "Softwarebeeld in 4:3, met zijbalken op een breed scherm; geen extra renderdetail.", "native_graphics": "software-640", "camera_profile": "original"},
-    "hd-1280x960": {"label": "1280 × 960 · 4:3", "description": "Onze bevestigde speelbasis. De wrapper vraagt 1280 × 960 aan; de interne renderresolutie is nog niet gemeten.", "native_graphics": "accelerated-640", "camera_profile": "original"},
-    "hd-1440x1080": {"label": "1440 × 1080 · 4:3", "description": "1080 pixels hoog met oorspronkelijke 4:3-verhouding. Interne renderresolutie nog niet gemeten.", "native_graphics": "accelerated-640", "camera_profile": "original"},
-    "hd-1920x1440": {"label": "1920 × 1440 · 4:3", "description": "Racebeeld eerder bereikt; interne renderresolutie nog niet gemeten.", "native_graphics": "accelerated-640", "camera_profile": "original"},
-    "hd-2880x2160": {"label": "2880 × 2160 · 4:3", "description": "2160 pixels hoog met oorspronkelijke 4:3-verhouding. Interne renderresolutie nog niet gemeten.", "native_graphics": "accelerated-640", "camera_profile": "original"},
-    "hd-1920x1080-camera": {"label": "1080p · 1920 × 1080 · 16:9 (aanbevolen)", "description": "Aanbevolen Full HD-breedbeeld, door de speler bevestigd werkend.", "native_graphics": "accelerated-640", "camera_profile": "camera-16-9"},
-    "hd-3840x2160-camera": {"label": "4K · 3840 × 2160 · 16:9", "description": "4K-breedbeeld, door de speler bevestigd werkend. Vraagt meer van je pc.", "native_graphics": "accelerated-640", "camera_profile": "camera-16-9"},
-    "hd-1280x960-fake": {"label": "1280 × 960 · unstable (vervallen)", "description": "Deze unstable schermvariant is vervallen. Kies een andere resolutie om te spelen; de eerder opgeslagen keuze blijft bewaard tot je zelf kiest.", "native_graphics": "accelerated-640", "camera_profile": "original", "launcher_visible": False},
+    "original": {"label": resolution_label(ratio="4:3", original=True), "description": "Behoudt de oorspronkelijke beeldinstellingen.", "native_graphics": None, "camera_profile": "original"},
+    "borderless-4-3": {"label": resolution_label(640, 480, "4:3", name="Opgeschaald"), "description": "Softwarebeeld in 4:3, met zijbalken op een breed scherm; geen extra renderdetail.", "native_graphics": "software-640", "camera_profile": "original"},
+    "hd-1280x960": {"label": resolution_label(1280, 960, "4:3"), "description": "Onze bevestigde speelbasis. De wrapper vraagt 1280 × 960 aan; de interne renderresolutie is nog niet gemeten.", "native_graphics": "accelerated-640", "camera_profile": "original"},
+    "hd-1440x1080": {"label": resolution_label(1440, 1080, "4:3"), "description": "1080 pixels hoog met oorspronkelijke 4:3-verhouding. Interne renderresolutie nog niet gemeten.", "native_graphics": "accelerated-640", "camera_profile": "original"},
+    "hd-1920x1440": {"label": resolution_label(1920, 1440, "4:3"), "description": "Racebeeld eerder bereikt; interne renderresolutie nog niet gemeten.", "native_graphics": "accelerated-640", "camera_profile": "original"},
+    "hd-2880x2160": {"label": resolution_label(2880, 2160, "4:3"), "description": "2160 pixels hoog met oorspronkelijke 4:3-verhouding. Interne renderresolutie nog niet gemeten.", "native_graphics": "accelerated-640", "camera_profile": "original"},
+    "hd-1920x1080-camera": {"label": resolution_label(1920, 1080, "16:9", status="aanbevolen"), "description": "Aanbevolen Full HD-breedbeeld, door de speler bevestigd werkend.", "native_graphics": "accelerated-640", "camera_profile": "camera-16-9"},
+    "hd-3840x2160-camera": {"label": resolution_label(3840, 2160, "16:9"), "description": "4K-breedbeeld, door de speler bevestigd werkend. Vraagt meer van je pc.", "native_graphics": "accelerated-640", "camera_profile": "camera-16-9"},
+    "hd-1280x960-fake": {"label": resolution_label(1280, 960, "4:3", status="vervallen"), "description": "Deze unstable schermvariant is vervallen. Kies een andere resolutie om te spelen; de eerder opgeslagen keuze blijft bewaard tot je zelf kiest.", "native_graphics": "accelerated-640", "camera_profile": "original", "launcher_visible": False},
 }
 CAMERA_PROFILES = {
     "original": {"label": "Oorspronkelijke 4:3-camera", "description": "Oorspronkelijke projectie; geen camera-aanpassing."},
