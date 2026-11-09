@@ -11,8 +11,11 @@ import json
 from pathlib import Path, PureWindowsPath
 
 from tools.trial_manifest import validate_ancestors, validate_tree
+from tools.game_source_profiles import CORE_FILES
+from tools.game_source_files import verify_game_files, case_path
 
 SOURCE_PROFILE = {
+    "core": CORE_FILES["a2racer1"],
     "files": 666,
     "bytes": 93431399,
     "sha256": "134f738aeff16eeeb0833eee8250568a336cf7160f374a37479b857a3156cde3",
@@ -47,8 +50,11 @@ def check_local_source(source: Path, *, full: bool = False) -> dict:
     validate_ancestors(source)
     if not source.is_dir():
         raise ValueError("De volledige lokale gamegegevens ontbreken.")
+    if full and SOURCE_PROFILE.get("core") is not None:
+        return {"mode":"builtin-NOCD-local-files", "disc_image_used":False,
+                **verify_game_files(source, 'a2racer1', profile=SOURCE_PROFILE["core"])}
     for name, (size, expected) in SOURCE_PROFILE["essential"].items():
-        path = source / name
+        path = case_path(source, name)
         validate_ancestors(path)
         if not path.is_file() or path.stat().st_size != size or _file_hash(path) != expected:
             raise ValueError(f"Lokale gamegegevens ontbreken of wijken af: {name}.")

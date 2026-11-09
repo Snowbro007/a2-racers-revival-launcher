@@ -10,6 +10,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 PUBLIC_DOCS = frozenset({
     'docs/launcher-start-help.md',
+    'docs/importing-games.md',
     'docs/public-gitignore.txt',
     'docs/public-readme.md',
     'docs/public-release-notes.md',

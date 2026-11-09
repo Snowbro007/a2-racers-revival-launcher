@@ -11,6 +11,7 @@ import time
 import uuid
 
 from tools.local_game_data import check_local_source, MAX_BYTES, MAX_FILES
+from tools.game_source_files import case_path
 from tools.trial_manifest import EXPECTED_BINARIES, validate_ancestors
 
 MAX_CANDIDATES = 16
@@ -82,12 +83,15 @@ def inspect_installation(source: Path, game: str = 'a2racer1') -> dict:
         return inspect_source(source)
     if game != 'a2racer1':
         raise ValueError('Onbekende game voor installatiekoppeling.')
+    checked = check_local_source(source, full=True)
+    if 'file_map' in checked:
+        return checked
     paths = bounded_files(source)
     for name, pin in EXPECTED_BINARIES['a2racer1'].items():
-        path = source / name
+        path = case_path(source, name)
         if not path.is_file() or path.stat().st_size > 2 * 1024**2 or hashlib.sha256(path.read_bytes()).hexdigest() != pin:
             raise ValueError('Deze gameversie is niet ondersteund of onvolledig: ' + name)
-    return {**check_local_source(source, full=True), 'files': len(paths)}
+    return {**checked, 'files': len(paths)}
 
 
 def copy_file(source: Path, target: Path) -> None:
@@ -222,8 +226,13 @@ def import_installation(root: Path, source: Path, game: str = 'a2racer1') -> dic
             from tools.ii_portable_prepare import filesystem_path
         else:
             filesystem_path = lambda path: path
-        for path in bounded_files(source, max_bytes=1024**3) if game == 'a2racer2' else bounded_files(source):
-            target = filesystem_path(stage / path.relative_to(source))
+        if 'file_map' in inspected:
+            selected = [(source / row['source'], stage / row['target']) for row in inspected['file_map']]
+        else:
+            paths = bounded_files(source, max_bytes=1024**3) if game == 'a2racer2' else bounded_files(source)
+            selected = [(path, stage / path.relative_to(source)) for path in paths]
+        for path, destination_path in selected:
+            target = filesystem_path(destination_path)
             target.parent.mkdir(parents=True, exist_ok=True)
             copy_file(filesystem_path(path), target)
         copied = inspect_installation(stage, game) if game != 'a2racer1' else inspect_installation(stage)

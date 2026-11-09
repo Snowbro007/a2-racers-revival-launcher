@@ -156,45 +156,9 @@ def flat_background(index,image):
 
 
 def inspect_source(source):
-    """Strict supported-version check and complete, stable, read-only tree hash."""
-    from tools.ii_launcher_graphics import NATIVE_ASSETS
-    source=filesystem_path(source)
-    if ii_playtest_check._source_count(source) != ii_playtest_check.EXPECTED_SOURCE_FILES:
-        raise ValueError('De complete ondersteunde Nederlandse deel-II-bron is vereist.')
-    for relative,pin in ii_playtest_check.SOURCE_PINS.items():
-        if not ii_playtest_check._fingerprint(source/relative,pin)['verified']:
-            raise ValueError('Andere/onvolledige deel-II-bron: '+relative)
-    for name,pin in NATIVE_ASSETS.items():
-        if sha(state.read_regular(source/'DATA'/name,64*1024**2)) != pin:
-            raise ValueError('Andere deel-II-resourceversie: '+name)
-    music_index,music_image=source/'DATA/MRCS.IND',source/'DATA/MRCS.IMG'
-    if music_index.exists() or music_image.exists():
-        from tools.ii_menu_music import INDEX_SHA256,IMAGE_SHA256
-        for path,pin in ((music_index,INDEX_SHA256),(music_image,IMAGE_SHA256)):
-            if sha(state.read_regular(path,64*1024**2))!=pin:
-                raise ValueError('Andere/onvolledige originele menumuziek: '+path.name)
-    for track in range(7):
-        for ext in ('CMP','DMP','OMP','PMP','PTH','RMP'):
-            state.read_regular(source/f'DATA/ETAPPE{track}.{ext}',8*1024**2)
-    files=[];total=0
-    paths=sorted(p for p in source.rglob('*') if p.is_file())
-    for path in paths:
-        before=path.stat()
-        raw=state.read_regular(path,64*1024**2)
-        after=path.stat()
-        if ((before.st_size,before.st_mtime_ns,before.st_ino) !=
-                (after.st_size,after.st_mtime_ns,after.st_ino) or len(raw)!=before.st_size):
-            raise ValueError('Deel-II-bron veranderde tijdens inspectie.')
-        total+=len(raw)
-        if total>1024**3: raise ValueError('Deel-II-bron is te groot.')
-        files.append({'path':path.relative_to(source).as_posix(),'size':len(raw),'sha256':sha(raw)})
-    if (len(files)!=ii_playtest_check.EXPECTED_SOURCE_FILES or
-            ii_playtest_check._source_count(source)!=len(files) or
-            sorted(p for p in source.rglob('*') if p.is_file())!=paths):
-        raise ValueError('Deel-II-bronboom veranderde tijdens inspectie.')
-    return {'game':'a2racer2','source_tree_sha256':sha(encoded(files)),
-            'source_files':len(files),'files':len(files),'bytes':total,
-            'source_bytes':total,'native_game_executed':False}
+    """Verify the original game files, independently of installer/helpdesk layout."""
+    from tools.game_source_files import verify_game_files
+    return verify_game_files(filesystem_path(source), 'a2racer2')
 
 
 def checked_inputs(root,source=None):

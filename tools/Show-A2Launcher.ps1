@@ -5,6 +5,7 @@ param([string]$PythonPath, [string]$PowerShellPath, [switch]$CheckOnly, [string]
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'launcher_common.ps1')
+. (Join-Path $PSScriptRoot 'launcher_folder_picker.ps1')
 . (Join-Path $PSScriptRoot 'launcher_updates.ps1')
 $workspacePath = Split-Path -Parent $PSScriptRoot
 Add-Type -AssemblyName PresentationFramework, PresentationCore, WindowsBase
@@ -705,11 +706,11 @@ function Select-Game([string]$GameName) {
     $ui.InstallationFoundSection.Visibility = if ($one -and -not $sourceReady -and $ui.InstallationChoice.Items.Count) { 'Visible' } else { 'Collapsed' }
     $ui.InstallationChoice.Visibility = if ($one -and $ui.InstallationChoice.Items.Count) { 'Visible' } else { 'Collapsed' }
     $ui.LinkInstallation.Visibility = if ($one -and $ui.InstallationChoice.SelectedItem -and $ui.InstallationChoice.SelectedItem.IsEnabled) { 'Visible' } else { 'Collapsed' }
-    $ui.InstallationFolderHint.Text = if ($one) { 'Volledige map op pc of USB' } else { 'Volledige map inclusief DATA' }
+    $ui.InstallationFolderHint.Text = if ($one) { 'Gamemap of cd-station' } else { 'Gamemap, DATA-map of cd-station' }
     if ($one) {
         $ui.InstallationNote.Text = if ($script:installationScanNote) { $script:installationScanNote } else { 'Kies hoe je je eigen volledige Nederlandse game hebt opgeslagen. Je bron blijft intact.' }
     } else {
-        $ui.InstallationNote.Text=if($sourceReady){'Gamebestanden gevonden. Maak nu een lokale speelkopie; je bron blijft intact.'}else{'Kies de volledige Nederlandse gamemap met DATA, of je eigen ZIP-bestand. Je bron blijft intact.'}
+        $ui.InstallationNote.Text=if($sourceReady){'Gamebestanden gevonden. Maak nu een lokale speelkopie; je bron blijft intact.'}else{'Kies je Nederlandse gamemap, de DATA-map, het cd-station of je eigen ZIP. Je bron blijft intact.'}
     }
     Set-GameLibraryInfo $GameName $sourceReady
     Set-CheatChoices $GameName $preferences
@@ -1331,16 +1332,11 @@ try {
     $ui.IIIProfileChoice.Add_SelectionChanged({ Update-IIIStatus; Update-Buttons })
     $ui.IIIChooseInstallation.Add_Click({
         try {
-            Add-Type -AssemblyName System.Windows.Forms
-            $dialog = New-Object Windows.Forms.FolderBrowserDialog
-            $dialog.Description = 'Kies de volledige A2 Racer III Tour '+$ui.IIITourChoice.SelectedItem.Tag+'-gamemap of DATA-map. De bron blijft intact.'
-            $dialog.ShowNewFolderButton = $false
-            try {
-                if ($dialog.ShowDialog() -eq [Windows.Forms.DialogResult]::OK) {
-                    Set-Status 'Deel III koppelen' 'De gekozen tourmap wordt gecontroleerd en naar een zelfstandige kopie gekopieerd.'
-                    Start-Model 'iii-import' @('import-iii-installation','--folder',$dialog.SelectedPath,'--tour',[string]$ui.IIITourChoice.SelectedItem.Tag)
-                }
-            } finally { $dialog.Dispose() }
+            $folder = Select-A2GameFolder $window ('Kies de volledige A2 Racer III Tour '+$ui.IIITourChoice.SelectedItem.Tag+'-gamemap of DATA-map. De bron blijft intact.')
+            if ($folder) {
+                Set-Status 'Deel III koppelen' 'De gekozen tourmap wordt gecontroleerd en naar een zelfstandige kopie gekopieerd.'
+                Start-Model 'iii-import' @('import-iii-installation','--folder',$folder,'--tour',[string]$ui.IIITourChoice.SelectedItem.Tag)
+            }
         } catch { Set-Status 'Deel III kon niet koppelen' $_.Exception.Message }
     })
     foreach($name in @('IIResolutionChoice','IIHudChoice','IISkyChoice','IIDistanceChoice')){
@@ -1360,16 +1356,11 @@ try {
     $ui.LaterChooseFolder.Add_Click({
         try {
             $game = (Get-LaterSelection).game
-            Add-Type -AssemblyName System.Windows.Forms
-            $dialog = New-Object Windows.Forms.FolderBrowserDialog
-            $dialog.Description = 'Kies je volledige eigen ' + (Get-LaterGameTitle $game) + '-gamemap. De bron blijft intact.'
-            $dialog.ShowNewFolderButton = $false
-            try {
-                if ($dialog.ShowDialog() -eq [Windows.Forms.DialogResult]::OK) {
-                    Set-Status 'Gamebestanden toevoegen' 'De gekozen map wordt gecontroleerd en naar een eigen kopie gezet.'
-                    Start-LaterModel 'later-import' @('import-installation','--folder',$dialog.SelectedPath,'--game',$game)
-                }
-            } finally { $dialog.Dispose() }
+            $folder = Select-A2GameFolder $window ('Kies je volledige eigen ' + (Get-LaterGameTitle $game) + '-gamemap. De bron blijft intact.')
+            if ($folder) {
+                Set-Status 'Gamebestanden toevoegen' 'De gekozen map wordt gecontroleerd en naar een eigen kopie gezet.'
+                Start-LaterModel 'later-import' @('import-installation','--folder',$folder,'--game',$game)
+            }
         } catch { Set-Status 'Latere game kon niet doorgaan' $_.Exception.Message }
     })
     $ui.LaterChooseArchive.Add_Click({
@@ -1442,16 +1433,11 @@ try {
     })
     $ui.ChooseInstallation.Add_Click({
         try {
-            Add-Type -AssemblyName System.Windows.Forms
-            $dialog = New-Object Windows.Forms.FolderBrowserDialog
-            $dialog.Description = 'Kies de volledige '+$ui.GameTitle.Text+'-gamemap. De bron blijft intact.'
-            $dialog.ShowNewFolderButton = $false
-            try {
-                if ($dialog.ShowDialog() -eq [Windows.Forms.DialogResult]::OK) {
-                    Set-Status 'Installatie koppelen' 'De gekozen map wordt gecontroleerd; andere versies worden niet gestart.'
-                    Start-Model 'import' @('import-installation','--folder',$dialog.SelectedPath,'--game',$script:game)
-                }
-            } finally { $dialog.Dispose() }
+            $folder = Select-A2GameFolder $window ('Kies de gamemap of het cd-station van '+$ui.GameTitle.Text+'. Bij deel II mag je ook de DATA-map kiezen. De bron blijft intact.')
+            if ($folder) {
+                Set-Status 'Installatie koppelen' 'De gekozen spelbestanden worden gecontroleerd en naar een eigen kopie gezet.'
+                Start-Model 'import' @('import-installation','--folder',$folder,'--game',$script:game)
+            }
         } catch { Set-Status 'Installatiemap niet gekoppeld' $_.Exception.Message }
     })
     $ui.GetGame.Add_Click({
