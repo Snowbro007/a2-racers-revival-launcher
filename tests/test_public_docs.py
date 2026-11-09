@@ -18,7 +18,8 @@ class PublicDocsTests(unittest.TestCase):
             'assets/a2racer1/test.pcx', '.gitignore', 'public-release.json',
         ]
         self.assertEqual(docs.check_paths(paths), len(paths))
-        self.assertEqual(len(docs.PUBLIC_DOCS), 9)
+        self.assertEqual(len(docs.PUBLIC_DOCS), 10)
+        self.assertIn('docs/importing-games.md', docs.PUBLIC_DOCS)
 
     def test_internal_documents_are_refused_in_docs_even_with_nontext_extensions(self):
         for path in ('docs/roadmap.md', 'docs/new-onboarding-20261021.md',
