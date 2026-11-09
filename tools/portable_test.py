@@ -31,10 +31,10 @@ PAYLOADS = {
     "ffmpeg": ("ffmpeg-9.0.2-essentials_build.zip", ARCHIVE_SHA256, "local/components/ffmpeg/9.0.2/ffmpeg-9.0.2-essentials_build.zip"),
 }
 APP_FILES = [f"a2revival/{name}.py" for name in ("__init__", "__main__", "cli", "diagnosis", "executables", "inventory")] + [
-    "tools/extract_disc.py", "tools/export_iso.py", "tools/trial_manifest.py", "tools/local_game_data.py", "tools/game_fixes.py", "tools/game_options.py", "tools/parent_wait_fix.py", "tools/render_distance_fix.py", "tools/intro_player.py", "tools/portable_test.py",
+    "tools/extract_disc.py", "tools/export_iso.py", "tools/trial_manifest.py", "tools/local_game_data.py", "tools/game_source_profiles.py", "tools/game_source_files.py", "tools/game_fixes.py", "tools/game_options.py", "tools/parent_wait_fix.py", "tools/render_distance_fix.py", "tools/intro_player.py", "tools/portable_test.py",
     "tools/Mount-A2Disc.ps1", "tools/Invoke-A2Trial.ps1", "tools/Invoke-A2WithIntro.ps1",
     "tools/Start-A2Portable.ps1", "tools/Run-A2Portable.ps1", "docs/portable-test.md", "docs/launcher-options.md", "Maak-snelkoppeling.ps1",
-    "Launcher.cmd", "tools/Show-A2Launcher.ps1", "tools/Invoke-A2LauncherSession.ps1", "tools/launcher_common.ps1",
+    "Launcher.cmd", "tools/Show-A2Launcher.ps1", "tools/Invoke-A2LauncherSession.ps1", "tools/launcher_common.ps1", "tools/launcher_folder_picker.ps1",
     "tools/launcher_window.xaml", "tools/launcher_art/cover-inspired-highway-v1.png", "tools/launcher_model.py", "tools/Watch-A2Focus.ps1", "docs/launcher.md", "docs/render-distance.md",
     "tools/ii_frontend_launcher.py", "tools/ii_frontend_state.py", "tools/Invoke-IIFrontend.ps1",
     "tools/ii_frontend.ps1", "tools/ii_frontend.xaml", "tools/ii_owned_session.ps1",

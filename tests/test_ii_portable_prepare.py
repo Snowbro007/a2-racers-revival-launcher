@@ -96,20 +96,19 @@ class PortableFixtures(unittest.TestCase):
             replacements[name]=raw
         self.assertEqual((new_index,new_image),fixture_archive([(name,replacements.get(name,raw)) for name,raw in records]))
 
-    def test_full_tree_hash_includes_unpinned_data_and_refuses_wrong_supported_version(self):
+    def test_game_files_are_version_bound_without_installer_file_count(self):
+        from tools import game_source_files
         source=self.root/'source';data=source/'DATA';data.mkdir(parents=True)
-        for name in ('SPEL.DAT','RC.IND','RC.IMG','RCS.IND','RCS.IMG','extra.bin'):
+        for name in ('SPEL.DAT','RC.IND','RC.IMG','RCS.IND','RCS.IMG'):
             (data/name).write_bytes(('synthetic '+name).encode())
         for track in range(7):
             for ext in ('CMP','DMP','OMP','PMP','PTH','RMP'):(data/f'ETAPPE{track}.{ext}').write_bytes(b'map')
-        self.patched(portable.ii_playtest_check,'EXPECTED_SOURCE_FILES',48)
-        raw=(data/'SPEL.DAT').read_bytes()
-        self.patched(portable.ii_playtest_check,'SOURCE_PINS',{'DATA/SPEL.DAT':{'size':len(raw),'sha256':portable.sha(raw)}})
-        self.patched(graphics,'NATIVE_ASSETS',{n:portable.sha((data/n).read_bytes()) for n in graphics.NATIVE_ASSETS})
+        profile={p.name:{'size':p.stat().st_size,'sha256':portable.sha(p.read_bytes())} for p in data.iterdir()}
+        self.patched(game_source_files,'CORE_FILES',{'a2racer2':profile})
         before=portable.inspect_source(source)
-        self.assertEqual(before['source_files'],48);self.assertFalse(before['native_game_executed'])
-        (data/'extra.bin').write_bytes(b'other raw extra.bin')
-        self.assertNotEqual(before['source_tree_sha256'],portable.inspect_source(source)['source_tree_sha256'])
+        self.assertEqual(before['source_files'],47);self.assertFalse(before['native_game_executed'])
+        (data/'extra.bin').write_bytes(b'unused file')
+        self.assertEqual(before,portable.inspect_source(source))
         (data/'SPEL.DAT').write_bytes(b'wrong source version')
         with self.assertRaisesRegex(ValueError,'bron'):portable.inspect_source(source)
         self.assertFalse((self.root/'reports').exists())
